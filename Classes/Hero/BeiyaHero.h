@@ -22,7 +22,7 @@ public:
 	* @fn createBeiya
 	* @brief the only way to instantiate class Beiya
 	*/
-	static Beiya* createBeiya() { return Beiya::create(); }
+	static Beiya* createBeiya();
 
 protected:
 	/**

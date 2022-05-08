@@ -12,6 +12,14 @@ namespace {
 	}
 }
 
+Beiya* Beiya::createBeiya()
+{
+	auto beiya = Beiya::create();
+	//initialize the physics body
+	beiya->initializeHeroPhysics(beiya);
+	return beiya;
+}
+
 bool Beiya::attack(Touch* touch, Event* event)
 {
 	/** @note the animation of attack */
@@ -25,6 +33,7 @@ bool Beiya::attack(Touch* touch, Event* event)
 	if (projectile == nullptr)
 		problemLoading("projectile.png");
 	projectile->setPosition(this->getPosition());
+	initializeBulletPhysics(projectile);
 	this->getParent()->addChild(projectile);
 
 	//get the vector of attack according to the range of hero
@@ -44,7 +53,7 @@ bool Beiya::attack(Touch* touch, Event* event)
 	return true;
 }
 
-const std::string Beiya::_beiyaPicture = "swordman.png";
+const std::string Beiya::_beiyaPicture = "player.png";
 
 Beiya::Beiya() :Hero(3360, 1)
 {
@@ -59,8 +68,6 @@ Beiya::Beiya() :Hero(3360, 1)
 bool Beiya::init()
 {
     _fileName = _beiyaPicture;
-
-	this->setScale(0.1);
 
     Texture2D* texture = _director->getTextureCache()->addImage(_beiyaPicture);
     if (texture)

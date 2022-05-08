@@ -3,6 +3,7 @@
 #pragma once
 
 #include "cocos2d.h"
+#include "ui/CocosGUI.h"
 #include <functional>
 #include <map>
 
@@ -36,6 +37,12 @@ public:
 	* @brief choose whether to use the mouse to shot. The function is disabled by default
 	*/
 	void setTouchListener(bool touchState) noexcept;
+
+	/**
+	* @fn setContactListener
+	* @brief choose whether to allow physics contact. The function is disabled by default
+	*/
+	void setContactListener(bool contactState) noexcept;
 
 	/**
 	* @fn getMoveSpeed
@@ -74,22 +81,37 @@ protected:
 	*/
 	void startLoading(float fdelta = 1);
 
+	/**
+	* @fn initializeHeroPhysics
+	* @brief initialize with hero's physics body
+	* @warning the function should be used after the set of texture
+	*/
+	void initializeHeroPhysics(cocos2d::Sprite* hero);
+
+	/**
+	* @fn initializeBulletPhysics
+	* @brief initialize with bullet's physics body
+	*/
+	void initializeBulletPhysics(cocos2d::Sprite* bullet);
+
 private:
-	bool _shotState = false;
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */
 	cocos2d::EventListenerKeyboard* _keyboardListener;
 	cocos2d::EventListenerTouchOneByOne* _touchListener;
+	cocos2d::EventListenerPhysicsContact* _contactListener;
 
 	/** initializer of the event listeners */
 	void initializeKeyboardListener();
 	void initializeTouchListener();
+	void initializeContactListener();
 
 	/** callback functions of the event listeners */
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = true; }
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = false; }
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event) { return this->attack(touch, event); }
+	bool onContactBegin(cocos2d::PhysicsContact& contact);
 
 	/**
 	* @fn moveHero
