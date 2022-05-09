@@ -26,6 +26,9 @@ public:
 		EXTREME_HIGH = 5
 	};
 
+	/// @name Listener Set-ups
+	/// @{
+
 	/**
 	* @fn setKeyboardListener
 	* @brief choose whether to use the keyboard to move hero. The function is disabled by default
@@ -44,11 +47,43 @@ public:
 	*/
 	void setContactListener(bool contactState) noexcept;
 
+	/// @}
+	/// end of Listener Set-ups
+
 	/**
 	* @fn getMoveSpeed
 	* @return the speed of hero(the distance the hero moves every second)
 	*/
 	float getMoveSpeed() const noexcept { return static_cast<float>(_moveSpeed); }
+
+	int getHitPoint()    const noexcept { return _hitPoint; }
+
+	int getHP()          const noexcept { return _healthPoint; }
+
+	/// @name HP Manipuators
+	/// @{
+
+	/**
+	* @fn increaseHP
+	* @brief increase HP and update the blood strip
+	* @param increasePoint the hp increasement point
+	* @return the HP after increasing
+	* @exception out_of_range the increasement point is negative
+	*/
+	int increaseHP(const int increasePoint);
+
+	/**
+	* @fn deductHP
+	* @brief deduct hp and update the blood strip
+	* @param deductPoint the hp deduction point
+	* @exception out_of_range the deduction point is negative
+	*/
+	int deductHP(const int deductPoint);
+
+	int setHP(const int HP) = delete;
+
+	/// @}
+	/// end of HP Manipulators
 
 protected:
 	/**
@@ -84,7 +119,7 @@ protected:
 	/**
 	* @fn initializeHeroPhysics
 	* @brief initialize with hero's physics body
-	* @warning the function should be used after the set of texture
+	* @warning the function should be used after the set of hero's texture
 	*/
 	void initializeHeroPhysics(cocos2d::Sprite* hero);
 
@@ -94,7 +129,15 @@ protected:
 	*/
 	void initializeBulletPhysics(cocos2d::Sprite* bullet);
 
+	/**
+	* @fn initializeBloodStrip
+	* @brief draw the blood strip
+	* @warning the function should be used after the set of hero's texture
+	*/
+	virtual void initialzeBloodStrip(const int maxHealthPoint);
+
 private:
+	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */

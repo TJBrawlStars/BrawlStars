@@ -81,18 +81,57 @@ void Hero::initializeContactListener()
 	_contactListener->setEnabled(false);
 }
 
+void Hero::initializeHeroPhysics(cocos2d::Sprite* hero)
+{
+	auto heroPhysicsBody = PhysicsBody::createBox(hero->getContentSize());
+	heroPhysicsBody->setDynamic(false);
+	heroPhysicsBody->setCategoryBitmask(0x01);
+	heroPhysicsBody->setContactTestBitmask(0x01);
+	hero->setPhysicsBody(heroPhysicsBody);
+	hero->setName("hero");
+}
+
+void Hero::initializeBulletPhysics(cocos2d::Sprite* bullet)
+{
+	auto bulletPhysicsBody = PhysicsBody::createBox(bullet->getContentSize());
+	bulletPhysicsBody->setDynamic(false);
+	bulletPhysicsBody->setCategoryBitmask(0x01);
+	bulletPhysicsBody->setContactTestBitmask(0x01);
+	bullet->setPhysicsBody(bulletPhysicsBody);
+	bullet->setName("bullet");
+}
+
+void Hero::initialzeBloodStrip(int healthPoint)
+{
+	_bloodStrip = ui::LoadingBar::create("bloodStrip.png");
+	_bloodStrip->setDirection(ui::LoadingBar::Direction::LEFT);
+	_bloodStrip->setPercent(100);
+	_bloodStrip->setScale(0.1);
+	Size heroSize = this->getContentSize();
+	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 4));
+	this->addChild(_bloodStrip);
+}
+
 bool Hero::onContactBegin(PhysicsContact& contact)
 {
+	//distinguish the nodes
+	Node* hero = nullptr;
+	Node* bullet = nullptr;
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
+	if (nodeA->getName() == "hero") hero = nodeA;
+	if (nodeB->getName() == "hero") hero = nodeB;
+	if (nodeA->getName() == "bullet") bullet = nodeA;
+	if (nodeB->getName() == "bullet") bullet = nodeB;
 
-	if (nodeA->getName() == "hero" && nodeB->getName() == "bullet" ||
-		nodeA->getName() == "bullet" && nodeB->getName() == "hero")
-		if (nodeA != this && nodeB != this)
-		{
-			nodeA->removeFromParentAndCleanup(false);
-			nodeB->removeFromParentAndCleanup(false);
-		}
+	//judge whether should the contact be handled
+	if (hero == nullptr || bullet == nullptr)
+		return false;
+	if (hero == this)
+		return false;
+
+	dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Hero*>(bullet->getParent())->getHitPoint());
+	bullet->removeFromParentAndCleanup(true);
 
 	return true;
 }
@@ -151,22 +190,24 @@ void Hero::startLoading(float fdelta)
 	}
 }
 
-void Hero::initializeHeroPhysics(cocos2d::Sprite* hero)
+int Hero::increaseHP(int increasePoint)
 {
-	auto heroPhysicsBody = PhysicsBody::createBox(hero->getContentSize());
-	heroPhysicsBody->setDynamic(false);
-	heroPhysicsBody->setCategoryBitmask(0x01);
-	heroPhysicsBody->setContactTestBitmask(0x01);
-	hero->setPhysicsBody(heroPhysicsBody);
-	hero->setName("hero");
+	if (increasePoint < 0)
+		throw std::out_of_range("negative HP increasement point");
+
+	_healthPoint = (_healthPoint + increasePoint) < 100 ? (_healthPoint + increasePoint) : 100;
+	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
+
+	return _healthPoint;
 }
 
-void Hero::initializeBulletPhysics(cocos2d::Sprite* bullet)
+int Hero::deductHP(int deductPoint)
 {
-	auto bulletPhysicsBody = PhysicsBody::createBox(bullet->getContentSize());
-	bulletPhysicsBody->setDynamic(false);
-	bulletPhysicsBody->setCategoryBitmask(0x01);
-	bulletPhysicsBody->setContactTestBitmask(0x01);
-	bullet->setPhysicsBody(bulletPhysicsBody);
-	bullet->setName("bullet");
+	if (deductPoint < 0)
+		throw std::out_of_range("negative HP deduction point");
+
+	_healthPoint = (_healthPoint - deductPoint) > 0 ? (_healthPoint - deductPoint) : 0;
+	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
+
+	return _healthPoint;
 }

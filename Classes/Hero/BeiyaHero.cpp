@@ -15,42 +15,14 @@ namespace {
 Beiya* Beiya::createBeiya()
 {
 	auto beiya = Beiya::create();
+
 	//initialize the physics body
 	beiya->initializeHeroPhysics(beiya);
+
+	//draw the blood strip
+	beiya->initialzeBloodStrip(beiya->_maxHealthPoint);
+
 	return beiya;
-}
-
-bool Beiya::attack(Touch* touch, Event* event)
-{
-	/** @note the animation of attack */
-	//get the location of touch point
-	Point touchLocation = touch->getLocation();
-	//convert the location to offset
-	Vec2 offset = touchLocation - this->getPosition();
-
-	//add projectile
-	auto projectile = Sprite::create("projectile.png");
-	if (projectile == nullptr)
-		problemLoading("projectile.png");
-	projectile->setPosition(this->getPosition());
-	initializeBulletPhysics(projectile);
-	this->getParent()->addChild(projectile);
-
-	//get the vector of attack according to the range of hero
-	offset.normalize();
-	Vec2 attackVec = offset * 50 * static_cast<int>(_shotRange);
-
-	//create the animation
-	auto shot = MoveBy::create(static_cast<float>(_shotRange) / 5, attackVec);
-	auto removeBullet = RemoveSelf::create();
-	projectile->runAction(Sequence::create(shot, removeBullet, nullptr));
-
-	/** @note modify hero attributes */
-	--_ammo;
-	if (_ammo == _maxAmmo - 1)
-		startLoading();
-
-	return true;
 }
 
 const std::string Beiya::_beiyaPicture = "player.png";
@@ -67,6 +39,9 @@ Beiya::Beiya() :Hero(3360, 1)
 
 bool Beiya::init()
 {
+	if (!Sprite::init())
+		return false;
+
     _fileName = _beiyaPicture;
 
     Texture2D* texture = _director->getTextureCache()->addImage(_beiyaPicture);
@@ -81,4 +56,38 @@ bool Beiya::init()
     // when load texture failed, it's better to get a "transparent" sprite then a crashed program
     // this->release();
     return false;
+}
+
+bool Beiya::attack(Touch* touch, Event* event)
+{
+	/** @note the animation of attack */
+	//get the location of touch point
+	Point touchLocation = touch->getLocation();
+	//convert the location to offset
+	Vec2 offset = touchLocation - this->getPosition();
+
+	//add projectile
+	auto projectile = Sprite::create("projectile.png");
+	if (projectile == nullptr)
+		problemLoading("projectile.png");
+	Size heroSize = this->getContentSize();
+	projectile->setPosition(Point(heroSize.width / 2, heroSize.height / 2));
+	initializeBulletPhysics(projectile);
+	this->addChild(projectile);
+
+	//get the vector of attack according to the range of hero
+	offset.normalize();
+	Vec2 attackVec = offset * 50 * static_cast<int>(_shotRange);
+
+	//create the animation
+	auto shot = MoveBy::create(static_cast<float>(_shotRange) / 5, attackVec);
+	auto removeBullet = RemoveSelf::create();
+	projectile->runAction(Sequence::create(shot, removeBullet, nullptr));
+
+	/** @note modify hero attributes */
+	--_ammo;
+	if (_ammo == _maxAmmo - 1)
+		startLoading();
+
+	return true;
 }
