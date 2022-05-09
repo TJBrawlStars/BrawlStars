@@ -1,4 +1,5 @@
 #include "MapInfo.h"
+#include "Const/Const.h"
 USING_NS_CC;
 
 void MapInfo::setCollisionBoard()
@@ -15,4 +16,13 @@ void MapInfo::setCollisionBoard()
             }
         }
     }
+}
+
+Vec2 MapInfo::randomPos()
+{
+    const int posX = cocos2d::random(32, maxWidth - 32);
+    const int posY = cocos2d::random(32, maxHeight - 32);
+
+    Vec2 pos = Vec2(posX, posY);
+    return Vec2(pos);
 }

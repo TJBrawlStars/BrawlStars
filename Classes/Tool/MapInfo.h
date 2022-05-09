@@ -17,4 +17,6 @@ public:
     TileVector _collisionBoard = TileVector(_mapTiledNum.width, std::vector<bool>(_mapTiledNum.height, false));
 public:
     void setCollisionBoard();
+    //随机产生一个位置
+    cocos2d::Vec2 randomPos();
 };
