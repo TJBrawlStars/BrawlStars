@@ -11,12 +11,12 @@ void GameScene::initMap()
     this->addChild(_mapinfo._map);
 
     //碰撞层
-    //_mapinfo._obstacleLayer = _map->getLayer("meta");
+    _mapinfo._obstacleLayer = _mapinfo._map->getLayer("meta");
 
     //地图方块数量
     _mapinfo._mapTiledNum = _mapinfo._map->getMapSize();
     //单个格子大小(直接初始化好）（有bug！！！）
-    _mapinfo._tiledSize = _mapinfo._map->getTileSize() + Size(_mapinfo._map->getTileSize().width / 4, _mapinfo._map->getTileSize().height / 4);
+    _mapinfo._tiledSize = _mapinfo._map->getTileSize() /*+ Size(_mapinfo._map->getTileSize().width / 4, _mapinfo._map->getTileSize().height / 4)*/;
     //设置_collisionBoard
     //_mapinfo.setCollisionBoard();
     
@@ -24,8 +24,6 @@ void GameScene::initMap()
 
 
 }
-
-
 
 
 
@@ -51,14 +49,16 @@ bool GameScene::isColliding(Vec2 position)
     cocos2d::Vec2 tilePos = this->tiledCoordFromPosition(position);
 
     int tileGid = _mapinfo._obstacleLayer->getTileGIDAt(tilePos);
-    //log("playerPos.x=%f", tilePos.x);
+    log("collidable id:%d", tileGid);
     //有bug
     if (tileGid != 0)
     {
-        Value prop = _mapinfo._map->getPropertiesForGID(tileGid);//获得gid属性
-        Value propMap = prop.asValueMap().at("Collidable");
-        if (prop.asString().compare("true") != 0)
+        //Value prop = _mapinfo._map->getPropertiesForGID(tileGid);//获得gid属性
+        //Value propMap = prop.asValueMap().at("Collidable");
+        //if (prop.asString().compare("true") != 0)
+        //{
             return true;
+        //}
     }
     return false;
 }

@@ -22,7 +22,7 @@ public:
     void setViewPointByPlayer(Point position);
 
     //判断是否碰撞障碍物（有bug！）(暂时不用)
-    //传入的是openGL坐标(就是左下角为原点，3000*3000）向右为x向上为y
+    //传入的是openGL坐标(就是左下角为原点，2400*2400）向右为x向上为y
     bool isColliding(Vec2 position);
 
     //转换成瓦片坐标（左上角为原点）

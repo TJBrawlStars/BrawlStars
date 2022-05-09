@@ -33,7 +33,6 @@ bool GameScene::init()
 	_player = Beiya::createBeiya();
 	_player->setPosition(Vec2(100, 100));
 	this->addChild(_player);
-
 	this->scheduleUpdate();
 	
 	return true;
@@ -48,4 +47,7 @@ void GameScene::update(float dt)
 	//use the keyboard to move hero
 	_player->setKeyboardListener(true);
 	setViewPointByPlayer(_player->getPosition());
+
+	//test zjk
+	isColliding(_player->getPosition());
 }
