@@ -66,6 +66,7 @@ list(APPEND GAME_SOURCE
      Classes/Tool/SceneManager.cpp
      Classes/Hero/HeroSprite.cpp
      Classes/Hero/BeiyaHero.cpp
+     Classes/Hero/BulletSprite.cpp
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
@@ -78,6 +79,7 @@ list(APPEND GAME_HEADER
      Classes/Tool/SceneManager.h
      Classes/Hero/HeroSprite.h
      Classes/Hero/BeiyaHero.h
+     Classes/Hero/BulletSprite.h
      )
 
 if(ANDROID)

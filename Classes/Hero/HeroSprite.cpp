@@ -38,12 +38,22 @@ void Hero::setTouchListener(bool touchState) noexcept
 		_touchListener->setEnabled(touchState);
 }
 
+void Hero::setContactListener(bool contactState) noexcept
+{
+	//judge whether the contact state needs to be reset
+	if (_contactListener->isEnabled() == contactState)
+		return;
+	else
+		_contactListener->setEnabled(contactState);
+}
+
 Hero::Hero(const int maxHealthPoint, const int maxAmmo)
 	:_maxHealthPoint(maxHealthPoint), _maxAmmo(maxAmmo)
 {
 	//initialize the event listeners
 	initializeKeyboardListener();
 	initializeTouchListener();
+	initializeContactListener();
 }
 
 void Hero::initializeKeyboardListener()
@@ -61,6 +71,79 @@ void Hero::initializeTouchListener()
 	_touchListener->onTouchBegan = CC_CALLBACK_2(Hero::onTouchBegan, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(_touchListener, this);
 	_touchListener->setEnabled(false);
+}
+
+void Hero::initializeContactListener()
+{
+	_contactListener = EventListenerPhysicsContact::create();
+	_contactListener->onContactBegin = CC_CALLBACK_1(Hero::onContactBegin, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(_contactListener, this);
+	_contactListener->setEnabled(false);
+}
+
+void Hero::initializeHeroPhysics(Hero* hero)
+{
+	auto heroPhysicsBody = PhysicsBody::createBox(hero->getContentSize());
+	heroPhysicsBody->setDynamic(false);
+	heroPhysicsBody->setCategoryBitmask(0x01);
+	heroPhysicsBody->setContactTestBitmask(0x01);
+	hero->setPhysicsBody(heroPhysicsBody);
+	hero->setName("hero");
+}
+
+void Hero::initializeBulletPhysics(Bullet* bullet)
+{
+	auto bulletPhysicsBody = PhysicsBody::createBox(bullet->getContentSize());
+	bulletPhysicsBody->setDynamic(false);
+	bulletPhysicsBody->setCategoryBitmask(0x01);
+	bulletPhysicsBody->setContactTestBitmask(0x01);
+	bullet->setPhysicsBody(bulletPhysicsBody);
+	bullet->setName("bullet");
+}
+
+void Hero::initialzeBloodStrip(int maxHealthPoint)
+{
+	_bloodStrip = ui::LoadingBar::create("bloodStrip.png");
+	_bloodStrip->setDirection(ui::LoadingBar::Direction::LEFT);
+	_bloodStrip->setPercent(100);
+	_bloodStrip->setScale(0.1);
+	Size heroSize = this->getContentSize();
+	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 4));
+	this->addChild(_bloodStrip);
+}
+
+void Hero::initializeAmmoStrip(int maxAmmo)
+{
+	//add the picture of ammo strip
+	for (auto i : _ammoStrip)
+		i = Sprite::create("ammoStrip.png");
+
+	Size heroSize = this->getContentSize();
+	_ammoStrip[0]->setPosition(Point(heroSize.width / 2, heroSize.height + 3));
+}
+
+bool Hero::onContactBegin(PhysicsContact& contact)
+{
+	//distinguish the nodes
+	Node* hero = nullptr;
+	Node* bullet = nullptr;
+	auto nodeA = contact.getShapeA()->getBody()->getNode();
+	auto nodeB = contact.getShapeB()->getBody()->getNode();
+	if (nodeA->getName() == "hero") hero = nodeA;
+	if (nodeB->getName() == "hero") hero = nodeB;
+	if (nodeA->getName() == "bullet") bullet = nodeA;
+	if (nodeB->getName() == "bullet") bullet = nodeB;
+
+	//judge whether should the contact be handled
+	if (hero == nullptr || bullet == nullptr)
+		return false;
+	if (hero == this)
+		return false;
+
+	dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
+	bullet->removeFromParentAndCleanup(true);
+
+	return true;
 }
 
 void Hero::moveHero(float fdelta)
@@ -87,7 +170,7 @@ void Hero::moveHero(float fdelta)
 	offset.normalize();
 
 	//create the animation
-	auto move = MoveBy::create(1, static_cast<int>(_moveSpeed) * offset);
+	auto move = MoveBy::create(0.1, static_cast<int>(_moveSpeed) * offset * 0.5);
 	this->runAction(move);
 }
 
@@ -115,4 +198,26 @@ void Hero::startLoading(float fdelta)
 		_ammo += 1;
 		return;
 	}
+}
+
+int Hero::increaseHP(int increasePoint)
+{
+	if (increasePoint < 0)
+		throw std::out_of_range("negative HP increasement point");
+
+	_healthPoint = (_healthPoint + increasePoint) < 100 ? (_healthPoint + increasePoint) : 100;
+	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
+
+	return _healthPoint;
+}
+
+int Hero::deductHP(int deductPoint)
+{
+	if (deductPoint < 0)
+		throw std::out_of_range("negative HP deduction point");
+
+	_healthPoint = (_healthPoint - deductPoint) > 0 ? (_healthPoint - deductPoint) : 0;
+	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
+
+	return _healthPoint;
 }
