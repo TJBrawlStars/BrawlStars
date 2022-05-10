@@ -1,35 +1,48 @@
 #pragma once
 
-//#define NDEBUG
-#include<cassert>
 #include "cocos2d.h"
-USING_NS_CC;
 #include"ui/CocosGUI.h"
-using namespace ui;
-#include "Tool/SceneManager.h"
 
 /**
 * @brief 初始的登录场景,实际上继承自Layer然后贴在main场景上
 */
-class LoadingScene :public Layer
+class LoadingScene :public cocos2d::Layer
 {
 public:
 
 	CREATE_FUNC(LoadingScene);
 
+	virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*);
+
 private:
 
 	virtual bool init();
 
+	//弃用
+
+	//**
+	//* @brief 设置按钮并add进场景
+	//* @param (Vec2&& pos)位置
+	//* @param ( std::string title)按钮标题
+	//* @param (std::string pic)图片路径
+	//*/
+	//cocos2d::ui::Button* SetButton(const cocos2d::Vec2&& pos, const std::string&& title, const std::string&& pic1, const std::string&& pic2);
+
+	LoadingScene() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
+		, _bg(NULL), _login_button(NULL), _exit_button(NULL) {};
+
 private:
 
-	const Vec2 kVisibleSize = Director::getInstance()->getVisibleSize();
+	const cocos2d::Size kVisibleSize;
 
 	//登录画面背景
-	Sprite* _bg = NULL;
+	cocos2d::Sprite* _bg;
 
 	//登录按钮
-	Button* _login_button = NULL;
+	cocos2d::ui::Button* _login_button;
+
+	//退出按钮
+	cocos2d::ui::Button* _exit_button;
 
 };
 
