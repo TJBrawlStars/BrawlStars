@@ -3,6 +3,7 @@
 #pragma once
 
 #include "cocos2d.h"
+#include "ui/CocosGUI.h"
 #include <functional>
 #include <map>
 
@@ -25,6 +26,9 @@ public:
 		EXTREME_HIGH = 5
 	};
 
+	/// @name Listener Set-ups
+	/// @{
+
 	/**
 	* @fn setKeyboardListener
 	* @brief choose whether to use the keyboard to move hero. The function is disabled by default
@@ -38,10 +42,48 @@ public:
 	void setTouchListener(bool touchState) noexcept;
 
 	/**
+	* @fn setContactListener
+	* @brief choose whether to allow physics contact. The function is disabled by default
+	*/
+	void setContactListener(bool contactState) noexcept;
+
+	/// @}
+	/// end of Listener Set-ups
+
+	/**
 	* @fn getMoveSpeed
 	* @return the speed of hero(the distance the hero moves every second)
 	*/
 	float getMoveSpeed() const noexcept { return static_cast<float>(_moveSpeed); }
+
+	int getHitPoint()    const noexcept { return _hitPoint; }
+
+	int getHP()          const noexcept { return _healthPoint; }
+
+	/// @name HP Manipuators
+	/// @{
+
+	/**
+	* @fn increaseHP
+	* @brief increase HP and update the blood strip
+	* @param increasePoint the hp increasement point
+	* @return the HP after increasing
+	* @exception out_of_range the increasement point is negative
+	*/
+	int increaseHP(const int increasePoint);
+
+	/**
+	* @fn deductHP
+	* @brief deduct hp and update the blood strip
+	* @param deductPoint the hp deduction point
+	* @exception out_of_range the deduction point is negative
+	*/
+	int deductHP(const int deductPoint);
+
+	int setHP(const int HP) = delete;
+
+	/// @}
+	/// end of HP Manipulators
 
 protected:
 	/**
@@ -74,22 +116,45 @@ protected:
 	*/
 	void startLoading(float fdelta = 1);
 
+	/**
+	* @fn initializeHeroPhysics
+	* @brief initialize with hero's physics body
+	* @warning the function should be used after the set of hero's texture
+	*/
+	void initializeHeroPhysics(cocos2d::Sprite* hero);
+
+	/**
+	* @fn initializeBulletPhysics
+	* @brief initialize with bullet's physics body
+	*/
+	void initializeBulletPhysics(cocos2d::Sprite* bullet);
+
+	/**
+	* @fn initializeBloodStrip
+	* @brief draw the blood strip
+	* @warning the function should be used after the set of hero's texture
+	*/
+	virtual void initialzeBloodStrip(const int maxHealthPoint);
+
 private:
-	bool _shotState = false;
+	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */
 	cocos2d::EventListenerKeyboard* _keyboardListener;
 	cocos2d::EventListenerTouchOneByOne* _touchListener;
+	cocos2d::EventListenerPhysicsContact* _contactListener;
 
 	/** initializer of the event listeners */
 	void initializeKeyboardListener();
 	void initializeTouchListener();
+	void initializeContactListener();
 
 	/** callback functions of the event listeners */
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = true; }
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = false; }
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event) { return this->attack(touch, event); }
+	bool onContactBegin(cocos2d::PhysicsContact& contact);
 
 	/**
 	* @fn moveHero

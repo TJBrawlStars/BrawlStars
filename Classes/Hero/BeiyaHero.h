@@ -21,8 +21,9 @@ public:
 	/**
 	* @fn createBeiya
 	* @brief the only way to instantiate class Beiya
+	* @warning the create function with filename is disabled
 	*/
-	static Beiya* createBeiya() { return Beiya::create(); }
+	static Beiya* createBeiya();
 
 protected:
 	/**
@@ -32,11 +33,7 @@ protected:
 	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) override;
 
 private:
-	/**
-	* @note the initialization of Beiya
-	*       use createBeiya() to create a new object
-	* @warning the create function with filename is disabled
-	*/
+	/** the initialization of Beiya */
 	Beiya();
 	CREATE_FUNC(Beiya)
 	static Beiya* create(const std::string&) = delete;

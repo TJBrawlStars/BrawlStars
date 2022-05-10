@@ -12,6 +12,52 @@ namespace {
 	}
 }
 
+Beiya* Beiya::createBeiya()
+{
+	auto beiya = Beiya::create();
+
+	//initialize the physics body
+	beiya->initializeHeroPhysics(beiya);
+
+	//draw the blood strip
+	beiya->initialzeBloodStrip(beiya->_maxHealthPoint);
+
+	return beiya;
+}
+
+const std::string Beiya::_beiyaPicture = "player.png";
+
+Beiya::Beiya() :Hero(3360, 1)
+{
+	_healthPoint = _maxHealthPoint;
+	_ammo = _maxAmmo;
+	_hitPoint = 1120;
+	_moveSpeed = Level::MEDIUM;
+	_shotRange = Level::HIGH;
+	_loadSpeed = Level::EXTREME_HIGH;
+}
+
+bool Beiya::init()
+{
+	if (!Sprite::init())
+		return false;
+
+    _fileName = _beiyaPicture;
+
+    Texture2D* texture = _director->getTextureCache()->addImage(_beiyaPicture);
+    if (texture)
+    {
+        Rect rect = Rect::ZERO;
+        rect.size = texture->getContentSize();
+        return initWithTexture(texture, rect);
+    }
+
+    // don't release here.
+    // when load texture failed, it's better to get a "transparent" sprite then a crashed program
+    // this->release();
+    return false;
+}
+
 bool Beiya::attack(Touch* touch, Event* event)
 {
 	/** @note the animation of attack */
@@ -24,8 +70,10 @@ bool Beiya::attack(Touch* touch, Event* event)
 	auto projectile = Sprite::create("projectile.png");
 	if (projectile == nullptr)
 		problemLoading("projectile.png");
-	projectile->setPosition(this->getPosition());
-	this->getParent()->addChild(projectile);
+	Size heroSize = this->getContentSize();
+	projectile->setPosition(Point(heroSize.width / 2, heroSize.height / 2));
+	initializeBulletPhysics(projectile);
+	this->addChild(projectile);
 
 	//get the vector of attack according to the range of hero
 	offset.normalize();
@@ -42,36 +90,4 @@ bool Beiya::attack(Touch* touch, Event* event)
 		startLoading();
 
 	return true;
-}
-
-const std::string Beiya::_beiyaPicture = "swordman.png";
-
-Beiya::Beiya() :Hero(3360, 1)
-{
-	_healthPoint = _maxHealthPoint;
-	_ammo = _maxAmmo;
-	_hitPoint = 1120;
-	_moveSpeed = Level::MEDIUM;
-	_shotRange = Level::HIGH;
-	_loadSpeed = Level::EXTREME_HIGH;
-}
-
-bool Beiya::init()
-{
-    _fileName = _beiyaPicture;
-
-	this->setScale(0.1);
-
-    Texture2D* texture = _director->getTextureCache()->addImage(_beiyaPicture);
-    if (texture)
-    {
-        Rect rect = Rect::ZERO;
-        rect.size = texture->getContentSize();
-        return initWithTexture(texture, rect);
-    }
-
-    // don't release here.
-    // when load texture failed, it's better to get a "transparent" sprite then a crashed program
-    // this->release();
-    return false;
 }
