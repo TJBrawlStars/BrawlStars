@@ -108,18 +108,21 @@ void Hero::initialzeBloodStrip(int maxHealthPoint)
 	_bloodStrip->setPercent(100);
 	_bloodStrip->setScale(0.1);
 	Size heroSize = this->getContentSize();
-	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 4));
+	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 6));
 	this->addChild(_bloodStrip);
 }
 
 void Hero::initializeAmmoStrip(int maxAmmo)
 {
 	//add the picture of ammo strip
-	for (auto i : _ammoStrip)
-		i = Sprite::create("ammoStrip.png");
-
-	Size heroSize = this->getContentSize();
-	_ammoStrip[0]->setPosition(Point(heroSize.width / 2, heroSize.height + 3));
+	for (int i = 0; i < maxAmmo; i++) {
+		Size heroSize = this->getContentSize();
+		auto strip = Sprite::create("ammoStrip.png");
+		_ammoStrip.push_back(strip);
+		strip->setPosition(Point(8 * i, heroSize.height + 3));
+		strip->setScale(0.1);
+		this->addChild(strip);
+	}
 }
 
 bool Hero::onContactBegin(PhysicsContact& contact)
@@ -174,32 +177,6 @@ void Hero::moveHero(float fdelta)
 	this->runAction(move);
 }
 
-void Hero::startLoading(float fdelta)
-{
-	//add the function to scheduler
-	if (!isScheduled(SEL_SCHEDULE(&Hero::startLoading)))
-		this->schedule(SEL_SCHEDULE(&Hero::startLoading), 0.75f);
-
-	//remove from scheduler if is full of bullet
-	if (_ammo == _maxAmmo) {
-		this->setTouchListener(true);
-		this->unschedule(SEL_SCHEDULE(&Hero::startLoading));
-		return;
-	}
-
-	//loading
-	if (!_ammo) {
-		this->setTouchListener(false);
-		_ammo += 1;
-		return;
-	}
-	else {
-		this->setTouchListener(true);
-		_ammo += 1;
-		return;
-	}
-}
-
 int Hero::increaseHP(int increasePoint)
 {
 	if (increasePoint < 0)
@@ -220,4 +197,10 @@ int Hero::deductHP(int deductPoint)
 	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
 
 	return _healthPoint;
+}
+
+void Hero::startLoading(float fdelta)
+{
+	_ammo = (_ammo + 1) < _maxAmmo ? (_ammo + 1) : _maxAmmo;
+	_ammoStrip[_ammo - 1]->setVisible(true);
 }

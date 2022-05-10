@@ -13,7 +13,7 @@ class Bullet :public cocos2d::Sprite {
 public:
 	enum class Effect { NONE, FREEZE, BURN };
 
-	static Bullet* bulletCreate(const std::string& filename);
+	static Bullet* createBullet(const std::string& filename);
 
 	int hitPoint()  const noexcept { return _hitPoint; }
 	Effect effect() const noexcept { return _effect; }

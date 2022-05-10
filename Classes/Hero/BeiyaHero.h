@@ -37,8 +37,6 @@ protected:
 private:
 	/** the initialization of Beiya */
 	Beiya();
-	CREATE_FUNC(Beiya)
-	bool init();
 
 	static const std::string _beiyaPicture;  ///< The filename of the picture
 };

@@ -6,6 +6,7 @@
 #include "ui/CocosGUI.h"
 #include "Hero/BulletSprite.h"
 #include <functional>
+#include <vector>
 #include <map>
 
 /**
@@ -86,6 +87,12 @@ public:
 	/// @}
 	/// end of HP Manipulators
 
+	/**
+	* @fn startLoading
+	* @brief each bullet is loaded for (2.0 - static_cast<float>(_loadSpeed) * 0.25) seconds
+	*/
+	void startLoading(float fdelta = 1);
+
 protected:
 	/**
 	* @brief the constructor is used to initialize the constant variables
@@ -105,18 +112,13 @@ protected:
 	Level _shotRange;
 	Level _moveSpeed;
 	Level _loadSpeed;
+	std::vector<cocos2d::Sprite*> _ammoStrip;
 	
 	/**
 	* @fn attack
 	* @brief derived classes need to override the attack function, which will act as the listener callback
 	*/
 	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
-
-	/**
-	* @fn startLoading
-	* @brief each bullet is loaded for 0.75 seconds
-	*/
-	void startLoading(float fdelta = 1);
 
 	/**
 	* @fn initializeHeroPhysics
@@ -147,7 +149,6 @@ protected:
 
 private:
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
-	cocos2d::Sprite* _ammoStrip[3];
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */

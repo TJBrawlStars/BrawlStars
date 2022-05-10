@@ -3,7 +3,7 @@
 
 USING_NS_CC;
 
-Bullet* Bullet::bulletCreate(const std::string& filename)
+Bullet* Bullet::createBullet(const std::string& filename)
 {
     Bullet* pRet = new(std::nothrow) Bullet();
     if (pRet && pRet->initWithFile(filename))

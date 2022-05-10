@@ -14,13 +14,28 @@ namespace {
 
 Beiya* Beiya::createBeiya()
 {
-	auto beiya = Beiya::create();
+	Beiya* beiya = new(std::nothrow) Beiya();
+	if (beiya && beiya->initWithFile(_beiyaPicture))
+	{
+		beiya->autorelease();
 
-	//initialize the physics body
-	beiya->initializeHeroPhysics(beiya);
+		//initialize the physics body
+		beiya->initializeHeroPhysics(beiya);
 
-	//draw the blood strip
-	beiya->initialzeBloodStrip(beiya->_maxHealthPoint);
+		//draw the blood strip
+		beiya->initialzeBloodStrip(beiya->_maxHealthPoint);
+
+		//draw the ammo strip
+		beiya->initializeAmmoStrip(beiya->_maxAmmo);
+
+		return beiya;
+	}
+	else
+	{
+		delete beiya;
+		beiya = nullptr;
+		return nullptr;
+	}
 
 	return beiya;
 }
@@ -37,37 +52,19 @@ Beiya::Beiya() :Hero(3360, 1)
 	_loadSpeed = Level::EXTREME_HIGH;
 }
 
-bool Beiya::init()
-{
-	if (!Sprite::init())
-		return false;
-
-    _fileName = _beiyaPicture;
-
-    Texture2D* texture = _director->getTextureCache()->addImage(_beiyaPicture);
-    if (texture)
-    {
-        Rect rect = Rect::ZERO;
-        rect.size = texture->getContentSize();
-        return initWithTexture(texture, rect);
-    }
-
-    // don't release here.
-    // when load texture failed, it's better to get a "transparent" sprite then a crashed program
-    // this->release();
-    return false;
-}
-
 bool Beiya::attack(Touch* touch, Event* event)
 {
-	/** @note the animation of attack */
+	if (!_ammo)
+		return true;
+
+	/** the animation of attack */
 	//get the location of touch point
 	Point touchLocation = touch->getLocation();
 	//convert the location to offset
 	Vec2 offset = touchLocation - this->getPosition();
 
 	//add projectile
-	auto projectile = Bullet::bulletCreate("projectile.png");
+	auto projectile = Bullet::createBullet("projectile.png");
 	if (projectile == nullptr)
 		problemLoading("projectile.png");
 	projectile->sethitPoint(this->getHitPoint());
@@ -84,10 +81,11 @@ bool Beiya::attack(Touch* touch, Event* event)
 	auto removeBullet = RemoveSelf::create();
 	projectile->runAction(Sequence::create(shot, removeBullet, nullptr));
 
-	/** @note modify hero attributes */
+	//modify the ammunition quantity
+	if (!isScheduled(SEL_SCHEDULE(&Hero::startLoading)))
+		schedule(SEL_SCHEDULE(&Hero::startLoading), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
 	--_ammo;
-	if (_ammo == _maxAmmo - 1)
-		startLoading();
+	_ammoStrip[_ammo]->setVisible(false);
 
 	return true;
 }
