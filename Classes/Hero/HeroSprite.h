@@ -4,6 +4,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include "Hero/BulletSprite.h"
 #include <functional>
 #include <map>
 
@@ -100,6 +101,7 @@ protected:
 	int _hitPoint;
 	int _ammo;
 	int _energy = 0;
+	int _diamond = 0;
 	Level _shotRange;
 	Level _moveSpeed;
 	Level _loadSpeed;
@@ -121,23 +123,31 @@ protected:
 	* @brief initialize with hero's physics body
 	* @warning the function should be used after the set of hero's texture
 	*/
-	void initializeHeroPhysics(cocos2d::Sprite* hero);
+	void initializeHeroPhysics(Hero* hero);
 
 	/**
 	* @fn initializeBulletPhysics
 	* @brief initialize with bullet's physics body
 	*/
-	void initializeBulletPhysics(cocos2d::Sprite* bullet);
+	void initializeBulletPhysics(Bullet* bullet);
 
 	/**
 	* @fn initializeBloodStrip
 	* @brief draw the blood strip
 	* @warning the function should be used after the set of hero's texture
 	*/
-	virtual void initialzeBloodStrip(const int maxHealthPoint);
+	void initialzeBloodStrip(const int maxHealthPoint);
+
+	/**
+	* @fn initializeAmmoStrip
+	* @brief draw the ammo strip
+	* @warning the function should be used after the set of hero's texture
+	*/
+	void initializeAmmoStrip(const int maxAmmo);
 
 private:
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
+	cocos2d::Sprite* _ammoStrip[3];
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */

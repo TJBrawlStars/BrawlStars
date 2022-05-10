@@ -81,7 +81,7 @@ void Hero::initializeContactListener()
 	_contactListener->setEnabled(false);
 }
 
-void Hero::initializeHeroPhysics(cocos2d::Sprite* hero)
+void Hero::initializeHeroPhysics(Hero* hero)
 {
 	auto heroPhysicsBody = PhysicsBody::createBox(hero->getContentSize());
 	heroPhysicsBody->setDynamic(false);
@@ -91,7 +91,7 @@ void Hero::initializeHeroPhysics(cocos2d::Sprite* hero)
 	hero->setName("hero");
 }
 
-void Hero::initializeBulletPhysics(cocos2d::Sprite* bullet)
+void Hero::initializeBulletPhysics(Bullet* bullet)
 {
 	auto bulletPhysicsBody = PhysicsBody::createBox(bullet->getContentSize());
 	bulletPhysicsBody->setDynamic(false);
@@ -101,7 +101,7 @@ void Hero::initializeBulletPhysics(cocos2d::Sprite* bullet)
 	bullet->setName("bullet");
 }
 
-void Hero::initialzeBloodStrip(int healthPoint)
+void Hero::initialzeBloodStrip(int maxHealthPoint)
 {
 	_bloodStrip = ui::LoadingBar::create("bloodStrip.png");
 	_bloodStrip->setDirection(ui::LoadingBar::Direction::LEFT);
@@ -110,6 +110,16 @@ void Hero::initialzeBloodStrip(int healthPoint)
 	Size heroSize = this->getContentSize();
 	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 4));
 	this->addChild(_bloodStrip);
+}
+
+void Hero::initializeAmmoStrip(int maxAmmo)
+{
+	//add the picture of ammo strip
+	for (auto i : _ammoStrip)
+		i = Sprite::create("ammoStrip.png");
+
+	Size heroSize = this->getContentSize();
+	_ammoStrip[0]->setPosition(Point(heroSize.width / 2, heroSize.height + 3));
 }
 
 bool Hero::onContactBegin(PhysicsContact& contact)
@@ -130,7 +140,7 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	if (hero == this)
 		return false;
 
-	dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Hero*>(bullet->getParent())->getHitPoint());
+	dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
 	bullet->removeFromParentAndCleanup(true);
 
 	return true;

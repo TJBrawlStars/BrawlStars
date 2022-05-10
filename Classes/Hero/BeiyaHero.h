@@ -4,6 +4,7 @@
 
 #include "cocos2d.h"
 #include "Hero/HeroSprite.h"
+#include "Hero/BulletSprite.h"
 
 /**
 * @class Beiya
@@ -24,6 +25,7 @@ public:
 	* @warning the create function with filename is disabled
 	*/
 	static Beiya* createBeiya();
+	static Beiya* create(const std::string&) = delete;
 
 protected:
 	/**
@@ -36,7 +38,6 @@ private:
 	/** the initialization of Beiya */
 	Beiya();
 	CREATE_FUNC(Beiya)
-	static Beiya* create(const std::string&) = delete;
 	bool init();
 
 	static const std::string _beiyaPicture;  ///< The filename of the picture

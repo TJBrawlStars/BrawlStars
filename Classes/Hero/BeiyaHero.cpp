@@ -67,13 +67,13 @@ bool Beiya::attack(Touch* touch, Event* event)
 	Vec2 offset = touchLocation - this->getPosition();
 
 	//add projectile
-	auto projectile = Sprite::create("projectile.png");
+	auto projectile = Bullet::bulletCreate("projectile.png");
 	if (projectile == nullptr)
 		problemLoading("projectile.png");
-	Size heroSize = this->getContentSize();
-	projectile->setPosition(Point(heroSize.width / 2, heroSize.height / 2));
+	projectile->sethitPoint(this->getHitPoint());
+	projectile->setPosition(this->getPosition());
 	initializeBulletPhysics(projectile);
-	this->addChild(projectile);
+	this->getParent()->addChild(projectile);
 
 	//get the vector of attack according to the range of hero
 	offset.normalize();
