@@ -6,6 +6,11 @@ TreasureBox* TreasureBox::createBox()
 	return TreasureBox::create();
 }
 
+//void TreasureBox::setBoxPos(cocos2d::Vec2 position)
+//{
+//	_boxPos = position;
+//}
+
 void TreasureBox::initialzeBloodStrip(const int maxBoxHealthPoint)
 {
 	_bloodStrip->setDirection(ui::LoadingBar::Direction::LEFT);
@@ -45,11 +50,11 @@ bool TreasureBox::init()
 	{
 		log("create successfully");
 		this->addChild(_sprite);//添加到了Treasure上，不需要tag
-		const int posX = random(32, maxWidth - 32);
-		const int posY = random(32, maxHeight - 32);
-		_boxPos = Vec2(posX, posY);
-		this->setPosition(posX, posY);
-		log("This box's corrdinate is %d %d", posX, posY);
+		//const int posX = random(32, maxWidth - 32);
+		//const int posY = random(32, maxHeight - 32);
+		//_boxPos = Vec2(posX, posY);
+		//this->setPosition(_boxPos);
+		//log("This box's corrdinate is %d %d", _boxPos.x, _boxPos.y);
 		generatePhysicalBody(Name::kTreasureBox, kBoxTag);
 	}
 
@@ -75,7 +80,6 @@ void TreasureBox::openBox()
 	//掉出宝石
 	auto diamond = DiamondBuff::create();
 	myParent->addChild(diamond, kDiamondPriority);
-	diamond->setDiamondPos(boxPos);
 	diamond->setPosition(boxPos);
 	auto action = JumpBy::create(1.0f, boxPos, 40, 1);
 	diamond->runAction(action);

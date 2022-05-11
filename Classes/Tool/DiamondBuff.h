@@ -20,12 +20,12 @@ public:
 		attack = 1
 	};
 
-	//暂时没用
-	void setDiamondPos(cocos2d::Vec2 position) { _DiamondPos = position; };
+	////暂时没用
+	//void setDiamondPos(cocos2d::Vec2 position) { _DiamondPos = position; };
 
 	//返回值是血量值和攻击值
 	static int buffAttackOrHealth();
 private:
-	//暂时没用
-	cocos2d::Vec2 _DiamondPos;
+	////暂时没用
+	//cocos2d::Vec2 _DiamondPos;
 };

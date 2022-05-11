@@ -29,10 +29,13 @@ public:
     Vec2 tiledCoordFromPosition(Vec2 position);
 
     //初始化地图
-    void initMap();
+    void addMap();
+
+    //初始化角色
+    void addHeroPlayer();
 
     //创建障碍层
-    void createBarrier();
+    void addBarrier();
 
     //添加宝箱
     void addRandomBox();

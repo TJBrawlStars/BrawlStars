@@ -10,7 +10,7 @@
 #include "Tool/Item.h"
 USING_NS_CC;
 
-void GameScene::initMap()
+void GameScene::addMap()
 {
     //初始化各个变量！！！！！！！！
     _mapinfo._map = TMXTiledMap::create("map/mapNo1.tmx");
@@ -36,6 +36,7 @@ void GameScene::initMap()
 void  GameScene::addBox()
 {
     auto box = TreasureBox::create();
+    box->setPosition(Vec2(random(32, maxWidth), random(32, maxHeight)));
     box->initialzeBloodStrip(kmaxBoxHealthPoint);
     this->addChild(box, kBoxPriority, Name::kTreasureBox);
 }
@@ -50,7 +51,7 @@ void GameScene::addRandomBox()
     }
 }
 
-void GameScene::createBarrier()
+void GameScene::addBarrier()
 {
     auto group = _mapinfo._map->getObjectGroup("barrier");
     ValueVector barrierObjects = group->getObjects();

@@ -16,7 +16,6 @@ bool DiamondBuff::init()
 	{
 		log("create diamond successfully");
 		this->addChild(_sprite);
-		this->setPosition(_DiamondPos);
 		//log("This box's corrdinate is %d %d", posX, posY);
 		generatePhysicalBody(Name::kDiamond, kDiamondTag);
 	}

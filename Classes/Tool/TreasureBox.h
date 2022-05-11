@@ -27,8 +27,9 @@ public:
 	*/
 	TreasureBox* createBox();
 
-	cocos2d::Vec2 getBoxPos() {return _boxPos;};
-	void setBoxPos(cocos2d::Vec2 position) = delete;//不能随便动
+	//没用！！！
+	//cocos2d::Vec2 getBoxPos() {return _boxPos;};
+	//void setBoxPos(cocos2d::Vec2 position);
 
 	TreasureBox(const int& maxBoxHealthPoint = kmaxBoxHealthPoint) :_maxHealthPoint(maxBoxHealthPoint) {_healthPoint = _maxHealthPoint;};
 
@@ -45,9 +46,16 @@ public:
 	int deductHP(int deductPoint);
 
 	int getHP() const noexcept { return _healthPoint; }
+
+	/**
+    * @fn isInExistPhysicalItem
+    * @brief 判断位置处是否有物理引擎
+    */
+	static bool isInExistPhysicalItem();
 protected:
-	//宝箱位置
-	cocos2d::Vec2 _boxPos;
+	//出过bug，别放在初始化的位置！！！也没必要再用
+	////宝箱位置
+	//cocos2d::Vec2 _boxPos;
 
     //血条
 	const int _maxHealthPoint;
