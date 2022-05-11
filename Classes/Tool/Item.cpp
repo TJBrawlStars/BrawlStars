@@ -8,7 +8,6 @@ void Item::bindSprite(Sprite* sprite)
 	_sprite = sprite;
 
 }
-
 Sprite* Item::getSprite()
 {
 	return _sprite;
@@ -17,6 +16,7 @@ Sprite* Item::getSprite()
 void Item::generatePhysicalBody(std::string message, int itemTag)
 {
 	_sprite->setTag(itemTag);
+	_sprite->setName(message);
 	auto size = _sprite->getContentSize();
 	size.width *= 1.2;
 	size.height *= 1.2;

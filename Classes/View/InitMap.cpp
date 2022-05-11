@@ -1,9 +1,14 @@
+/**
+* @author 张靖凯
+* 初始化地图，障碍物
+* 
+*/
 #include"cocos2d.h"
-USING_NS_CC;
 #include "View\GameScene.h"
 #include "Const/Const.h"
 #include "Tool/TreasureBox.h"
 #include "Tool/Item.h"
+USING_NS_CC;
 
 void GameScene::initMap()
 {
@@ -11,27 +16,28 @@ void GameScene::initMap()
     _mapinfo._map = TMXTiledMap::create("map/mapNo1.tmx");
     _mapinfo._map->setAnchorPoint(Vec2::ZERO);
     _mapinfo._map->setPosition(Vec2::ZERO);
-    this->addChild(_mapinfo._map);
+    this->addChild(_mapinfo._map, kMapPriority);
 
-    //碰撞层
-    //_mapinfo._obstacleLayer = _mapinfo._map->getLayer("meta");
+    //让障碍层显示在global
+    _mapinfo._obstacleLayer = _mapinfo._map->getLayer("1");
+    _mapinfo._obstacleLayer->setGlobalZOrder(kTMXlayer);
+    _mapinfo._obstacleLayer = _mapinfo._map->getLayer("2");
+    _mapinfo._obstacleLayer->setGlobalZOrder(kTMXlayer);
+    _mapinfo._obstacleLayer = _mapinfo._map->getLayer("3");
+    _mapinfo._obstacleLayer->setGlobalZOrder(kTMXlayer);
 
     //地图方块数量
     _mapinfo._mapTiledNum = _mapinfo._map->getMapSize();
-    //单个格子大小(直接初始化好）（有bug！！！）
-    _mapinfo._tiledSize = _mapinfo._map->getTileSize() /*+ Size(_mapinfo._map->getTileSize().width / 4, _mapinfo._map->getTileSize().height / 4)*/;
-    //设置_collisionBoard
-    //_mapinfo.setCollisionBoard();
-    
+    //单个格子大小
+    _mapinfo._tiledSize = _mapinfo._map->getTileSize();
     //初始化结束
-
-
 }
 
 void  GameScene::addBox()
 {
     auto box = TreasureBox::create();
-    this->addChild(box, kBoxPriority, Name::kTreasure);
+    box->initialzeBloodStrip(kmaxBoxHealthPoint);
+    this->addChild(box, kBoxPriority, Name::kTreasureBox);
 }
 
 void GameScene::addRandomBox()
@@ -70,6 +76,7 @@ void GameScene::createBarrier()
         tmpSprite->setContentSize(Size(width, height));
         tmpSprite->addComponent(tmpPhysicsBody);
         tmpSprite->setTag(kBarrierTag);
+        tmpSprite->setName(Name::kBarrier);
 
         this->addChild(tmpSprite, kBarrierPriority);
         log("create barrer:%f", width);
