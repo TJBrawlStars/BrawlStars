@@ -9,12 +9,18 @@ using namespace ui;
 #include "Tool/Setting.h"
 #include "Tool/SceneManager.h"
 #include "Tool/Tools.h"
+#include "FigureLayer.h"
+#include "InforLayer.h"
 #pragma execution_character_set("utf-8")  
+
+MainScene* MainScene::_that = NULL;
 
 bool MainScene::init()
 {
 	if (!Scene::init())
 		return false;
+
+	_that = this;
 
 	//设置loading界面
 	if (SceneManager::getInstance()->isFirst())
@@ -30,7 +36,7 @@ bool MainScene::init()
 	//设置背景
 	_bg = Tools::SetBg("ui/MainBg.png", this);
 
-	//各种按钮的实现
+	//菜单按钮
 	_menu_button = Tools::ButtonCreate(Vec2(275, kVisibleSize.height - 40), "ui/menu.png", this);
 	_menu_button->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
@@ -43,15 +49,20 @@ bool MainScene::init()
 			}
 		});
 
+	//个人信息按钮
 	_info_button = Tools::ButtonCreate(Vec2(77, kVisibleSize.height - 40), "ui/info.png", this);
 	_info_button->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
 			{
-				//弹出个人信息显示层
+				_info = InforLayer::create();
+				assert(_info);
+				this->addChild(_info);
+				Tools::SwitchScene(_info, Tools::SwitchSceneType::Down);
 			}
 		});
 
+	//开房间按钮
 	_play_button = Tools::ButtonCreate("对   战", Vec2(kVisibleSize.width - 200, 75), this);
 	_play_button->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
@@ -64,6 +75,7 @@ bool MainScene::init()
 			}
 		});
 
+	//返回按钮
 	_back = Tools::ButtonCreate(Vec2(175, kVisibleSize.height - 40), "ui/back.png", this);
 	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
@@ -78,51 +90,44 @@ bool MainScene::init()
 			}
 		});
 
-	////主界面显示的人物
-	//_figure = Sprite::create();
-	//assert(_figure != NULL);
-	//_figure->setPosition(kVisibleSize / 2);
-	//this->addChild(_figure);
+	//主界面显示的人物(默认第一个）
+	_figure = Tools::ButtonCreateN(kVisibleSize / 2, "ui/figure1.jpg", this);
+	_figure->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+		{
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				_changeFigure = FigureLayer::create();
+				assert(_changeFigure != 0);
+				this->addChild(_changeFigure, 100);
+				Tools::SwitchScene(_changeFigure, Tools::SwitchSceneType::Down);
+			}
+		});
 
 	return true;
 }
 
-//弃用
+void MainScene::SetFigure(const std::string& filename)
+{
+	if (filename != _figure->getNormalFile().file)
+	{
+		this->scheduleOnce([this, &filename](float dlt)
+			{
+				_figure = Tools::ButtonCreateN(kVisibleSize / 2, filename, this);
+				_figure->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+					{
+						if (type == Widget::TouchEventType::ENDED)
+						{
+							_changeFigure = FigureLayer::create();
+							assert(_changeFigure != 0);
+							this->addChild(_changeFigure);
+							Tools::SwitchScene(_changeFigure, Tools::SwitchSceneType::Down);
+						}
+					});
+			}, 0.5f, "delaytime");
+	}
+}
 
-//Button* MainScene::ButtonCreate(const Vec2&& position, const std::string&& pic_name)
-//{
-//	auto button = Button::create("ui/button.png");
-//	assert(button != NULL);
-//
-//	button->setScale9Enabled(true);
-//	button->setCapInsets(Rect(5, 5, 15, 15));
-//	button->setPosition(position);
-//
-//	auto sprite = Sprite::create(pic_name);
-//	assert(sprite != NULL);
-//
-//	button->addChild(sprite);
-//	button->setContentSize(Size(sprite->getContentSize().width + 50, sprite->getContentSize().height + 25));
-//	sprite->setPosition(button->getContentSize() / 2);
-//	this->addChild(button);
-//	return button;
-//}
-
-//弃用
-
-//Button* MainScene::ButtonCreate(const std::string&& words, const Vec2&& position)
-//{
-//	auto button = Button::create("ui/button_y.png");
-//	assert(button != NULL);
-//
-//	button->setScale9Enabled(true);
-//	button->setCapInsets(Rect(5, 5, 15, 15));
-//	button->setPosition(position);
-//
-//	auto label = Label::createWithSystemFont(words, "微软雅黑", 50);
-//	assert(label != NULL);
-//	button->setTitleLabel(label);
-//	button->setContentSize(Size(label->getContentSize().width + 125, label->getContentSize().height + 50));
-//	this->addChild(button);
-//	return button;
-//}
+std::string MainScene::GetFigure() const
+{
+	return _figure->getNormalFile().file;
+}
