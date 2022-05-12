@@ -26,10 +26,7 @@ bool SettingLayer::init()
 	_back = Tools::ButtonCreate(Vec2(100, kVisibleSize.height - 100), "ui/back.png", this);
 	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType)
 		{
-			auto distory = RemoveSelf::create();
-			auto move = MoveTo::create(0.5f, Vec2(0, kVisibleSize.height));
-			this->runAction(Sequence::createWithTwoActions(move, distory));
-           //做出划上划下的效果
+			Tools::SwitchScene(this, Tools::SwitchSceneType::Up);
 		});
 
 	return true;
