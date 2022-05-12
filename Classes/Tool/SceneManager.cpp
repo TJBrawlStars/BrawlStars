@@ -53,5 +53,5 @@ void SceneManager::changeScene(EnumSceneType type)
 		_first = false;
 	}
 	else
-		director->replaceScene(scene);
+		director->replaceScene(TransitionCrossFade::create(0.5f, scene));
 }

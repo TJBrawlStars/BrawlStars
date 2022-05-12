@@ -11,7 +11,6 @@ USING_NS_CC;
 
 /**
 * @brief 自定义的场景筛选器,是一个单例类
-* @Author みけねこ
 */
 class SceneManager : public Ref
 {
