@@ -61,6 +61,40 @@ cocos2d::ui::Button* Tools::ButtonCreate(const cocos2d::Vec2&& position,const st
 	return button;
 }
 
+cocos2d::ui::Button* Tools::ButtonCreateN(const cocos2d::Vec2&& position, const std::string&& pic_name, cocos2d::Node* that)
+{
+	auto button = Button::create(pic_name);
+	assert(button != NULL);
+	that->addChild(button);
+	button->setPosition(position);
+	return button;
+}
+
+cocos2d::ui::Button* Tools::ButtonCreateN(const cocos2d::Vec2&& position, const std::string& pic_name, cocos2d::Node* that)
+{
+	auto button = Button::create(pic_name);
+	assert(button != NULL);
+	that->addChild(button);
+	button->setPosition(position);
+	return button;
+}
+
+//cocos2d::ui::Button* Tools::ButtonCreate(const cocos2d::Vec2&& position, const std::string&& words, const std::string& pic_name, const std::string& pic_name_s, cocos2d::Node* that)
+//{
+//	auto button = Button::create(pic_name, pic_name_s);
+//	assert(button != NULL);
+//	button->setPosition(position);
+//	button->setScale9Enabled(true);
+//	button->setCapInsets(Rect(5, 5, 15, 15));
+//
+//	auto label = Label::createWithSystemFont(words, "Î¢ÈíÑÅºÚ", 40);
+//	assert(label != NULL);
+//	button->setTitleLabel(label);
+//	button->setContentSize(Size(label->getContentSize().width + 120, label->getContentSize().height + 50));
+//	that->addChild(button);
+//	return button;
+//}
+
 void Tools::LayerSwallow(EventListenerTouchOneByOne* listener, cocos2d::Layer* that)
 {
 	listener->setSwallowTouches(true);
@@ -162,7 +196,7 @@ cocos2d::Menu* Tools::MenuCreate(cocos2d::Vec2&& pos, std::string&& item, std::s
 	return soundmenu;
 }
 
-cocos2d::Label* Tools::LabelCreateTTF(cocos2d::Vec2&& pos, std::string&& words, std::string&& ttf ,float size, Node* that)
+cocos2d::Label* Tools::LabelCreateTTF(cocos2d::Vec2&& pos,const std::string& words, std::string&& ttf ,float size, Node* that)
 {
 	auto label = Label::createWithTTF(words, ttf, size);
 	assert(label != NULL);
@@ -171,13 +205,22 @@ cocos2d::Label* Tools::LabelCreateTTF(cocos2d::Vec2&& pos, std::string&& words, 
 	return label;
 }
 
-cocos2d::Label* Tools::LabelCreateSystem(cocos2d::Vec2&& pos, std::string&& words ,std::string&& ttf, float size, Node* that)
+cocos2d::Label* Tools::LabelCreateSystem(cocos2d::Vec2&& pos, const std::string& words ,std::string&& ttf, float size, Node* that)
 {
 	auto label = Label::createWithSystemFont(words, ttf, size);
 	assert(label != NULL);
 	that->addChild(label);
 	label->setPosition(pos);
 	return label;
+}
+
+cocos2d::Sprite* Tools::SpriteCreate(const cocos2d::Vec2& pos, std::string&& filename , cocos2d::Node* that)
+{
+	auto sprite = Sprite::create(filename);
+	assert(sprite != NULL);
+	sprite->setPosition(pos);
+	that->addChild(sprite);
+	return sprite;
 }
 
 

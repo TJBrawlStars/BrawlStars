@@ -26,6 +26,12 @@ public:
 	static cocos2d::ui::Button* ButtonCreate(const std::string&& words, const cocos2d::Vec2&& position, cocos2d::Node* that);
 	static cocos2d::ui::Button* ButtonCreate(const cocos2d::Vec2&& position, const std::string&& words, const std::string&& pic_name
 		                                   , const std::string&& pic_name_s, cocos2d::Node* that);
+	////左值版本
+	//static cocos2d::ui::Button* ButtonCreate(const cocos2d::Vec2&& position, const std::string&& words, const std::string& pic_name
+ //                                          , const std::string& pic_name_s, cocos2d::Node* that);
+	//普通图片按钮
+	static cocos2d::ui::Button* ButtonCreateN(const cocos2d::Vec2&& position, const std::string&& pic_name, cocos2d::Node* that);
+	static cocos2d::ui::Button* ButtonCreateN(const cocos2d::Vec2&& position, const std::string& pic_name, cocos2d::Node* that);
 
 	/**
 	* @brief 设置layer吞没点击事件
@@ -80,8 +86,14 @@ public:
 	* @param (cocos2d::Node*)要添加进的节点
 	* @param (cocos2d::ccMenuCallback& callback)回调函数
 	*/
-	static cocos2d::Label* LabelCreateTTF(cocos2d::Vec2&& pos, std::string&& words, std::string&& ttf, float size, cocos2d::Node*);
-	static cocos2d::Label* LabelCreateSystem(cocos2d::Vec2&& pos, std::string&& words, std::string&& ttf, float size, cocos2d::Node*);
+	static cocos2d::Label* LabelCreateTTF(cocos2d::Vec2&& pos, const std::string& words, std::string&& ttf, float size, cocos2d::Node*);
+	static cocos2d::Label* LabelCreateSystem(cocos2d::Vec2&& pos, const std::string& words, std::string&& ttf, float size, cocos2d::Node*);
+
+	/**
+	* @brief 封装创建精灵
+	* @param (cocos2d::Node*)要添加进的节点
+	*/
+	static cocos2d::Sprite* SpriteCreate(const cocos2d::Vec2& pos, std::string&& filename, cocos2d::Node*);
 
 private:
 
