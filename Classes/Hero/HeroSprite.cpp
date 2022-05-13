@@ -179,10 +179,10 @@ void Hero::moveHero(float fdelta)
 	//normalize the offset
 	Vec2 offset = Vec2(offsetX, offsetY);
 	offset.normalize();
+	offset *= 0.5;
 
-	//create the animation
-	auto move = MoveBy::create(0.1, static_cast<int>(_moveSpeed) * offset * 0.5);
-	this->runAction(move);
+	//move the hero
+	this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
 }
 
 int Hero::increaseHP(int increasePoint)
