@@ -166,6 +166,7 @@ protected:
 private:
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
+	cocos2d::Point _prePos;
 
 	/** event listeners */
 	cocos2d::EventListenerKeyboard* _keyboardListener;
@@ -182,12 +183,15 @@ private:
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = false; }
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event) { return this->attack(touch, event); }
 	bool onContactBegin(cocos2d::PhysicsContact& contact);
+	void onContactSeperate(cocos2d::PhysicsContact& contact);
 
 	/**
 	* @fn moveHero
 	* @brief used by scheduler to move hero
 	*/
 	void moveHero(float fdelta = 1);
+
+	void superchargedAbility(float fdelta = 1);
 
 DEPRECATED_ACCESS:
 

@@ -1,5 +1,6 @@
 //2150266  ±ÃÏ“›
- #include "HeroSprite.h"
+#include "HeroSprite.h"
+#include <cmath>
 
 USING_NS_CC;
 
@@ -81,6 +82,7 @@ void Hero::initializeContactListener()
 		return;
 	_contactListener = EventListenerPhysicsContact::create();
 	_contactListener->onContactBegin = CC_CALLBACK_1(Hero::onContactBegin, this);
+//	_contactListener->onContactSeparate = CC_CALLBACK_1(Hero::onContactSeperate, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(_contactListener, this);
 }
 
@@ -88,8 +90,8 @@ void Hero::initializeHeroPhysics(Hero* hero)
 {
 	auto heroPhysicsBody = PhysicsBody::createBox(hero->getContentSize());
 	heroPhysicsBody->setDynamic(false);
-	heroPhysicsBody->setCategoryBitmask(0x01);
-	heroPhysicsBody->setContactTestBitmask(0x01);
+	heroPhysicsBody->setCategoryBitmask(0x03);
+	heroPhysicsBody->setContactTestBitmask(0x03);
 	hero->setPhysicsBody(heroPhysicsBody);
 	hero->setName("hero");
 }
@@ -131,37 +133,87 @@ void Hero::initializeAmmoStrip(int maxAmmo)
 bool Hero::onContactBegin(PhysicsContact& contact)
 {
 	//distinguish the nodes
-	Node* hero = nullptr;
-	Node* bullet = nullptr;
+	typedef Node* NodePtr;
+	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr;
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
 	if (nodeA->getName() == "hero") hero = nodeA;
 	if (nodeB->getName() == "hero") hero = nodeB;
 	if (nodeA->getName() == "bullet") bullet = nodeA;
 	if (nodeB->getName() == "bullet") bullet = nodeB;
+	if (nodeA->getName() == "wall") wall = nodeA;
+	if (nodeB->getName() == "wall") wall = nodeB;
+	if (nodeA->getName() == "grass") grass = nodeA;
+	if (nodeB->getName() == "grass") grass = nodeB;
+	if (nodeA->getName() == "diamond") diamond = nodeA;
+	if (nodeB->getName() == "diamond") diamond = nodeB;
 
-	//judge whether should the contact be handled
-	if (hero == nullptr || bullet == nullptr)
+	//handle the contact
+	if (hero && bullet) {
+		//make sure the bullet wont hit its parent hero
+		if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->parentHero())
+			return false;
+
+		//deduct hp and remove bullet
+		dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
+		bullet->removeFromParent();
+
+		//blood return
+		hero->unschedule(SEL_SCHEDULE(&Hero::heal));
+		hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
+
 		return false;
-	if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->parentHero())
-		return false;
+	}
+	else if (hero && diamond) {
+		dynamic_cast<Hero*>(hero)->_diamond++;
+		diamond->removeFromParentAndCleanup(true);
 
-	//deduct hp and remove bullet
-	dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
-	bullet->removeFromParentAndCleanup(true);
+		return true;
+	}
+	else if (hero && wall) {
+		Point heroPos = hero->getPosition();
+		Point wallPos = wall->getPosition();
+		Size heroSize = hero->getContentSize();
+		Size wallSize = wall->getContentSize();
+		float offsetx = (heroSize.width + wallSize.width) / 2;
+		float offsety = (heroSize.height + wallSize.height) / 2;
+		Vec2 offset = heroPos - wallPos;
+		hero->setPosition(dynamic_cast<Hero*>(hero)->_prePos);
 
-	//blood return
-	hero->unschedule(SEL_SCHEDULE(&Hero::heal));
-	hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
+		return true;
+	}
+	else if (hero && grass) {
+		hero->setOpacity(150);
 
-	return true;
+		return true;
+	}
+
+	return false;
+}
+
+void Hero::onContactSeperate(PhysicsContact& contact)
+{
+	typedef Node* NodePtr;
+	NodePtr hero = nullptr, grass = nullptr;
+	auto nodeA = contact.getShapeA()->getBody()->getNode();
+	auto nodeB = contact.getShapeB()->getBody()->getNode();
+	if (nodeA->getName() == "hero") hero = nodeA;
+	if (nodeB->getName() == "hero") hero = nodeB;
+	if (nodeA->getName() == "grass") grass = nodeA;
+	if (nodeB->getName() == "grass") grass = nodeB;
+
+	if (hero && grass) {
+		hero->setOpacity(255);
+	}
 }
 
 void Hero::moveHero(float fdelta)
 {
+	_prePos = this->getPosition();
+
 	using code = cocos2d::EventKeyboard::KeyCode;
 
-	//judge whether the hero is frozen
+	//judge whether the hero is moving
 	if (_moveSpeed == Level::ZERO)
 		return;
 
@@ -183,6 +235,11 @@ void Hero::moveHero(float fdelta)
 
 	//move the hero
 	this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
+}
+
+void Hero::superchargedAbility(float fdelta)
+{
+
 }
 
 int Hero::increaseHP(int increasePoint)
