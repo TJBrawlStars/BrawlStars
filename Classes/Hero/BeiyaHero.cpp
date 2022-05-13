@@ -68,6 +68,7 @@ bool Beiya::attack(Touch* touch, Event* event)
 	if (projectile == nullptr)
 		problemLoading("projectile.png");
 	projectile->sethitPoint(this->getHitPoint());
+	projectile->setParentHero(this);
 	projectile->setPosition(this->getPosition());
 	initializeBulletPhysics(projectile);
 	this->getParent()->addChild(projectile);
@@ -82,8 +83,8 @@ bool Beiya::attack(Touch* touch, Event* event)
 	projectile->runAction(Sequence::create(shot, removeBullet, nullptr));
 
 	//modify the ammunition quantity
-	if (!isScheduled(SEL_SCHEDULE(&Hero::startLoading)))
-		schedule(SEL_SCHEDULE(&Hero::startLoading), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
+	if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
+		schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
 	--_ammo;
 	_ammoStrip[_ammo]->setVisible(false);
 

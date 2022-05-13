@@ -8,6 +8,8 @@
 #include <functional>
 #include <vector>
 #include <map>
+#define DEPRECATED_ACCESS private
+class Bullet;
 
 /**
 * @class Hero
@@ -52,17 +54,22 @@ public:
 	/// @}
 	/// end of Listener Set-ups
 
-	/**
-	* @fn getMoveSpeed
-	* @return the speed of hero(the distance the hero moves every second)
-	*/
+	/// @name Attribute Manipulators
+	/// @{
+
 	float getMoveSpeed() const noexcept { return static_cast<float>(_moveSpeed); }
-
 	int getHitPoint()    const noexcept { return _hitPoint; }
-
 	int getHP()          const noexcept { return _healthPoint; }
+	int getEnergy()      const noexcept { return _energy; }
+	int getDiamond()     const noexcept { return _diamond; }
 
-	/// @name HP Manipuators
+	void addEnergy(int num = 250) noexcept { _energy = (_energy + num) < _maxEnergy ? (_energy + num) : _maxEnergy; }
+	void addDiamond(int num = 1)  noexcept { ++_diamond; }
+
+	/// @}
+	/// end of Attribute Manipulators
+
+	/// @name HP Manipulators
 	/// @{
 
 	/**
@@ -87,11 +94,19 @@ public:
 	/// @}
 	/// end of HP Manipulators
 
+	/// @name Schedule Selectors
+	/// @{
+
 	/**
 	* @fn startLoading
 	* @brief each bullet is loaded for (2.0 - static_cast<float>(_loadSpeed) * 0.25) seconds
 	*/
-	void startLoading(float fdelta = 1);
+	void load(float fdelta = 1) noexcept;
+
+	void heal(float fdelta = 1) noexcept;
+
+	///@}
+	///end of Schedule Selectors
 
 protected:
 	/**
@@ -104,6 +119,7 @@ protected:
 	/** the attributes of a hero */
 	const int _maxHealthPoint;
 	const int _maxAmmo;
+	const int _maxEnergy = 1000;
 	int _healthPoint;
 	int _hitPoint;
 	int _ammo;
@@ -154,7 +170,7 @@ private:
 	/** event listeners */
 	cocos2d::EventListenerKeyboard* _keyboardListener;
 	cocos2d::EventListenerTouchOneByOne* _touchListener;
-	cocos2d::EventListenerPhysicsContact* _contactListener;
+	static cocos2d::EventListenerPhysicsContact* _contactListener;
 
 	/** initializer of the event listeners */
 	void initializeKeyboardListener();
@@ -172,4 +188,7 @@ private:
 	* @brief used by scheduler to move hero
 	*/
 	void moveHero(float fdelta = 1);
+
+DEPRECATED_ACCESS:
+
 };

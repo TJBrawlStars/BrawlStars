@@ -12,6 +12,8 @@ namespace {
 	}
 }
 
+cocos2d::EventListenerPhysicsContact* Hero::_contactListener = nullptr;
+
 void Hero::setKeyboardListener(bool keyboardState) noexcept
 {
 	//judge whether the keyboard state needs to be reset
@@ -75,10 +77,11 @@ void Hero::initializeTouchListener()
 
 void Hero::initializeContactListener()
 {
+	if (_contactListener)
+		return;
 	_contactListener = EventListenerPhysicsContact::create();
 	_contactListener->onContactBegin = CC_CALLBACK_1(Hero::onContactBegin, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(_contactListener, this);
-	_contactListener->setEnabled(false);
 }
 
 void Hero::initializeHeroPhysics(Hero* hero)
@@ -140,11 +143,16 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	//judge whether should the contact be handled
 	if (hero == nullptr || bullet == nullptr)
 		return false;
-	if (hero == this)
+	if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->parentHero())
 		return false;
 
+	//deduct hp and remove bullet
 	dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
 	bullet->removeFromParentAndCleanup(true);
+
+	//blood return
+	hero->unschedule(SEL_SCHEDULE(&Hero::heal));
+	hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
 
 	return true;
 }
@@ -199,8 +207,16 @@ int Hero::deductHP(int deductPoint)
 	return _healthPoint;
 }
 
-void Hero::startLoading(float fdelta)
+void Hero::load(float fdelta) noexcept
 {
 	_ammo = (_ammo + 1) < _maxAmmo ? (_ammo + 1) : _maxAmmo;
 	_ammoStrip[_ammo - 1]->setVisible(true);
+}
+
+void Hero::heal(float fdelta) noexcept
+{
+	if (!isScheduled(SEL_SCHEDULE(&Hero::heal)))
+		schedule(SEL_SCHEDULE(&Hero::heal), 0.75);
+	this->_healthPoint = (_healthPoint + 709) < _maxHealthPoint ? (_healthPoint + 709) : _maxHealthPoint;
+	this->_bloodStrip->setPercent(static_cast<float>(_healthPoint) / _maxHealthPoint * 100);
 }
