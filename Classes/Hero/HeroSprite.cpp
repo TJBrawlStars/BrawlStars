@@ -82,28 +82,18 @@ void Hero::initializeContactListener()
 		return;
 	_contactListener = EventListenerPhysicsContact::create();
 	_contactListener->onContactBegin = CC_CALLBACK_1(Hero::onContactBegin, this);
-//	_contactListener->onContactSeparate = CC_CALLBACK_1(Hero::onContactSeperate, this);
+	_contactListener->onContactSeparate = CC_CALLBACK_1(Hero::onContactSeperate, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(_contactListener, this);
 }
 
-void Hero::initializeHeroPhysics(Hero* hero)
+void Hero::initializeHeroPhysics()
 {
-	auto heroPhysicsBody = PhysicsBody::createBox(hero->getContentSize());
+	auto heroPhysicsBody = PhysicsBody::createBox(this->getContentSize());
 	heroPhysicsBody->setDynamic(false);
 	heroPhysicsBody->setCategoryBitmask(0x03);
 	heroPhysicsBody->setContactTestBitmask(0x03);
-	hero->setPhysicsBody(heroPhysicsBody);
-	hero->setName("hero");
-}
-
-void Hero::initializeBulletPhysics(Bullet* bullet)
-{
-	auto bulletPhysicsBody = PhysicsBody::createBox(bullet->getContentSize());
-	bulletPhysicsBody->setDynamic(false);
-	bulletPhysicsBody->setCategoryBitmask(0x01);
-	bulletPhysicsBody->setContactTestBitmask(0x01);
-	bullet->setPhysicsBody(bulletPhysicsBody);
-	bullet->setName("bullet");
+	this->setPhysicsBody(heroPhysicsBody);
+	this->setName("hero");
 }
 
 void Hero::initialzeBloodStrip(int maxHealthPoint)
@@ -130,7 +120,86 @@ void Hero::initializeAmmoStrip(int maxAmmo)
 	}
 }
 
+/**
+* the physics bitmasks:
+* name           categoryBitmask         contactTestBitmask
+* hero           0x03                    0x03
+* bullet         0x01                    0x01
+* wall           0x01                    0x01
+* grass          0x02                    0x02
+* diamond        0x02                    0x02
+* box            0x01                    0x01
+*/
 bool Hero::onContactBegin(PhysicsContact& contact)
+{
+	//distinguish the nodes
+	typedef Node* NodePtr;
+	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, box = nullptr;
+	auto nodeA = contact.getShapeA()->getBody()->getNode();
+	auto nodeB = contact.getShapeB()->getBody()->getNode();
+	if (nodeA->getName() == "hero") hero = nodeA;
+	if (nodeB->getName() == "hero") hero = nodeB;
+	if (nodeA->getName() == "bullet") bullet = nodeA;
+	if (nodeB->getName() == "bullet") bullet = nodeB;
+	if (nodeA->getName() == "wall") wall = nodeA;
+	if (nodeB->getName() == "wall") wall = nodeB;
+	if (nodeA->getName() == "grass") grass = nodeA;
+	if (nodeB->getName() == "grass") grass = nodeB;
+	if (nodeA->getName() == "diamond") diamond = nodeA;
+	if (nodeB->getName() == "diamond") diamond = nodeB;
+	if (nodeA->getName() == "box") box = nodeA;
+	if (nodeB->getName() == "box") box = nodeB;
+
+	//handle the contacts
+	if (hero && bullet) {  //deduct hp
+		//make sure the bullet wont hit its parent hero
+		if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->parentHero())
+			return false;
+
+		//deduct hp and remove bullet
+		dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
+		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
+		bullet->setVisible(false);
+
+		//blood return
+		hero->unschedule(SEL_SCHEDULE(&Hero::heal));
+		hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
+
+		return false;
+	}
+	else if (hero && diamond) {  //add the diamond
+		dynamic_cast<Hero*>(hero)->_diamond++;
+		diamond->removeFromParent();
+
+		return false;
+	}
+	else if (hero && wall) {
+		Point heroPos = hero->getPosition();
+		Point wallPos = wall->getPosition();
+		Size heroSize = hero->getContentSize();
+		Size wallSize = wall->getContentSize();
+		float offsetx = (heroSize.width + wallSize.width) / 2;
+		float offsety = (heroSize.height + wallSize.height) / 2;
+		Vec2 offset = heroPos - wallPos;
+		
+		return false;
+	}
+	else if (hero && grass) {
+		hero->setOpacity(150);
+
+		return false;
+	}
+	else if (bullet && wall) {  //remove bullet
+		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
+		bullet->setVisible(false);
+
+		return false;
+	}
+
+	return false;
+}
+
+void Hero::onContactSeperate(PhysicsContact& contact)
 {
 	//distinguish the nodes
 	typedef Node* NodePtr;
@@ -148,69 +217,13 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	if (nodeA->getName() == "diamond") diamond = nodeA;
 	if (nodeB->getName() == "diamond") diamond = nodeB;
 
-	//handle the contact
-	if (hero && bullet) {
-		//make sure the bullet wont hit its parent hero
-		if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->parentHero())
-			return false;
-
-		//deduct hp and remove bullet
-		dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
-		bullet->removeFromParent();
-
-		//blood return
-		hero->unschedule(SEL_SCHEDULE(&Hero::heal));
-		hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
-
-		return false;
-	}
-	else if (hero && diamond) {
-		dynamic_cast<Hero*>(hero)->_diamond++;
-		diamond->removeFromParentAndCleanup(true);
-
-		return true;
-	}
-	else if (hero && wall) {
-		Point heroPos = hero->getPosition();
-		Point wallPos = wall->getPosition();
-		Size heroSize = hero->getContentSize();
-		Size wallSize = wall->getContentSize();
-		float offsetx = (heroSize.width + wallSize.width) / 2;
-		float offsety = (heroSize.height + wallSize.height) / 2;
-		Vec2 offset = heroPos - wallPos;
-		hero->setPosition(dynamic_cast<Hero*>(hero)->_prePos);
-
-		return true;
-	}
-	else if (hero && grass) {
-		hero->setOpacity(150);
-
-		return true;
-	}
-
-	return false;
-}
-
-void Hero::onContactSeperate(PhysicsContact& contact)
-{
-	typedef Node* NodePtr;
-	NodePtr hero = nullptr, grass = nullptr;
-	auto nodeA = contact.getShapeA()->getBody()->getNode();
-	auto nodeB = contact.getShapeB()->getBody()->getNode();
-	if (nodeA->getName() == "hero") hero = nodeA;
-	if (nodeB->getName() == "hero") hero = nodeB;
-	if (nodeA->getName() == "grass") grass = nodeA;
-	if (nodeB->getName() == "grass") grass = nodeB;
-
-	if (hero && grass) {
+	if (hero && grass) {  //make hero visible
 		hero->setOpacity(255);
 	}
 }
 
 void Hero::moveHero(float fdelta)
 {
-	_prePos = this->getPosition();
-
 	using code = cocos2d::EventKeyboard::KeyCode;
 
 	//judge whether the hero is moving

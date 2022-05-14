@@ -8,7 +8,10 @@
 #include <functional>
 #include <vector>
 #include <map>
+
 #define DEPRECATED_ACCESS private
+#define SELECTOR_ACCESS public
+
 class Bullet;
 
 /**
@@ -94,6 +97,7 @@ public:
 	/// @}
 	/// end of HP Manipulators
 
+SELECTOR_ACCESS:
 	/// @name Schedule Selectors
 	/// @{
 
@@ -141,13 +145,7 @@ protected:
 	* @brief initialize with hero's physics body
 	* @warning the function should be used after the set of hero's texture
 	*/
-	void initializeHeroPhysics(Hero* hero);
-
-	/**
-	* @fn initializeBulletPhysics
-	* @brief initialize with bullet's physics body
-	*/
-	void initializeBulletPhysics(Bullet* bullet);
+	void initializeHeroPhysics();
 
 	/**
 	* @fn initializeBloodStrip
@@ -166,7 +164,6 @@ protected:
 private:
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
-	cocos2d::Point _prePos;
 
 	/** event listeners */
 	cocos2d::EventListenerKeyboard* _keyboardListener;

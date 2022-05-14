@@ -34,4 +34,10 @@ private:
 	int _hitPoint = 0;              ///< the hit point of the bullet which is related to hero
 	Effect _effect = Effect::NONE;  ///< the special effect of bullet
 	std::string _bulletPicture;     ///< the picture of bullet
+
+	/**
+	* @fn initializeBulletPhysics
+	* @brief initialize with bullet's physics body
+	*/
+	void initializeBulletPhysics();
 };

@@ -20,7 +20,7 @@ Beiya* Beiya::createBeiya()
 		beiya->autorelease();
 
 		//initialize the physics body
-		beiya->initializeHeroPhysics(beiya);
+		beiya->initializeHeroPhysics();
 
 		//draw the blood strip
 		beiya->initialzeBloodStrip(beiya->_maxHealthPoint);
@@ -70,7 +70,6 @@ bool Beiya::attack(Touch* touch, Event* event)
 	projectile->sethitPoint(this->getHitPoint());
 	projectile->setParentHero(this);
 	projectile->setPosition(this->getPosition());
-	initializeBulletPhysics(projectile);
 	this->getParent()->addChild(projectile);
 
 	//get the vector of attack according to the range of hero
