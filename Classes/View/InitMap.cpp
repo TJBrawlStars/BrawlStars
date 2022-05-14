@@ -1,19 +1,26 @@
 /**
 * @author 张靖凯
-* 初始化地图，障碍物
-* 
+* @brief 初始化地图
 */
 #include"cocos2d.h"
 #include "View\GameScene.h"
 #include "Const/Const.h"
-#include "Tool/TreasureBox.h"
-#include "Tool/Item.h"
+using namespace std;
 USING_NS_CC;
 
 void GameScene::addMap()
 {
     //初始化各个变量！！！！！！！！
-    _mapinfo._map = TMXTiledMap::create("map/mapNo1.tmx");
+    const int mapChooseNum = random(1, 3);
+    string mapChooseStr;
+    if (mapChooseNum == 1)
+        mapChooseStr = Path::map1;
+    else if (mapChooseNum == 2)
+        mapChooseStr = Path::map2;
+    else if (mapChooseNum == 3)
+        mapChooseStr = Path::map3;
+
+    _mapinfo._map = TMXTiledMap::create(mapChooseStr);
     _mapinfo._map->setAnchorPoint(Vec2::ZERO);
     _mapinfo._map->setPosition(Vec2::ZERO);
     this->addChild(_mapinfo._map, kMapPriority);
@@ -26,65 +33,16 @@ void GameScene::addMap()
     _mapinfo._obstacleLayer = _mapinfo._map->getLayer("3");
     _mapinfo._obstacleLayer->setGlobalZOrder(kTMXlayer);
 
+    //草丛不能这样哦~~~~
+    //_mapinfo._obstacleLayer = _mapinfo._map->getLayer("4");
+    //_mapinfo._obstacleLayer->setGlobalZOrder(kTMXlayer);
+    // 
     //地图方块数量
     _mapinfo._mapTiledNum = _mapinfo._map->getMapSize();
     //单个格子大小
     _mapinfo._tiledSize = _mapinfo._map->getTileSize();
     //初始化结束
 }
-
-void  GameScene::addBox()
-{
-    auto box = TreasureBox::create();
-    box->setPosition(Vec2(random(32, maxWidth), random(32, maxHeight)));
-    box->initialzeBloodStrip(kmaxBoxHealthPoint);
-    this->addChild(box, kBoxPriority, Name::kTreasureBox);
-}
-
-void GameScene::addRandomBox()
-{
-    const int randomBoxNum = cocos2d::random(18, 23);
-    log("create box:%d", randomBoxNum);
-    for (int i = 1; i <= randomBoxNum; i++)
-    {
-        addBox();
-    }
-}
-
-void GameScene::addBarrier()
-{
-    auto group = _mapinfo._map->getObjectGroup("barrier");
-    ValueVector barrierObjects = group->getObjects();
-    for (auto barrier : barrierObjects)
-    {
-        ValueMap& dict = barrier.asValueMap();
-        float x = dict["x"].asFloat();
-        float y = dict["y"].asFloat();
-        float width = dict["width"].asFloat();
-        float height = dict["height"].asFloat();
-
-        PhysicsBody* tmpPhysicsBody = PhysicsBody::createBox(Size(width, height),
-        PhysicsMaterial(100.0f, 0.0f, 0.0f));
-        tmpPhysicsBody->setDynamic(false);
-        tmpPhysicsBody->setCategoryBitmask(1);
-        tmpPhysicsBody->setCollisionBitmask(1);
-        tmpPhysicsBody->setContactTestBitmask(1);
-        tmpPhysicsBody->setGravityEnable(false);
-
-        Sprite* tmpSprite = Sprite::create();
-        tmpSprite->setPosition(Vec2(x, y));
-        tmpSprite->setAnchorPoint(Vec2::ZERO);
-        tmpSprite->setContentSize(Size(width, height));
-        tmpSprite->addComponent(tmpPhysicsBody);
-        tmpSprite->setTag(kBarrierTag);
-        tmpSprite->setName(Name::kBarrier);
-
-        this->addChild(tmpSprite, kBarrierPriority);
-        log("create barrer:%f", width);
-    }
-}
-
-
 
 Vec2 GameScene::tiledCoordFromPosition(Vec2 position)
 {
@@ -138,24 +96,3 @@ void GameScene::setViewPointByPlayer(Point position)
 
     this->setPosition(viewPos);
 }
-
-//暂时不用这个了
-//bool GameScene::isColliding(Vec2 position)
-//{
-//    //转化成瓦片坐标
-//    cocos2d::Vec2 tilePos = this->tiledCoordFromPosition(position);
-//
-//    int tileGid = _mapinfo._obstacleLayer->getTileGIDAt(tilePos);
-//    log("collidable id:%d", tileGid);
-//    //有bug
-//    if (tileGid != 0)
-//    {
-//        //Value prop = _mapinfo._map->getPropertiesForGID(tileGid);//获得gid属性
-//        //Value propMap = prop.asValueMap().at("Collidable");
-//        //if (prop.asString().compare("true") != 0)
-//        //{
-//            return true;
-//        //}
-//    }
-//    return false;
-//}
