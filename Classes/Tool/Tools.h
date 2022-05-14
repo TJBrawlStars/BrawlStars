@@ -46,6 +46,7 @@ public:
 	* @param (const std::string&&filename)图片地址
 	*/
 	static cocos2d::Sprite* SetBg(const std::string&& filename, cocos2d::Node* that);
+	static cocos2d::Sprite* SetBg(const std::string& filename, cocos2d::Node* that);
 	static cocos2d::ui::Scale9Sprite* SetBg(cocos2d::Node* that);
 
 	/**
@@ -57,7 +58,10 @@ public:
 		Up,
 		FadeIn,
 		FadeOut,
-		Turn
+		Turn,
+		//给侧边栏用的
+		LeftToRight,
+		RightToLeft
 	};
 
 	/**
@@ -87,7 +91,7 @@ public:
 	* @param (cocos2d::ccMenuCallback& callback)回调函数
 	*/
 	static cocos2d::Label* LabelCreateTTF(cocos2d::Vec2&& pos, const std::string& words, std::string&& ttf, float size, cocos2d::Node*);
-	static cocos2d::Label* LabelCreateSystem(cocos2d::Vec2&& pos, const std::string& words, std::string&& ttf, float size, cocos2d::Node*);
+	static cocos2d::Label* LabelCreateSystem(const cocos2d::Vec2& pos, const std::string& words, std::string&& ttf, float size, cocos2d::Node*);
 
 	/**
 	* @brief 封装创建精灵
