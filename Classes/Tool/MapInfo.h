@@ -18,5 +18,5 @@ public:
 public:
     void setCollisionBoard();
     //随机产生一个位置
-    cocos2d::Vec2 randomPos();
+    static cocos2d::Vec2 randomPos();
 };

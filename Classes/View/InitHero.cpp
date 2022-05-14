@@ -1,7 +1,7 @@
 /**
 * @author ’≈æ∏ø≠
 * ≥ı ºªØ”¢–€
-*
+* 
 */
 #include"cocos2d.h"
 #include "View\GameScene.h"
