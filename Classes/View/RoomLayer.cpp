@@ -5,6 +5,7 @@ using namespace ui;
 #include<cassert>
 #include "Tool/SceneManager.h"
 #include"Tool/Tools.h"
+#include"Tool/Setting.h"
 #pragma execution_character_set("utf-8")  
 
 static constexpr int kEnemyTag = 0;
@@ -22,19 +23,16 @@ bool RoomLayer::init()
 
 	//层背景
 	_bg = Tools::SetBg(this);
-	/*_bg = Scale9Sprite::create("ui/button.png");
-	assert(_bg != NULL);
-	this->addChild(_bg);
-	_bg->setCapInsets(Rect(5, 5, 15, 15));
-	_bg->setPosition(kVisibleSize / 2);
-	_bg->setContentSize(kVisibleSize);*/
 
 	//开始游戏按钮
 	_start = Tools::ButtonCreate("开始对战", Vec2(kVisibleSize.width - 130, 75), this);
 	_start->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_GameScene);
+			}
 		});
 
 	//返回按钮
@@ -42,7 +40,10 @@ bool RoomLayer::init()
 	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				Tools::SwitchScene(this, Tools::SwitchSceneType::Up);
+			}
 		});
 
 	//6个房间成员框
@@ -58,6 +59,7 @@ bool RoomLayer::init()
 			//设置我方和敌方机器人个数
 			if (type == Widget::TouchEventType::ENDED)
 			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				/*while (_enemy.setRobot(true));
 				while (_our.setRobot(true));*/
 				while (_member.setRobot(true));
@@ -78,44 +80,6 @@ bool RoomLayer::onTouchBegan(cocos2d::Touch*, cocos2d::Event*)
 {
 	return true;
 }
-
-//弃用
-
-//Button* RoomLayer::ButtonCreate(const cocos2d::Vec2&& position, const std::string&& pic_name)
-//{
-//	auto button = Button::create("ui/button.png");
-//	assert(button != NULL);
-//
-//	button->setScale9Enabled(true);
-//	button->setCapInsets(Rect(5, 5, 15, 15));
-//	button->setPosition(position);
-//
-//	auto sprite = Sprite::create(pic_name);
-//	assert(sprite != NULL);
-//
-//	button->addChild(sprite);
-//	button->setContentSize(Size(sprite->getContentSize().width + 50, sprite->getContentSize().height + 25));
-//	sprite->setPosition(button->getContentSize() / 2);
-//	this->addChild(button);
-//	return button;
-//}
-//
-//Button* RoomLayer::ButtonCreate(const std::string&& words, const cocos2d::Vec2&& position)
-//{
-//	auto button = Button::create("ui/button_y.png");
-//	assert(button != NULL);
-//
-//	button->setScale9Enabled(true);
-//	button->setCapInsets(Rect(5, 5, 15, 15));
-//	button->setPosition(position);
-//
-//	auto label = Label::createWithSystemFont(words, "微软雅黑", 30);
-//	assert(label != NULL);
-//	button->setTitleLabel(label);
-//	button->setContentSize(Size(label->getContentSize().width + 25, label->getContentSize().height + 25));
-//	this->addChild(button);
-//	return button;
-//}
 
 void RoomLayer::MemberCreate()
 {
