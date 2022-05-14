@@ -2,13 +2,15 @@
 //#define NDEBUG
 #include<cassert>
 #include "cocos2d.h"
+USING_NS_CC;
 #include"ui/CocosGUI.h"
+using namespace ui;
 #include"Tool/SceneManager.h"
 #include "Tool/MapInfo.h"
 #include"Hero/HeroSprite.h"
 #include"Hero/BeiyaHero.h"
 
-class GameScene : public cocos2d::Scene
+class GameScene : public Scene
 {
 public:
     CREATE_FUNC(GameScene);
@@ -16,74 +18,71 @@ public:
     virtual bool init();
 
     /********* @author:张靖凯************/
-
     //传入主角的坐标，放在控制器（控制角色）当中
-    void setViewPointByPlayer(cocos2d::Point position);
-
+    void setViewPointByPlayer(Point position);
 
     //判断是否碰撞障碍物（有bug！）(暂时不用)
     //传入的是openGL坐标(就是左下角为原点，2400*2400）向右为x向上为y
     //bool isColliding(Vec2 position);
 
-
     //转换成瓦片坐标（左上角为原点）
-    cocos2d::Vec2 tiledCoordFromPosition(cocos2d::Vec2 position);
-
-
-    //返回障碍层/草丛
-    cocos2d::Vector<cocos2d::Sprite*> getObstacle();
-    cocos2d::Vector<cocos2d::Sprite*> getGrass();
-
-
-    //判断是否有障碍物/草丛,有则返回true
-    bool isBarrierExist(cocos2d::Point position);
-    bool isGrassExist(cocos2d::Point position);
-
-    void grassPlayerOpacity();
+    Vec2 tiledCoordFromPosition(Vec2 position);
 
     //初始化地图
-    void addMap();
-
-
-    //初始化角色
-    void addHeroPlayer();
-    
-
-    //void addAIHeroPlayer(); 
-    
+    void initMap();
 
     //创建障碍层
-    void addBarrier();
+    void createBarrier();
 
+    //添加宝箱
+    void addRandomBox();
+    void addBox();
 
-    //创建草丛
-    void addGrass();
-
-
-    ////添加宝箱
-    //void addRandomBox();
-    //void addBox();
-
-
-    /********* @author:王琳************/
-    
+    //schedule update
     void update(float dt);
+    
 
 private:
     //屏幕大小
-    const cocos2d::Vec2 kVisibleSize = cocos2d::Director::getInstance()->getVisibleSize();
+    const Vec2 kVisibleSize = Director::getInstance()->getVisibleSize();
+
+
+
 
     /********* @author:张靖凯************/
 
     //地图信息（initMap()函数初始化了里面的变量）
     MapInfo _mapinfo;
-    //障碍容器
-    cocos2d::Vector<cocos2d::Sprite*> _obstacle;
-    //草丛容器
-    cocos2d::Vector<cocos2d::Sprite*> _grass;
     //主角
     Beiya* _player;
    
 };
 
+/********* @author:王琳************/
+class poisonCircle :public Scene
+{
+public:
+
+    //static Scene* scene();
+    CREATE_FUNC(poisonCircle);
+
+    
+   
+    virtual bool init();
+
+    void updatepoisonCircle(float dt);
+
+    cocos2d::Sprite* poisonCircleDown;
+    cocos2d::Sprite* poisonCircleUp;
+    cocos2d::Sprite* poisonCircleLeft;
+    cocos2d::Sprite* poisonCircleRight;
+    float poisonCircleMarch = 0.7f;
+    float poisonCircleMax = 2400;
+
+   // int poisonCircleDamage = 10;
+   // float poisonCircleInterval = 3;
+
+   // bool poisonCircleCanDamage = true;
+
+};
 
