@@ -8,6 +8,8 @@ class RoomLayer;
 class SettingLayer;
 class FigureLayer;
 class InforLayer;
+class MenuLayer;
+class FriendLayer;
 
    /**
    * @brief 主场景
@@ -33,13 +35,24 @@ public:
     */
     static  MainScene* GetMainScene() { return _that; }
 
+    /**
+    * @brief 修改头像
+    */
+    void SetInfo(const std::string& filename);
+
+    /**
+    * @brief 得到头像
+    */
+    std::string GetInfo();
+
 private:
 
     virtual bool init();
 
     MainScene() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
         , _bg(NULL), _loading(NULL), _menu_button(NULL), _info_button(NULL), _play_button(NULL)
-        , _figure(NULL), _room(NULL), _set(NULL), _back(NULL), _changeFigure(NULL), _info(NULL) {};
+        , _figure(NULL), _room(NULL), _menu(NULL), _back(NULL), _changeFigure(NULL), _info(NULL)
+        , _friends(NULL) {};
 
 private:
 
@@ -69,8 +82,8 @@ private:
    //房间层
    RoomLayer* _room;
 
-   //设置层
-   SettingLayer* _set;
+   //菜单层
+   MenuLayer* _menu;
 
    //返回按钮
    cocos2d::ui::Button* _back;
@@ -80,6 +93,15 @@ private:
 
    //info层
    InforLayer* _info;
+
+   //好友按钮
+   cocos2d::ui::Button* _friends;
+
+   //friend层
+   FriendLayer* _friend;
+
+   //消息按钮 
+   cocos2d::ui::Button* _messages;
 
 };
 

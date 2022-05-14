@@ -11,9 +11,26 @@ using namespace ui;
 #include "Tool/Tools.h"
 #include "FigureLayer.h"
 #include "InforLayer.h"
+#include "MenuLayer.h"
+#include "FriendLayer.h"
 #pragma execution_character_set("utf-8")  
 
 MainScene* MainScene::_that = NULL;
+
+void MainScene::SetInfo(const std::string& filename)
+{
+	_info_button->removeAllChildren();
+	auto item = Sprite::create(filename);
+	assert(item);
+	_info_button->setName(filename);
+	_info_button->addChild(item);
+	item->setPosition(_info_button->getContentSize() / 2);
+}
+
+std::string MainScene::GetInfo()
+{
+	return _info_button->getName();
+}
 
 bool MainScene::init()
 {
@@ -34,7 +51,7 @@ bool MainScene::init()
 	}
 
 	//设置背景
-	_bg = Tools::SetBg("ui/MainBg.png", this);
+ 	_bg = Tools::SetBg("ui/MainBg.png", this);
 
 	//菜单按钮
 	_menu_button = Tools::ButtonCreate(Vec2(275, kVisibleSize.height - 40), "ui/menu.png", this);
@@ -42,19 +59,22 @@ bool MainScene::init()
 		{
 			if (type == Widget::TouchEventType::ENDED)
 			{
-				_set = SettingLayer::create();
-				assert(_set);
-				this->addChild(_set);
-				Tools::SwitchScene(_set, Tools::SwitchSceneType::Down);
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+				_menu = MenuLayer::create();
+				assert(_menu);
+				this->addChild(_menu);
+				Tools::SwitchScene(_menu, Tools::SwitchSceneType::LeftToRight);
 			}
 		});
 
 	//个人信息按钮
-	_info_button = Tools::ButtonCreate(Vec2(77, kVisibleSize.height - 40), "ui/info.png", this);
+	_info_button = Tools::ButtonCreate(Vec2(77, kVisibleSize.height - 40), "ui/info1.png", this);
+	_info_button->setName("ui/info1.png");
 	_info_button->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
 			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				_info = InforLayer::create();
 				assert(_info);
 				this->addChild(_info);
@@ -68,6 +88,7 @@ bool MainScene::init()
 		{
 			if (type == Widget::TouchEventType::ENDED)
 			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				_room = RoomLayer::create();
 				assert(_room);
 				this->addChild(_room);
@@ -82,6 +103,7 @@ bool MainScene::init()
 			//不这样的话点击和结束点击都会创建一个层，坑死我了
 			if (type == Widget::TouchEventType::ENDED)
 			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				Setting::getInstance()->StopSound();
 				_loading = LoadingScene::create();
 				assert(_loading != NULL);
@@ -96,10 +118,35 @@ bool MainScene::init()
 		{
 			if (type == Widget::TouchEventType::ENDED)
 			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				_changeFigure = FigureLayer::create();
 				assert(_changeFigure != 0);
 				this->addChild(_changeFigure, 100);
 				Tools::SwitchScene(_changeFigure, Tools::SwitchSceneType::Down);
+			}
+		});
+
+	//好友按钮
+	_friends = Tools::ButtonCreate(Vec2(375, kVisibleSize.height - 40), "ui/friend.png", this);
+	_friends->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+		{
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+				_friend = FriendLayer::create();
+				assert(_friend);
+				this->addChild(_friend);
+				Tools::SwitchScene(_friend, Tools::SwitchSceneType::Down);
+			}
+		});
+
+	//消息按钮
+	_messages = Tools::ButtonCreate(Vec2(75, 40), "ui/message.png", this);
+	_messages->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+		{
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				//聊天系统，这边做一个聊天的侧边栏叭
 			}
 		});
 
