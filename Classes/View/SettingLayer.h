@@ -23,13 +23,18 @@ private:
 
 	virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*);
 
-	SettingLayer() :_bg(NULL), _soundmenu(NULL), _soundbar(NULL), _back(NULL)
-		, kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize()) {};
+	SettingLayer() : kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
+		, _bg(NULL), _soundmenu(NULL), _soundbar(NULL), _back(NULL), _sound_effectMenu(NULL), _sound_effectBar(NULL) {};
 
 	/**
-	* @brief 静音菜单的回调函数
+	* @brief 背景音静音菜单的回调函数
 	*/
 	void SoundmenuCloseCallback(cocos2d::Ref* pSender);
+
+	/**
+	* @brief 音效静音菜单的回调函数
+	*/
+	void SoundEffectmenuCloseCallback(cocos2d::Ref* pSender);
 
 private:
 
@@ -38,14 +43,23 @@ private:
 	//设置画面背景
 	cocos2d::ui::Scale9Sprite* _bg;
 
-	//设置菜单
+	//背景声音设置菜单
 	cocos2d::Menu* _soundmenu;
 
-	//声音控制滑条
+	//背景声音控制滑条
 	cocos2d::ui::Slider* _soundbar;
 
 	//返回按钮
 	cocos2d::ui::Button* _back;
+
+	//音效设置菜单
+	cocos2d::Menu* _sound_effectMenu;
+
+	//音效控制滑条
+	cocos2d::ui::Slider* _sound_effectBar;
+
+	//退出登录
+	cocos2d::ui::Button* _exit;
 
 };
 
