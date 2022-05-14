@@ -12,6 +12,7 @@ public:
 
     static Setting* getInstance();
 
+    /*-----------------------------------------------背景音*/
     /**
     * @brief 播放指定背景音乐
     */
@@ -32,17 +33,45 @@ public:
     */
     void SoundPercentSet(const int persent);
 
+    /**
+    * @brief 是否播放背景音
+    */
+    bool isSound() { return _sound; }
+
+    /*-----------------------------------------------音效*/
+    /**
+    * @brief 播放指定音效
+    */
+    void GoSoundEffect(std::string filename);
+
+    /**
+    * @brief 设置音效是否播放
+    */
+    void SoundEffectSet(const bool set);
+
+    /**
+    * @brief 设置音效百分比
+    */
+    void SoundEffectPercentSet(const int persent);
+
+    /**
+    * @brief 是否播放音效
+    */
+    bool isSoundEffect() { return _sound_effect; }
+
 private:
 
     static Setting* instance;
 
     bool _sound;
 
+    bool _sound_effect;
+
     CocosDenshion::SimpleAudioEngine* _sound_engine = CocosDenshion::SimpleAudioEngine::getInstance();
 
 private:
 
-    Setting() :_sound(true) {};
+    Setting() :_sound(true), _sound_effect(true) {};
 
 };
 

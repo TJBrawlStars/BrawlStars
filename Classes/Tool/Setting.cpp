@@ -10,6 +10,7 @@ Setting* Setting::getInstance()
 	if (instance == NULL)
 	{
 		instance = new Setting();
+		auto a = instance->_sound;
 		//ÈÝ´í´¦Àí
 		if (instance)
 		{
@@ -34,9 +35,9 @@ void Setting::SoundSet(const bool set)
 {
 	_sound = set;
 	if (set)
-		_sound_engine->pauseBackgroundMusic();
-	else
 		_sound_engine->resumeBackgroundMusic();
+	else
+		_sound_engine->pauseBackgroundMusic();
 }
 
 void Setting::StopSound()
@@ -47,4 +48,20 @@ void Setting::StopSound()
 void Setting::SoundPercentSet(const int persent)
 {
 	_sound_engine->getInstance()->setBackgroundMusicVolume(persent * 0.01f);
+}
+
+void Setting::GoSoundEffect(std::string filename)
+{
+	if (_sound_effect != false)
+		_sound_engine->playEffect(filename.c_str());
+}
+
+void Setting::SoundEffectSet(const bool set)
+{
+	_sound_effect = set;
+}
+
+void Setting::SoundEffectPercentSet(const int persent)
+{
+	_sound_engine->getInstance()->setEffectsVolume(persent * 0.01f);
 }
