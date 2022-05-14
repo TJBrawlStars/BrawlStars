@@ -24,43 +24,54 @@ bool LoadingScene::init()
 	//背景的设置
 	_bg = Tools::SetBg("ui/loadingBg.jpg", this);
 
-	//按钮的设置
-	_login_button = Tools::ButtonCreate(Vec2(kVisibleSize.width / 2, kVisibleSize.height / 2 - 150)
+	if (true)//如果没有登录信息的话,需要改这里
+	{
+		//登录按钮
+		_login_button = Tools::ButtonCreate(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.3f)
+			, "登      录", "ui/loadingButton.png", "ui/loadingButton_s.png", this);
+		//这边真要登录的话就新写一个函数叭
+		_login_button->addTouchEventListener([this](Ref*, ui::Widget::TouchEventType type)
+			{
+				if (type == Widget::TouchEventType::ENDED)
+				{
+					Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+					auto distory = RemoveSelf::create();
+					_login_button->runAction(distory);
+					LoadGame();
+				}
+			});
+	}
+
+	return true;
+}
+
+void LoadingScene::LoadGame()
+{
+	/*-----------------------------------------------------------------------------------开始游戏按钮*/
+	_start_button = Tools::ButtonCreate(Vec2(kVisibleSize.width / 2, kVisibleSize.height / 2 - 150)
 		, "开始游戏", "ui/loadingButton.png", "ui/loadingButton_s.png", this);
-	_login_button->addTouchEventListener([this](Ref*, ui::Widget::TouchEventType type)
+	_start_button->addTouchEventListener([this](Ref*, ui::Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				Tools::SwitchScene(this, Tools::SwitchSceneType::FadeOut);
+			}
 		});
 
-	//退出按钮
+	/*-----------------------------------------------------------------------------------退出按钮*/
 	_exit_button = Tools::ButtonCreate(Vec2(kVisibleSize.width / 2, kVisibleSize.height / 2 - 250)
 		, "结束游戏", "ui/loadingButton.png", "ui/loadingButton_s.png", this);
 	_exit_button->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				Director::getInstance()->end();
+			}
 		});
 
-	return true;
 }
-
-//弃用
-
-//Button* LoadingScene::SetButton(const Vec2&& pos, const std::string&& title, const std::string&& pic1, const std::string&& pic2)
-//{
-//	auto button = Button::create(pic1, pic2);
-//	assert(button != NULL);
-//	button->setPosition(pos);
-//	button->setScale9Enabled(true);
-//	button->setCapInsets(Rect(5, 5, 15, 15));
-//	auto label = Label::createWithSystemFont(title, "微软雅黑", 40);
-//	assert(label != NULL);
-//	button->setTitleLabel(label);
-//	button->setContentSize(Size(label->getContentSize().width + 120, label->getContentSize().height + 50));
-//	this->addChild(button);
-//	return button;
-//}
 
 bool LoadingScene::onTouchBegan(Touch*, Event*)
 {

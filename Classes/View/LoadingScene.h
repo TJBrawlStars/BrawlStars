@@ -18,18 +18,13 @@ private:
 
 	virtual bool init();
 
-	//弃用
-
-	//**
-	//* @brief 设置按钮并add进场景
-	//* @param (Vec2&& pos)位置
-	//* @param ( std::string title)按钮标题
-	//* @param (std::string pic)图片路径
-	//*/
-	//cocos2d::ui::Button* SetButton(const cocos2d::Vec2&& pos, const std::string&& title, const std::string&& pic1, const std::string&& pic2);
+	/**
+	* @brief 设置登陆后的界面
+	*/
+	void LoadGame();
 
 	LoadingScene() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
-		, _bg(NULL), _login_button(NULL), _exit_button(NULL) {};
+		, _bg(NULL), _login_button(NULL), _start_button(NULL), _exit_button(NULL) {};
 
 private:
 
@@ -40,6 +35,9 @@ private:
 
 	//登录按钮
 	cocos2d::ui::Button* _login_button;
+
+	//开始游戏按钮
+	cocos2d::ui::Button* _start_button;
 
 	//退出按钮
 	cocos2d::ui::Button* _exit_button;
