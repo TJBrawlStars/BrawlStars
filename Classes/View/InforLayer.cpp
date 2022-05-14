@@ -5,6 +5,7 @@ using namespace ui;
 #include<cassert>
 #include "Tool/Setting.h"
 #include"Tool/Tools.h"
+#include "MainScene.h"
 #pragma execution_character_set("utf-8")  
 
 bool InforLayer::init()
@@ -22,20 +23,44 @@ bool InforLayer::init()
 
 	//返回按钮
 	_back = Tools::ButtonCreate(Vec2(100, kVisibleSize.height - 100), "ui/back.png", this);
-	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType)
+	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
-			Tools::SwitchScene(this, Tools::SwitchSceneType::Up);
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+				Tools::SwitchScene(this, Tools::SwitchSceneType::Up);
+				MainScene::GetMainScene()->SetInfo(_profile->getNormalFile().file);
+			}
 			//传信息给文件
 		});
 
-	//从文件里读信息，我们做一个本地的（doge
+	//从文件里读信息，我们做一个本地的（dogeq
 
 	//设置头像（To do ：加一个换头像功能？
-	_profile = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f), "ui/info.png", this);
+	_profile = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f), MainScene::GetMainScene()->GetInfo(), this);
 	_profile->setScale(1.5);
+	_profile->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+		{
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+				int tag = _profile->getNormalFile().file.at(7) - '0';
+				auto filename = "ui/info" + Value(tag % kInfos + 1).asString() + ".png";
+				_profile->loadTextureNormal(filename);
+			}
+		});
 
 	//设置info Name
 	setInfo(Information::Name, "みけねこ");
+
+	//设置info Cup
+	setInfo(Information::Cup, "0");
+
+	//设置info MaxRank
+	setInfo(Information::MaxRank, "0");
+
+	//设置info Money
+	setInfo(Information::Money, "0");
 
 	return true;
 }
@@ -72,6 +97,30 @@ void InforLayer::setInfo(Information infoType, const std::string&& info)
 							dynamic_cast<TextField*>(ref)->setString("");
 						});*/
 				}});
+	}
+	else if (infoType == Information::Cup)
+	{
+		auto label1 = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2 - 25, kVisibleSize.height * 0.7f), "奖杯", "微软雅黑", 40, this);
+		label1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+		auto label2 = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2 + 25, kVisibleSize.height * 0.7f), info, "微软雅黑", 40, this);
+		label2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+		_infomation.pushBack(label2);
+	}
+	else if (infoType == Information::MaxRank)
+	{
+		auto label1 = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2 - 25, kVisibleSize.height * 0.6f), "最高排名", "微软雅黑", 40, this);
+		label1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+		auto label2 = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2 + 25, kVisibleSize.height * 0.6f), info, "微软雅黑", 40, this);
+		label2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+		_infomation.pushBack(label2);
+	}
+	else if (infoType == Information::Money)
+	{
+		auto label1 = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2 - 25, kVisibleSize.height * 0.5f), "金币", "微软雅黑", 40, this);
+		label1->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+		auto label2 = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2 + 25, kVisibleSize.height * 0.5f), info, "微软雅黑", 40, this);
+		label2->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+		_infomation.pushBack(label2);
 	}
 }
 

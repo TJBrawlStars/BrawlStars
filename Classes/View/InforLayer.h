@@ -18,6 +18,9 @@ public:
 	enum class Information
 	{
 		Name,
+		Cup,
+		Money,
+		MaxRank,
 	};
 
 	/**
@@ -32,7 +35,7 @@ private:
 	virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*) { return true; }
 
 	InforLayer() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
-		, _bg(NULL), _back(NULL), _profile(NULL), _change_name(NULL) {};
+		, _bg(NULL), _back(NULL), _profile(NULL), _change_name(NULL), kInfos(3) {};
 
 	/**
     * @brief 提供创建info标签的方法（一个标题+一个数字）
@@ -67,5 +70,8 @@ private:
 
 	//文本框
 	cocos2d::ui::TextField* _text;
+
+	//头像个数，在初始化的地方改
+	const int kInfos;
 
 };
