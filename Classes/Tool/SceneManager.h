@@ -6,6 +6,7 @@
 #include "View/MainScene.h"
 #include "View/GameScene.h"
 #include "View/SettlementScene.h"
+#include "View/PauseScene.h"
 
 USING_NS_CC;
 
@@ -23,6 +24,7 @@ public:
         en_MainScene,
         en_GameScene,
         en_SettlementScene,
+        en_PauseScene,
         en_Max
     };
 
@@ -35,22 +37,27 @@ public:
     * @brief 改变场景
     * @param （EnumSceneType type） 类内的枚举类，用于标记场景
     */
-    void changeScene(EnumSceneType type);
+    void changeScene(EnumSceneType type, int operate = 0);
 
     /**
     * @brief 判断是不是第一次运行场景
     */
     bool isFirst() { return _first; }
 
+    /**
+    * @brief 设置成第一次运行场景
+    */
+    void SetFirst(){ _first = true; }
+
 private:
 
-    SceneManager() {};
+    SceneManager() :_first(true) {};
 
 private:
 
     //场景管理器对象
     static SceneManager* _scene_manager;
 
-    bool _first = true;
+    bool _first;
 
 };
