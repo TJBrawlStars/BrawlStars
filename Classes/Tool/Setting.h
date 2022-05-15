@@ -59,6 +59,15 @@ public:
     */
     bool isSoundEffect() { return _sound_effect; }
 
+    /*-----------------------------------------------ÕËºÅ*/
+
+    /**
+    * @brief µÇÂ¼Ïà¹Ø
+    */
+    void SetLogin(bool set) { _login = set; }
+
+    bool isLogin() { return _login; }
+
 private:
 
     static Setting* instance;
@@ -67,11 +76,14 @@ private:
 
     bool _sound_effect;
 
-    CocosDenshion::SimpleAudioEngine* _sound_engine = CocosDenshion::SimpleAudioEngine::getInstance();
+    CocosDenshion::SimpleAudioEngine* _sound_engine;
+
+    //µÇÂ¼×´Ì¬
+    bool _login;
 
 private:
 
-    Setting() :_sound(true), _sound_effect(true) {};
+    Setting() :_sound(true), _sound_effect(true), _sound_engine(CocosDenshion::SimpleAudioEngine::getInstance()), _login(false) {};
 
 };
 
