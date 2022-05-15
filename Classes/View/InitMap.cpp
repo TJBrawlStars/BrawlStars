@@ -60,12 +60,8 @@ Vec2 GameScene::tiledCoordFromPosition(Vec2 position)
     return Vec2(x, y);
 }
 
-void GameScene::setViewPointByPlayer(Point position)
+Vec2 GameScene::destPos(Point position)
 {
-    //精灵不存在就退出
-    if (_player == nullptr)
-        return;
-
     //屏幕大小
     Size visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -80,19 +76,29 @@ void GameScene::setViewPointByPlayer(Point position)
     float x = std::max(playerPos.x, visibleSize.width / 2);
     float y = std::max(playerPos.y, visibleSize.height / 2);
 
-    //log("playerPos.x=%f", playerPos.x);
-    //log("map.x=%f", _mapinfo._map->getPosition().x);
-    //log("this->getposition().x=%f", this->getPosition().x);
     x = std::min(x, mapSize.width - visibleSize.width / 2);
     y = std::min(y, mapSize.height - visibleSize.height / 2);
 
     //目标点
-    Vec2 destPos = Vec2(x, y);
+    return Vec2(x, y);
+}
+
+void GameScene::setViewPointByPlayer(Point position)
+{
+    //精灵不存在就退出
+    if (_player == nullptr)
+        return;
+
+    //屏幕大小
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+
+    //目标点
+    Vec2 destPosition = destPos(position);
     //屏幕中点
     Vec2 centerPos = Vec2(visibleSize.width / 2, visibleSize.height / 2);
 
     //屏幕中点和所要移动的目标点之间的距离
-    Vec2 viewPos = centerPos - destPos;
-
+    Vec2 viewPos = centerPos - destPosition;
+    log("destPos.x=%f", destPosition.x);
     this->setPosition(viewPos);
 }

@@ -7,6 +7,7 @@
 #include "Tool/MapInfo.h"
 #include"Hero/HeroSprite.h"
 #include"Hero/BeiyaHero.h"
+#include"Tool/Timer.h"
 
 class GameScene : public cocos2d::Scene
 {
@@ -20,6 +21,7 @@ public:
     //传入主角的坐标，放在控制器（控制角色）当中
     void setViewPointByPlayer(cocos2d::Point position);
 
+    Beiya* getBeiya() { return _player; };
 
     //判断是否碰撞障碍物（有bug！）(暂时不用)
     //传入的是openGL坐标(就是左下角为原点，2400*2400）向右为x向上为y
@@ -59,12 +61,13 @@ public:
     //创建草丛
     void addGrass();
 
+    void inTimerViewScreen();
 
-    ////添加宝箱
-    //void addRandomBox();
-    //void addBox();
+    //屏幕中心的位置
+    Vec2 destPos(Point position);
 
-
+    ////时间的UI
+    //void setTimeUI(MyTimer& timer);
     /********* @author:王琳************/
     
     void update(float dt);

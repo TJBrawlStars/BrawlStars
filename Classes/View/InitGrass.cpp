@@ -45,6 +45,11 @@ void GameScene::addGrass()
     }
 }
 
+void GameScene::inTimerViewScreen()
+{
+    
+}
+
 bool GameScene::isGrassExist(cocos2d::Point position)
 {
     for (auto grass : _grass)
