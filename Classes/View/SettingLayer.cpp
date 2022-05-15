@@ -92,7 +92,7 @@ void SettingLayer::Set()
 				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				//这边还要删掉本地账号信息
 				Setting::getInstance()->StopSound();
-				SceneManager::getInstance()->SetFirst();
+				Setting::getInstance()->SetLogin(false);
 				SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_MainScene);
 				auto distory = RemoveSelf::create();
 				this->runAction(distory);

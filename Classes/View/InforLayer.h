@@ -13,7 +13,7 @@ public:
 	CREATE_FUNC(InforLayer);
 
 	/**
-    * @brief 标志有什么类型的信息
+    * @brief 标志有什么类型的信息,与存数据的vector下标一一对应
     */
 	enum class Information
 	{

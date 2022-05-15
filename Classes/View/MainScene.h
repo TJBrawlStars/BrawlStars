@@ -45,6 +45,11 @@ public:
     */
     std::string GetInfo();
 
+    /**
+    * @brief 用于登陆后初始化主场景上的图像
+    */
+    void Load();
+
 private:
 
     virtual bool init();

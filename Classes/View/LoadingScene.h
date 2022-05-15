@@ -23,8 +23,13 @@ private:
 	*/
 	void LoadGame();
 
+	/**
+	* @brief 输入框点击事件
+	*/
+	void TextFieldEvent(Ref* pSender, cocos2d::ui::TextField::EventType type);
+
 	LoadingScene() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
-		, _bg(NULL), _login_button(NULL), _start_button(NULL), _exit_button(NULL) {};
+		, _bg(NULL), _login_button(NULL), _start_button(NULL), _exit_button(NULL), _text(NULL), _id("") {};
 
 private:
 
@@ -41,6 +46,12 @@ private:
 
 	//退出按钮
 	cocos2d::ui::Button* _exit_button;
+
+	//登录id输入
+	cocos2d::ui::TextField* _text;
+
+	//ID
+	std::string _id;
 
 };
 

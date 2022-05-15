@@ -6,6 +6,7 @@ using namespace ui;
 #include "Tool/SceneManager.h"
 #include "Tool/Setting.h"
 #include "Tool/Tools.h"
+#include "Tool/Data.h"
 #pragma execution_character_set("utf-8")  
 
 bool LoadingScene::init()
@@ -24,24 +25,49 @@ bool LoadingScene::init()
 	//背景的设置
 	_bg = Tools::SetBg("ui/loadingBg.jpg", this);
 
-	if (true)//如果没有登录信息的话,需要改这里
+	//未登录的要登陆
+	if (!Setting::getInstance()->isLogin())
 	{
+		//输入id文本框
+		_text = Tools::TextCreate(kVisibleSize / 2, "点击这里输入id(2字符内,未知的id信息会在本设备新建账号)", 3, this);
+		_text->addEventListener(CC_CALLBACK_2(LoadingScene::TextFieldEvent, this));
+		_text->setColor(Color3B::BLACK);
+		//加个底框，看的清楚点
+		auto bg = Scale9Sprite::create("ui/button.png");
+		assert(bg);
+		bg->setCapInsets(Rect(5, 5, 15, 15));
+		bg->setContentSize(Size(_text->getContentSize().width + 30, (_text->getContentSize().height + 15)));
+		bg->setPosition(kVisibleSize / 2);
+		this->addChild(bg);
+		bg->setName("bg");
+
 		//登录按钮
 		_login_button = Tools::ButtonCreate(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.3f)
 			, "登      录", "ui/loadingButton.png", "ui/loadingButton_s.png", this);
 		//这边真要登录的话就新写一个函数叭
 		_login_button->addTouchEventListener([this](Ref*, ui::Widget::TouchEventType type)
 			{
-				if (type == Widget::TouchEventType::ENDED)
+				if (type == Widget::TouchEventType::ENDED && _id != "")
 				{
 					Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 					auto distory = RemoveSelf::create();
 					_login_button->runAction(distory);
+					_text->runAction(distory->clone());
+					this->removeChildByName("bg");
+
+					//感觉这个路径release版本要改一下啊，然后还要加一个输入
+					PlistData::addDate(_id, "../Resources/Data/data" + _id + ".plist");
+
+					MainScene::GetMainScene()->Load();
+					Setting::getInstance()->SetLogin(true);
 					LoadGame();
 				}
 			});
 	}
+	else
+		LoadGame();
 
+	CCLOG("LoadingScene finish");
 	return true;
 }
 
@@ -71,6 +97,27 @@ void LoadingScene::LoadGame()
 			}
 		});
 
+}
+
+void LoadingScene::TextFieldEvent(Ref* pSender, cocos2d::ui::TextField::EventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::TextField::EventType::ATTACH_WITH_IME:
+	{
+		dynamic_cast<TextField*>(pSender)->setString("|");
+		break;
+	}
+	case cocos2d::ui::TextField::EventType::DETACH_WITH_IME:
+	{
+		auto item = dynamic_cast<TextField*>(pSender);
+		_id = item->getString().substr(1, item->getString().length() - 1);
+		item->setString(_id);
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 bool LoadingScene::onTouchBegan(Touch*, Event*)

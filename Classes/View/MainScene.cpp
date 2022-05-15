@@ -13,6 +13,7 @@ using namespace ui;
 #include "InforLayer.h"
 #include "MenuLayer.h"
 #include "FriendLayer.h"
+#include "Tool/Data.h"
 #pragma execution_character_set("utf-8")  
 
 MainScene* MainScene::_that = NULL;
@@ -32,6 +33,38 @@ std::string MainScene::GetInfo()
 	return _info_button->getName();
 }
 
+void MainScene::Load()
+{
+	//主界面显示的人物
+	_figure = Tools::ButtonCreateN(kVisibleSize / 2, PlistData::getDataByType(PlistData::DataType::Figure), this);
+	_figure->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+		{
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+				_changeFigure = FigureLayer::create();
+				assert(_changeFigure != 0);
+				this->addChild(_changeFigure, 100);
+				Tools::SwitchScene(_changeFigure, Tools::SwitchSceneType::Down);
+			}
+		});
+
+	//个人信息按钮
+	_info_button = Tools::ButtonCreate(Vec2(77, kVisibleSize.height - 40), PlistData::getDataByType(PlistData::DataType::Profile), this);
+	_info_button->setName("ui/info1.png");
+	_info_button->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+		{
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+				_info = InforLayer::create();
+				assert(_info);
+				this->addChild(_info);
+				Tools::SwitchScene(_info, Tools::SwitchSceneType::Down);
+			}
+		});
+}
+
 bool MainScene::init()
 {
 	if (!Scene::init())
@@ -40,7 +73,7 @@ bool MainScene::init()
 	_that = this;
 
 	//设置loading界面
-	if (SceneManager::getInstance()->isFirst())
+	if (!Setting::getInstance()->isLogin())
 	{
 		//初始化Tools
 		Tools::set();
@@ -64,21 +97,6 @@ bool MainScene::init()
 				assert(_menu);
 				this->addChild(_menu);
 				Tools::SwitchScene(_menu, Tools::SwitchSceneType::LeftToRight);
-			}
-		});
-
-	//个人信息按钮
-	_info_button = Tools::ButtonCreate(Vec2(77, kVisibleSize.height - 40), "ui/info1.png", this);
-	_info_button->setName("ui/info1.png");
-	_info_button->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
-		{
-			if (type == Widget::TouchEventType::ENDED)
-			{
-				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
-				_info = InforLayer::create();
-				assert(_info);
-				this->addChild(_info);
-				Tools::SwitchScene(_info, Tools::SwitchSceneType::Down);
 			}
 		});
 
@@ -112,20 +130,6 @@ bool MainScene::init()
 			}
 		});
 
-	//主界面显示的人物(默认第一个）
-	_figure = Tools::ButtonCreateN(kVisibleSize / 2, "ui/figure1.jpg", this);
-	_figure->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
-		{
-			if (type == Widget::TouchEventType::ENDED)
-			{
-				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
-				_changeFigure = FigureLayer::create();
-				assert(_changeFigure != 0);
-				this->addChild(_changeFigure, 100);
-				Tools::SwitchScene(_changeFigure, Tools::SwitchSceneType::Down);
-			}
-		});
-
 	//好友按钮
 	_friends = Tools::ButtonCreate(Vec2(375, kVisibleSize.height - 40), "ui/friend.png", this);
 	_friends->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
@@ -150,6 +154,7 @@ bool MainScene::init()
 			}
 		});
 
+	CCLOG("main finish");
 	return true;
 }
 

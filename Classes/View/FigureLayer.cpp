@@ -5,6 +5,7 @@ using namespace ui;
 #include<cassert>
 #include"Tool/Tools.h"
 #include "MainScene.h"
+#include "Tool/Data.h"
 
 bool FigureLayer::init()
 {
@@ -47,6 +48,7 @@ void FigureLayer::SetFigures()
 		name = "ui/figure" + Value(i).asString() + ".jpg";
 		auto figure = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2 - (2 - i) * 250, kVisibleSize.height / 2 + 150 - (i - 1) / 3 * 300)
 			, name, this);
+		PlistData::WriteDataByType(PlistData::DataType::Figure, name);
 		//马上跟上初始化设定打勾的角色
 		if (Value(i).asString().at(0) == _figure.at(9))
 			_select = Tools::SpriteCreate(figure->getPosition(), "ui/select.png", this);

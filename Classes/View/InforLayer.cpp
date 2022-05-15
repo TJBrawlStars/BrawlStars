@@ -6,6 +6,7 @@ using namespace ui;
 #include "Tool/Setting.h"
 #include"Tool/Tools.h"
 #include "MainScene.h"
+#include "Tool/Data.h"
 #pragma execution_character_set("utf-8")  
 
 bool InforLayer::init()
@@ -37,7 +38,8 @@ bool InforLayer::init()
 	//从文件里读信息，我们做一个本地的（dogeq
 
 	//设置头像（To do ：加一个换头像功能？
-	_profile = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f), MainScene::GetMainScene()->GetInfo(), this);
+	_profile = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f)
+		, PlistData::getDataByType(PlistData::DataType::Profile), this);
 	_profile->setScale(1.5);
 	_profile->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
@@ -47,20 +49,21 @@ bool InforLayer::init()
 				int tag = _profile->getNormalFile().file.at(7) - '0';
 				auto filename = "ui/info" + Value(tag % kInfos + 1).asString() + ".png";
 				_profile->loadTextureNormal(filename);
+				PlistData::WriteDataByType(PlistData::DataType::Profile, filename);
 			}
 		});
 
 	//设置info Name
-	setInfo(Information::Name, "みけねこ");
+	setInfo(Information::Name, PlistData::getDataByType(PlistData::DataType::Name));
 
 	//设置info Cup
-	setInfo(Information::Cup, "0");
+	setInfo(Information::Cup, PlistData::getDataByType(PlistData::DataType::Cups));
 
 	//设置info MaxRank
 	setInfo(Information::MaxRank, "0");
 
 	//设置info Money
-	setInfo(Information::Money, "0");
+	setInfo(Information::Money, PlistData::getDataByType(PlistData::DataType::Money));
 
 	return true;
 }
@@ -82,20 +85,10 @@ void InforLayer::setInfo(Information infoType, const std::string&& info)
 				if (type == Widget::TouchEventType::ENDED)
 				{
 					auto item = dynamic_cast<Button*>(ref);
-					_text = TextField::create();
+					_text = Tools::TextCreate(Vec2(item->getPosition().x + item->getContentSize().width / 2 + 15, item->getPosition().y)
+						, "点击这里输入(7字内)", 8, this);
 					_text->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-					_text->setPosition(Vec2(item->getPosition().x + item->getContentSize().width / 2 + 15, item->getPosition().y));
-					_text->setFontName("微软雅黑");
-					_text->setFontSize(36);
-					_text->setPlaceHolder("点击这里输入(7字内)");
-					this->addChild(_text);
-					_text->setMaxLengthEnabled(true);
-					_text->setMaxLength(7);
 					_text->addEventListener(CC_CALLBACK_2(InforLayer::TextFieldEvent, this));
-					/*_text->addClickEventListener([&](Ref* ref)
-						{
-							dynamic_cast<TextField*>(ref)->setString("");
-						});*/
 				}});
 	}
 	else if (infoType == Information::Cup)
@@ -127,7 +120,11 @@ void InforLayer::setInfo(Information infoType, const std::string&& info)
 void InforLayer::Change(const std::string& newinfo, Information infoType)
 {
 	if (infoType == Information::Name)
+	{
 		_infomation.at(0)->setString(newinfo);
+		PlistData::WriteDataByType(PlistData::DataType::Name, newinfo);
+		_change_name->setPosition(Vec2(_infomation.at(0)->getPosition().x + _infomation.at(0)->getContentSize().width + 50, _infomation.at(0)->getPosition().y));
+	}
 }
 
 void InforLayer::TextFieldEvent(Ref* pSender, cocos2d::ui::TextField::EventType type)
@@ -136,13 +133,14 @@ void InforLayer::TextFieldEvent(Ref* pSender, cocos2d::ui::TextField::EventType 
 	{
 	case cocos2d::ui::TextField::EventType::ATTACH_WITH_IME:
 	{
-		dynamic_cast<TextField*>(pSender)->setString(" ");
+		dynamic_cast<TextField*>(pSender)->setString("|");
 		break;
 	}
 	case cocos2d::ui::TextField::EventType::DETACH_WITH_IME:
 	{
 		auto item = dynamic_cast<TextField*>(pSender);
-		Change(item->getString(), Information::Name);
+		auto name = item->getString();
+		Change(name.substr(1, name.size() - 1), Information::Name);
 		auto distory = RemoveSelf::create();
 		item->runAction(distory);
 		break;
