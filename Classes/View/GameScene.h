@@ -67,7 +67,6 @@ public:
     CREATE_FUNC(poisonCircle);
 
     
-   
     virtual bool init();
 
     void updatepoisonCircle(float dt);
@@ -76,6 +75,9 @@ public:
     cocos2d::Sprite* poisonCircleUp;
     cocos2d::Sprite* poisonCircleLeft;
     cocos2d::Sprite* poisonCircleRight;
+
+   
+
     float poisonCircleMarch = 0.7f;
     float poisonCircleMax = 2400;
 
