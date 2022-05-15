@@ -5,6 +5,7 @@ using namespace ui;
 #include<cassert>
 #include "View/LoadingScene.h"
 #include "View/RoomLayer.h"
+#pragma execution_character_set("utf-8")  
 
 //这里不能直接给kVisibleSize用director获取，因为全局变量在director获取visiblesize之前就已经做好赋值
 cocos2d::Size Tools::kVisibleSize = Size(0, 0);
@@ -78,22 +79,6 @@ cocos2d::ui::Button* Tools::ButtonCreateN(const cocos2d::Vec2&& position, const 
 	button->setPosition(position);
 	return button;
 }
-
-//cocos2d::ui::Button* Tools::ButtonCreate(const cocos2d::Vec2&& position, const std::string&& words, const std::string& pic_name, const std::string& pic_name_s, cocos2d::Node* that)
-//{
-//	auto button = Button::create(pic_name, pic_name_s);
-//	assert(button != NULL);
-//	button->setPosition(position);
-//	button->setScale9Enabled(true);
-//	button->setCapInsets(Rect(5, 5, 15, 15));
-//
-//	auto label = Label::createWithSystemFont(words, "微软雅黑", 40);
-//	assert(label != NULL);
-//	button->setTitleLabel(label);
-//	button->setContentSize(Size(label->getContentSize().width + 120, label->getContentSize().height + 50));
-//	that->addChild(button);
-//	return button;
-//}
 
 void Tools::LayerSwallow(EventListenerTouchOneByOne* listener, cocos2d::Layer* that)
 {
@@ -247,6 +232,20 @@ cocos2d::Sprite* Tools::SpriteCreate(const cocos2d::Vec2& pos, std::string&& fil
 	sprite->setPosition(pos);
 	that->addChild(sprite);
 	return sprite;
+}
+
+cocos2d::ui::TextField* Tools::TextCreate(const cocos2d::Vec2& pos, std::string&& words, int maxlen, cocos2d::Node* that)
+{
+	auto text = TextField::create();
+	assert(text);
+	text->setPosition(pos);
+	text->setFontName("微软雅黑");
+	text->setFontSize(36);
+	text->setPlaceHolder(words);
+	that->addChild(text, 2);
+	text->setMaxLengthEnabled(true);
+	text->setMaxLength(maxlen);
+	return text;
 }
 
 

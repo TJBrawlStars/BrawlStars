@@ -99,6 +99,14 @@ public:
 	*/
 	static cocos2d::Sprite* SpriteCreate(const cocos2d::Vec2& pos, std::string&& filename, cocos2d::Node*);
 
+	/**
+	* @brief 封装创建文本框
+	* @param (cocos2d::Node*)要添加进的节点
+	* @param ( std::string&& words)没点击时候的提示语
+	* @param (std::string&& maxlen)输入最大字符数
+	*/
+	static cocos2d::ui::TextField* TextCreate(const cocos2d::Vec2& pos, std::string&& words, int maxlen, cocos2d::Node* that);
+
 private:
 
 	//这里不能直接给kVisibleSize用director获取，因为全局变量在director获取visiblesize之前就已经做好赋值
