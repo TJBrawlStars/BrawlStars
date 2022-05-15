@@ -72,6 +72,7 @@ list(APPEND GAME_SOURCE
      Classes/Tool/Member.cpp
      Classes/Tool/Setting.cpp
      Classes/Tool/Tools.cpp
+     Classes/Tool/Data.cpp
      Classes/Hero/HeroSprite.cpp
      Classes/Hero/BeiyaHero.cpp
      )
@@ -92,6 +93,7 @@ list(APPEND GAME_HEADER
      Classes/Tool/Member.h
      Classes/Tool/Setting.h
      Classes/Tool/Tools.h
+     Classes/Tool/Data.h
      Classes/Hero/HeroSprite.h
      Classes/Hero/BeiyaHero.h
      )
