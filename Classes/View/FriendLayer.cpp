@@ -35,7 +35,7 @@ bool FriendLayer::init()
 		});
 
 	//添加好友
-	_addFriend = Tools::ButtonCreate("添加好友", Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.2), this);
+	_addFriend = Tools::ButtonCreate("添加好友", Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.2f), this);
 	_addFriend->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
