@@ -17,17 +17,17 @@ private:
     virtual bool init();
 
     SettlementScene() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
-        , _continue(NULL), _bg(NULL) {};
+        , _continue(NULL), _bg(NULL), _figure(NULL), _cups(NULL), _money(NULL) {};
 
     /**
-    * @brief 从游戏控制器中读出胜利方，然后在指定一边显示win
+    * @brief 从游戏控制器中读出名次顺序，分配奖励
     */
-    void WhoWin();
+    void Win();
 
-    /**
-    * @brief 从游戏控制器中读出我方和敌方的hero然后把照片贴上来,然后对应的战绩也要有,在底下+标签叭
-    */
-    void ShowRecord();
+    ///**
+    //* @brief 从游戏控制器中读出我方和敌方的hero然后把照片贴上来,然后对应的战绩也要有,在底下+标签叭
+    //*/
+    //void ShowRecord();
 
 private:
      
@@ -38,5 +38,14 @@ private:
 
     //背景
     cocos2d::Sprite* _bg;
+
+    //玩家英雄展示
+    cocos2d::Sprite* _figure;
+
+    //获得奖杯数
+    cocos2d::Label* _cups;
+
+    //获得金币数
+    cocos2d::Label* _money;
 
 };
