@@ -6,15 +6,20 @@ using namespace ui;
 #include "Tool/SceneManager.h"
 #include"Tool/Tools.h"
 #include"Tool/Setting.h"
+#include"Tool/Data.h"
+#include"FigureLayer.h"
 #pragma execution_character_set("utf-8")  
 
 static constexpr int kEnemyTag = 0;
 static constexpr int kOurTag = 1;
+RoomLayer* RoomLayer::_that = NULL;
 
 bool RoomLayer::init()
 {
 	if (!Layer::init())
 		return false;
+
+	_that = this;
 
 	//设置吞噬点击事件
 	auto listener = EventListenerTouchOneByOne::create();
@@ -46,7 +51,7 @@ bool RoomLayer::init()
 			}
 		});
 
-	//6个房间成员框
+	//10个房间成员框
 	MemberCreate();
 
 	//VS字样
@@ -90,33 +95,57 @@ void RoomLayer::MemberCreate()
 
 void RoomLayer::PlusMemberCreate()
 {
+	//把自己填上
+	_self = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2 + (-2) * 150, kVisibleSize.height / 2 - 200)
+		, PlistData::getDataByType(PlistData::DataType::Figure), this);
+	_self->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+		{
+			if (type == Widget::TouchEventType::ENDED)
+			{
+				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+				auto changeFigure = FigureLayer::create();
+				assert(changeFigure != 0);
+				this->addChild(changeFigure);
+				Tools::SwitchScene(changeFigure, Tools::SwitchSceneType::Down);
+			}
+		});
+
 	for (int i = 1; i <= 9; ++i)
 	{
 		auto box1 = MenuItemImage::create("ui/box.png", "ui/box.png");
 		auto box2 = MenuItemImage::create("ui/box_robot.png", "ui/box_robot.png");
+		auto box3= MenuItemImage::create("ui/box_human.png", "ui/box_human.png");
 		assert(box1 != NULL);
 		assert(box2 != NULL);
+		assert(box3 != NULL);
 		//这边如果联机的话这个callback函数要改一下
-		auto box0 = MenuItemToggle::createWithCallback(CC_CALLBACK_1(RoomLayer::menuCloseCallback, this), box1, box2, NULL);
+		auto box0 = MenuItemToggle::createWithCallback(CC_CALLBACK_1(RoomLayer::menuCloseCallback, this), box1, box2, box3, NULL);
 		_figures.pushBack(box0);
+		////设置tag，方便从vector里取
+		//box0->setTag(i - 1);
 		auto box = Menu::create(box0, NULL);
 		this->addChild(box);
 
 		if (i <= 5)
 		{
-			//设置tag，方便之后根据tag控制哪个Menber成员的增减
-			//box0->setTag(kEnemyTag);
 			box->setPosition(Vec2(kVisibleSize.width / 2 + (i - 3) * 150, kVisibleSize.height / 2 + 200));
 		}
 		else
 		{
-			//设置tag，方便之后根据tag控制哪个Menber成员的增减
-			//box0->setTag(kOurTag);
 			box->setPosition(Vec2(kVisibleSize.width / 2 + (i - 7) * 150, kVisibleSize.height / 2 - 200));
 		}
 		box->setContentSize(Size(50, 125));
 	    
 	}
+}
+
+void RoomLayer::SetButton()
+{
+	_current->removeChildByName("button1");
+	_current->removeChildByName("button2");
+	//遍历_figures实现恢复使用(使用基于范围的For循环)
+	for (auto item : _figures)
+		item->setEnabled(true);
 }
 
 void RoomLayer::menuCloseCallback(Ref* pSender)
@@ -126,24 +155,77 @@ void RoomLayer::menuCloseCallback(Ref* pSender)
 	auto const item = dynamic_cast<MenuItemToggle*>(pSender);
 	if (item)
 	{
+		_current = item;
 		if (item->getSelectedIndex()==1)
 		{
-			/*if (item->getTag() == kOurTag)
-				_our.setRobot(true);
-			else if (item->getTag() == kEnemyTag)
-				_enemy.setRobot(true);*/
-			_member.setRobot(true);
+			//遍历_figures实现其他菜单不能使用(使用基于范围的For循环)
+			for (auto item : _figures)
+				item->setEnabled(false);
+			Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+			auto button1 = Tools::ButtonCreate("机器人", Vec2(_current->getContentSize().width / 2, _current->getContentSize().height/2 + 75), item);
+			button1->setName("button1");
+			button1->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
+				{
+					if (type == Widget::TouchEventType::ENDED)
+					{
+						Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+						_member.setRobot(true);
+						_current->setName("robot");
+						_current->setSelectedIndex(1);
+						SetButton();
+					}
+				});
+			//玩家这里以后做一个回调函数吧
+			//
+			//
+			//
+			//
+			auto button2 = Tools::ButtonCreate("玩家", Vec2(_current->getContentSize().width / 2, _current->getContentSize().height/2 - 75), item);
+			button2->setName("button2");
+			button2->addTouchEventListener([&item, this](Ref*, Widget::TouchEventType type)
+				{
+					if (type == Widget::TouchEventType::ENDED)
+					{
+						Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+						_member.setHuman(true);
+						_current->setName("human");
+						_current->setSelectedIndex(2);
+						SetButton();
+					}
+				});
 		}
 		else
 		{
-			/*if (item->getTag() == kOurTag)
-				_our.setRobot(false);
-			else if (item->getTag() == kEnemyTag)
-				_enemy.setRobot(false);*/
-			_member.setRobot(false);
+			Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+			if (item->getName() == "robot")
+				_member.setRobot(false);
+			else if (item->getName() == "human")
+				_member.setHuman(false);
 		}
 	}
 }
 
+void RoomLayer::setSelf(const std::string& filename)
+{
+	if (_that != NULL)
+	{
+		_that->scheduleOnce([&filename](float dlt)
+			{
+				_that->_self->runAction(RemoveSelf::create());
+				_that->_self = Tools::ButtonCreateN(Vec2(_that->kVisibleSize.width / 2 + (-2) * 150, _that->kVisibleSize.height / 2 - 200)
+					, filename, _that);
+				_that->_self->addTouchEventListener([](Ref*, Widget::TouchEventType type)
+					{
+						if (type == Widget::TouchEventType::ENDED)
+						{
+							Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
+							auto changeFigure = FigureLayer::create();
+							assert(changeFigure != 0);
+							_that->addChild(changeFigure);
+							Tools::SwitchScene(changeFigure, Tools::SwitchSceneType::Down);
+						}
+					});
+			}, 0.5f, "delaytime");
+	}
+}
 
-		
