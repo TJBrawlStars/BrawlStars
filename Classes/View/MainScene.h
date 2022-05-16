@@ -59,6 +59,8 @@ private:
         , _figure(NULL), _room(NULL), _menu(NULL), _back(NULL), _changeFigure(NULL), _info(NULL)
         , _friends(NULL) {};
 
+    ~MainScene() { _that = NULL; }
+
 private:
 
     const cocos2d::Size kVisibleSize;

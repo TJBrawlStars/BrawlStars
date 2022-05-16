@@ -6,6 +6,7 @@ using namespace ui;
 #include"Tool/Tools.h"
 #include "MainScene.h"
 #include "Tool/Data.h"
+#include"RoomLayer.h"
 
 bool FigureLayer::init()
 {
@@ -21,14 +22,16 @@ bool FigureLayer::init()
 	_bg = Tools::SetBg(this);
 
 	//读取现已设定的角色,获得角色数字
-	_figure = MainScene::GetMainScene()->GetFigure();
+	_figure = PlistData::getDataByType(PlistData::DataType::Figure);
 
 	//返回按钮
 	_back = Tools::ButtonCreate(Vec2(100, kVisibleSize.height - 100), "ui/back.png", this);
 	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType)
 		{
-			//同时把主场景的设置了
+			//同时把主场景的和房间场景的设置了
 			MainScene::GetMainScene()->SetFigure(_figure);
+			RoomLayer::setSelf(_figure);
+			PlistData::WriteDataByType(PlistData::DataType::Figure, _figure);
 			//做出划上划下的效果
 			Tools::SwitchScene(this, Tools::SwitchSceneType::Up);
 		});
@@ -48,7 +51,6 @@ void FigureLayer::SetFigures()
 		name = "ui/figure" + Value(i).asString() + ".jpg";
 		auto figure = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2 - (2 - i) * 250, kVisibleSize.height / 2 + 150 - (i - 1) / 3 * 300)
 			, name, this);
-		PlistData::WriteDataByType(PlistData::DataType::Figure, name);
 		//马上跟上初始化设定打勾的角色
 		if (Value(i).asString().at(0) == _figure.at(9))
 			_select = Tools::SpriteCreate(figure->getPosition(), "ui/select.png", this);

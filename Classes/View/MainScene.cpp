@@ -71,20 +71,21 @@ bool MainScene::init()
 		return false;
 
 	_that = this;
+	//初始化Tools
+	Tools::set();
+
+	//设置背景
+	_bg = Tools::SetBg("ui/MainBg.png", this);
 
 	//设置loading界面
 	if (!Setting::getInstance()->isLogin())
 	{
-		//初始化Tools
-		Tools::set();
-
 		_loading = LoadingScene::create();
 		assert(_loading != NULL);
 		this->addChild(_loading, 100);
 	}
-
-	//设置背景
- 	_bg = Tools::SetBg("ui/MainBg.png", this);
+	else
+		Load();
 
 	//菜单按钮
 	_menu_button = Tools::ButtonCreate(Vec2(275, kVisibleSize.height - 40), "ui/menu.png", this);
@@ -109,7 +110,7 @@ bool MainScene::init()
 				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				_room = RoomLayer::create();
 				assert(_room);
-				this->addChild(_room);
+				this->addChild(_room, 100);
 				Tools::SwitchScene(_room, Tools::SwitchSceneType::Down);
 			}
 		});
