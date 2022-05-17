@@ -1,5 +1,6 @@
 //2150266  ±ÃÏ“›
 #include "HeroSprite.h"
+#include "Treasure/TreasureBoxSprite.h"
 #include <cmath>
 
 USING_NS_CC;
@@ -90,15 +91,14 @@ void Hero::initializeHeroPhysics()
 {
 	auto heroPhysicsBody = PhysicsBody::createBox(this->getContentSize());
 	heroPhysicsBody->setDynamic(false);
-	heroPhysicsBody->setCategoryBitmask(0x03);
-	heroPhysicsBody->setContactTestBitmask(0x03);
+	heroPhysicsBody->setCategoryBitmask(0x1F);
+	heroPhysicsBody->setContactTestBitmask(0x1F);
 	this->setPhysicsBody(heroPhysicsBody);
 	this->setName("hero");
 }
 
-void Hero::initialzeBloodStrip(int maxHealthPoint)
+void Hero::initializeBloodStrip()
 {
-	_bloodStrip = ui::LoadingBar::create("bloodStrip.png");
 	_bloodStrip->setDirection(ui::LoadingBar::Direction::LEFT);
 	_bloodStrip->setPercent(100);
 	_bloodStrip->setScale(0.1);
@@ -120,15 +120,27 @@ void Hero::initializeAmmoStrip(int maxAmmo)
 	}
 }
 
+void Hero::initializeEnergyStrip()
+{
+	_energyStrip->setDirection(ui::LoadingBar::Direction::LEFT);
+	_energyStrip->setPercent(0);
+	_energyStrip->setScale(0.1);
+	_energyStrip->setOpacity(150);
+	Size heroSize = this->getContentSize();
+	_energyStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 9));
+	this->addChild(_energyStrip);
+}
+
 /**
 * the physics bitmasks:
 * name           categoryBitmask         contactTestBitmask
-* hero           0x03                    0x03
-* bullet         0x01                    0x01
+* hero           0x1F                    0x1F
+* bullet         0x03                    0x03
 * wall           0x01                    0x01
-* grass          0x02                    0x02
-* diamond        0x02                    0x02
-* box            0x01                    0x01
+* grass          0x04                    0x04
+* diamond        0x08                    0x08
+* box            0x02                    0x02
+* poison         0x10                    0x10
 */
 bool Hero::onContactBegin(PhysicsContact& contact)
 {
@@ -151,13 +163,18 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	if (nodeB->getName() == "box") box = nodeB;
 
 	//handle the contacts
-	if (hero && bullet) {  //deduct hp
+	if (hero && bullet) {
 		//make sure the bullet wont hit its parent hero
-		if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->parentHero())
+		if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->getParentHero())
 			return false;
 
-		//deduct hp and remove bullet
-		dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->hitPoint());
+		//deduct hp
+		dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->getHitPoint());
+
+		//add energy
+		dynamic_cast<Bullet*>(bullet)->getParentHero()->increaseEnergy(dynamic_cast<Bullet*>(bullet)->getEnergy());
+
+		//remove bullet
 		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
 		bullet->setVisible(false);
 
@@ -167,29 +184,31 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 
 		return false;
 	}
-	else if (hero && diamond) {  //add the diamond
+	else if (hero && diamond) {
+		//add diamond
 		dynamic_cast<Hero*>(hero)->_diamond++;
-		diamond->removeFromParent();
+		diamond->getPhysicsBody()->setCategoryBitmask(0x00);
+		diamond->setVisible(false);
 
-		return false;
-	}
-	else if (hero && wall) {
-		Point heroPos = hero->getPosition();
-		Point wallPos = wall->getPosition();
-		Size heroSize = hero->getContentSize();
-		Size wallSize = wall->getContentSize();
-		float offsetx = (heroSize.width + wallSize.width) / 2;
-		float offsety = (heroSize.height + wallSize.height) / 2;
-		Vec2 offset = heroPos - wallPos;
-		
 		return false;
 	}
 	else if (hero && grass) {
+		//make hero transparent
 		hero->setOpacity(150);
+		grass->setOpacity(150);
 
 		return false;
 	}
-	else if (bullet && wall) {  //remove bullet
+	else if (bullet && wall) {
+		//remove bullet
+		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
+		bullet->setVisible(false);
+
+		return false;
+	}
+	else if (bullet && box) {
+		//deduct box hp and remove bullet
+		dynamic_cast<TreasureBox::Box*>(box)->deductHP(dynamic_cast<Bullet*>(bullet)->getHitPoint());
 		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
 		bullet->setVisible(false);
 
@@ -217,8 +236,13 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 	if (nodeA->getName() == "diamond") diamond = nodeA;
 	if (nodeB->getName() == "diamond") diamond = nodeB;
 
-	if (hero && grass) {  //make hero visible
+	if (hero && grass) {
+		//make hero and grass visible
 		hero->setOpacity(255);
+		grass->setOpacity(255);
+	}
+	if (hero && diamond) {
+		diamond->getParent()->removeFromParent();
 	}
 }
 
@@ -257,10 +281,12 @@ void Hero::superchargedAbility(float fdelta)
 
 int Hero::increaseHP(int increasePoint)
 {
+	//exception
 	if (increasePoint < 0)
 		throw std::out_of_range("negative HP increasement point");
 
-	_healthPoint = (_healthPoint + increasePoint) < 100 ? (_healthPoint + increasePoint) : 100;
+	//modify the hp
+	_healthPoint = (_healthPoint + increasePoint) < _maxHealthPoint ? (_healthPoint + increasePoint) : _maxHealthPoint;
 	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
 
 	return _healthPoint;
@@ -268,13 +294,68 @@ int Hero::increaseHP(int increasePoint)
 
 int Hero::deductHP(int deductPoint)
 {
+	//exception
 	if (deductPoint < 0)
 		throw std::out_of_range("negative HP deduction point");
 
+	//modify the hp
 	_healthPoint = (_healthPoint - deductPoint) > 0 ? (_healthPoint - deductPoint) : 0;
 	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
 
 	return _healthPoint;
+}
+
+int Hero::increaseEnergy(int increasePoint)
+{
+	//exception
+	if (increasePoint < 0)
+		throw std::out_of_range("negative energy increasement point");
+
+	//modify the energy
+	_energy = (_energy + increasePoint) < _maxEnergy ? (_energy + increasePoint) : _maxEnergy;
+	_energyStrip->setPercent(static_cast<double>(_energy) / _maxEnergy * 100);
+
+	if (_energy == _maxEnergy)
+		_energyStrip->setOpacity(255);
+
+	return _energy;
+}
+
+int Hero::deductEnergy(int deductPoint)
+{
+	//exception
+	if (deductPoint < 0)
+		throw std::out_of_range("negative energy deduction point");
+
+	//modify the energy
+	_energy = (_energy - deductPoint) > 0 ? (_energy - deductPoint) : 0;
+	_energyStrip->setPercent(static_cast<double>(_energy) / _maxEnergy * 100);
+
+	//update the energy strip
+	if (_energy != _maxEnergy)
+		_energyStrip->setOpacity(150);
+
+	return _energy;
+}
+
+int Hero::setEnergy(const int energy)
+{
+	//exception
+	if (energy < 0)
+		throw std::out_of_range("negative energy point");
+	else if (energy > _maxEnergy)
+		throw std::out_of_range("energy point larger than max energy");
+
+	//modify the energy
+	_energy = energy;
+
+	//update the energy strip
+	if (_energy == _maxEnergy)
+		_energyStrip->setOpacity(255);
+	else
+		_energyStrip->setOpacity(150);
+
+	return _energy;
 }
 
 void Hero::load(float fdelta) noexcept

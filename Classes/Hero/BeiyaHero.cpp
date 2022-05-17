@@ -23,10 +23,13 @@ Beiya* Beiya::createBeiya()
 		beiya->initializeHeroPhysics();
 
 		//draw the blood strip
-		beiya->initialzeBloodStrip(beiya->_maxHealthPoint);
+		beiya->initializeBloodStrip();
 
 		//draw the ammo strip
 		beiya->initializeAmmoStrip(beiya->_maxAmmo);
+
+		//draw the energy strip
+		beiya->initializeEnergyStrip();
 
 		return beiya;
 	}
@@ -67,7 +70,8 @@ bool Beiya::attack(Touch* touch, Event* event)
 	auto projectile = Bullet::createBullet("projectile.png");
 	if (projectile == nullptr)
 		problemLoading("projectile.png");
-	projectile->sethitPoint(this->getHitPoint());
+	projectile->setHitPoint(this->getHitPoint());
+	projectile->setEnergy(_maxEnergy / 3 + 1);
 	projectile->setParentHero(this);
 	projectile->setPosition(this->getPosition());
 	this->getParent()->addChild(projectile);

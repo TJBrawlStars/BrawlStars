@@ -72,30 +72,55 @@ public:
 	/// @}
 	/// end of Attribute Manipulators
 
-	/// @name HP Manipulators
+	/// @name Strip Manipulators
+	/// @brief modify the attributes and update the strips
 	/// @{
 
 	/**
 	* @fn increaseHP
-	* @brief increase HP and update the blood strip
-	* @param increasePoint the hp increasement point
+	* @param increasePoint: the hp increasement point
 	* @return the HP after increasing
+	* @return the health point
 	* @exception out_of_range the increasement point is negative
 	*/
 	int increaseHP(const int increasePoint);
 
 	/**
 	* @fn deductHP
-	* @brief deduct hp and update the blood strip
-	* @param deductPoint the hp deduction point
+	* @param deductPoint: the hp deduction point
+	* @return the health point
 	* @exception out_of_range the deduction point is negative
 	*/
 	int deductHP(const int deductPoint);
 
 	int setHP(const int HP) = delete;
 
+	/**
+	* @fn increaseEnergy
+	* @param increasePoint: the energy increasement point
+	* @return the energy point
+	* @exception out_of_range the increasement point is negative
+	*/
+	int increaseEnergy(const int increasePoint);
+
+	/**
+	* @fn deductEnergy
+	* @param deductPoint: the energy deduction point
+	* @return the energy point
+	* @exception out_of_range the deduction point is negative
+	*/
+	int deductEnergy(const int deductPoint);
+
+	/**
+	* @fn setEnergy
+	* @param energy: the energy point
+	* @return the energy point
+	* @exception out_of_range the input is negative or larger than max energy
+	*/
+	int setEnergy(const int energy);
+
 	/// @}
-	/// end of HP Manipulators
+	/// end of Strip Manipulators
 
 SELECTOR_ACCESS:
 	/// @name Schedule Selectors
@@ -123,16 +148,18 @@ protected:
 	/** the attributes of a hero */
 	const int _maxHealthPoint;
 	const int _maxAmmo;
-	const int _maxEnergy = 1000;
+	const double _maxEnergy = 1000;
 	int _healthPoint;
 	int _hitPoint;
 	int _ammo;
-	int _energy = 0;
+	double _energy = 0;
 	int _diamond = 0;
 	Level _shotRange;
 	Level _moveSpeed;
 	Level _loadSpeed;
 	std::vector<cocos2d::Sprite*> _ammoStrip;
+	cocos2d::ui::LoadingBar* _energyStrip = cocos2d::ui::LoadingBar::create("energyStrip.png");  ///< the energy strip
+	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
 	
 	/**
 	* @fn attack
@@ -140,29 +167,43 @@ protected:
 	*/
 	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
 
+
+
+	/// @name Initializers in derived classes
+	/// @warning the function should be used after the set of hero's texture
+	/// @{
+	
 	/**
 	* @fn initializeHeroPhysics
-	* @brief initialize with hero's physics body
-	* @warning the function should be used after the set of hero's texture
+	* @brief initialize the physics body of hero
 	*/
 	void initializeHeroPhysics();
 
-	/**
+	/** 
 	* @fn initializeBloodStrip
 	* @brief draw the blood strip
-	* @warning the function should be used after the set of hero's texture
+	* @deprecated show the health point on the strip
 	*/
-	void initialzeBloodStrip(const int maxHealthPoint);
+	void initializeBloodStrip();
 
 	/**
 	* @fn initializeAmmoStrip
-	* @brief draw the ammo strip
-	* @warning the function should be used after the set of hero's texture
+	* @brief initialize the ammo strip with the max ammo
 	*/
 	void initializeAmmoStrip(const int maxAmmo);
 
+	void initializeEnergyStrip();
+
+	/**
+	* @fn initializeDiamondDisplay
+	* @brief display the number of diamonds
+	*/
+	void initializeDiamondDisplay(const int diamond = 0) = delete;
+
+	/// @}
+	/// end of Initializers in derived classes
+
 private:
-	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */

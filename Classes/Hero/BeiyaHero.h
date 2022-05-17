@@ -17,7 +17,8 @@
 *		_shotRange = Level::HIGH;
 *		_loadSpeed = Level::EXTREME_HIGH;
 */
-class Beiya :public Hero {
+class Beiya :public Hero
+{
 public:
 	/**
 	* @fn createBeiya

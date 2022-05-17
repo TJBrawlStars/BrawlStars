@@ -34,8 +34,8 @@ void Bullet::initializeBulletPhysics()
 {
     auto bulletPhysicsBody = PhysicsBody::createBox(this->getContentSize());
     bulletPhysicsBody->setDynamic(false);
-    bulletPhysicsBody->setCategoryBitmask(0x01);
-    bulletPhysicsBody->setContactTestBitmask(0x01);
+    bulletPhysicsBody->setCategoryBitmask(0x03);
+    bulletPhysicsBody->setContactTestBitmask(0x03);
     this->setPhysicsBody(bulletPhysicsBody);
     this->setName("bullet");
 }
