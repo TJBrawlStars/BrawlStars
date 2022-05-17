@@ -62,12 +62,14 @@ CLASS_DECLARATION_ACCESS:
 	};
 
 public:
+	/** create an object */
 	static TreasureBox* createTreasureBox();
 
 	Box* getBox()         const noexcept { return _box; }
 	Diamond* getDiamond() const noexcept { return  _diamond; }
 
 private:
+	/** the initializers */
 	TreasureBox();
 	CREATE_FUNC(TreasureBox)
 
