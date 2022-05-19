@@ -6,7 +6,14 @@
 #include "ui/CocosGUI.h"
 #include "Hero/BulletSprite.h"
 #include <functional>
+#include <vector>
+#include <string>
 #include <map>
+
+#define DEPRECATED_ACCESS private
+#define SELECTOR_ACCESS public
+
+class Bullet;
 
 /**
 * @class Hero
@@ -51,109 +58,215 @@ public:
 	/// @}
 	/// end of Listener Set-ups
 
-	/**
-	* @fn getMoveSpeed
-	* @return the speed of hero(the distance the hero moves every second)
-	*/
-	float getMoveSpeed() const noexcept { return static_cast<float>(_moveSpeed); }
-
-	int getHitPoint()    const noexcept { return _hitPoint; }
-
-	int getHP()          const noexcept { return _healthPoint; }
-
-	/// @name HP Manipuators
+	/// @name Attribute Manipulators
 	/// @{
 
+	float getMoveSpeed()   const noexcept { return static_cast<float>(_moveSpeed); }
+	int getHitPoint()      const noexcept { return _hitPoint; }
+	int getSkillHitPoint() const noexcept { return _skillHitPoint; }
+	int getHP()            const noexcept { return _healthPoint; }
+	int getEnergy()        const noexcept { return _energy; }
+	int getDiamond()       const noexcept { return _diamond; }
+
 	/**
-	* @fn increaseHP
-	* @brief increase HP and update the blood strip
-	* @param increasePoint the hp increasement point
+	* @fn addHP
+	* @brief modify the health point and update the health strip
+	* @param increasePoint: the hp increasement point
 	* @return the HP after increasing
+	* @return the health point
 	* @exception out_of_range the increasement point is negative
 	*/
-	int increaseHP(const int increasePoint);
+	int addHP(const int increasePoint);
 
 	/**
 	* @fn deductHP
-	* @brief deduct hp and update the blood strip
-	* @param deductPoint the hp deduction point
+	* @brief modify the health point and update the health strip
+	* @param deductPoint: the hp deduction point
+	* @return the health point
 	* @exception out_of_range the deduction point is negative
 	*/
 	int deductHP(const int deductPoint);
 
 	int setHP(const int HP) = delete;
 
+	/**
+	* @fn addEnergy
+	* @brief modify the energy point and update the energy strip
+	* @param increasePoint: the energy increasement point
+	* @return the energy point
+	* @exception out_of_range the increasement point is negative
+	*/
+	int addEnergy(const int increasePoint);
+
+	/**
+	* @fn deductEnergy
+	* @brief modify the energy point and update the energy strip
+	* @param deductPoint: the energy deduction point
+	* @return the energy point
+	* @exception out_of_range the deduction point is negative
+	*/
+	int deductEnergy(const int deductPoint);
+
+	/**
+	* @fn setEnergy
+	* @brief modify the energy point and update the energy strip
+	* @param energy: the energy point
+	* @return the energy point
+	* @exception out_of_range the input is negative or larger than max energy
+	*/
+	int setEnergy(const int energy);
+
+	/**
+	* @fn addDiamond
+	* @brief modify the attributes and update the diamond number
+	* @param increasePoint: the diamond increasement point
+	* @return the number of diamond
+	* @exception out_of_range the increasement point is negative
+	*/
+	int addDiamond(const int increasePoint);
+
+	/**
+	* @fn deductDiamond
+	* @brief modify the attributes and update the diamond number
+	* @param deductPoint: the diamond deduction point
+	* @return the number of diamond
+	* @exception out_of_range the deduction point is negative
+	*/
+	int deductDiamond(const int deductPoint);
+
+	/**
+	* @fn setDiamond
+	* @brief modify the attributes and update the diamond number
+	* @param diamond: the diamond number
+	* @return the number of diamond
+	* @exception out_of_range the input is negative
+	*/
+	int setDiamond(const int diamond);
+
 	/// @}
-	/// end of HP Manipulators
+	/// end of Attribute Manipulators
+
+SELECTOR_ACCESS:
+	/// @name Schedule Selectors
+	/// @{
+
+	/**
+	* @fn startLoading
+	* @brief each bullet is loaded for (2.0 - static_cast<float>(_loadSpeed) * 0.25) seconds
+	*/
+	void load(float fdelta = 1) noexcept;
+
+	void heal(float fdelta = 1) noexcept;
+
+	/**
+	* @fn moveHero
+	* @brief used by scheduler to move hero
+	*/
+	void moveHero(float fdelta = 1) noexcept;
+
+	/// @}
+	/// end of Schedule Selectors
 
 protected:
 	/**
 	* @brief the constructor is used to initialize the constant variables
 	* @details derived classes must give the constant parameters, so the default constructor is deleted
 	*/
-	Hero(const int maxHealthPoint, const int maxAmmo);
+	Hero(const int originalHP, const int maxAmmo);
 	Hero() = delete;
 
 	/** the attributes of a hero */
-	const int _maxHealthPoint;
 	const int _maxAmmo;
+	const double _maxEnergy = 1000;
+	const int _originalHP;
+	int _maxHealthPoint;
 	int _healthPoint;
 	int _hitPoint;
+	int _skillHitPoint;
 	int _ammo;
-	int _energy = 0;
+	double _energy = 0;
 	int _diamond = 0;
 	Level _shotRange;
 	Level _moveSpeed;
 	Level _loadSpeed;
+	std::vector<cocos2d::Sprite*> _ammoStrip;
+	cocos2d::ui::LoadingBar* _energyStrip = cocos2d::ui::LoadingBar::create("energyStrip.png");  ///< the energy strip
+	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");    ///< the blood strip
+	cocos2d::Sprite* heroDiamond = cocos2d::Sprite::create("diamond.png");                       ///< the diamond to be displayed
+	cocos2d::Label* diamondNum;                                                                  ///< the number of diamonds
 	
+	/// @name Pure Virtual Functions
+	/// @{
+	/// 
 	/**
 	* @fn attack
-	* @brief derived classes need to override the attack function, which will act as the listener callback
+	* @brief the animation of attack
+	* @details derived classes need to override the function, which will act as a listener callback
 	*/
 	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
 
 	/**
-	* @fn startLoading
-	* @brief each bullet is loaded for 0.75 seconds
+	* @fn superChargedSkill
+	* @brief the animation of super charged skill
+	* @details derived classes need to override the function, which will act as a listener callback
 	*/
-	void startLoading(float fdelta = 1);
+	virtual bool superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
 
+	/**
+	* @fn updateAttributesWithDiamond
+	* @brief the default update strategy, which can be overrided
+	*/
+	virtual void updateAttributesWithDiamond();
+
+	/// @}
+	/// end of Pure Virtual Functions
+
+	/// @name Initializers in derived classes
+	/// @warning the function should be used after the set of hero's texture
+	/// @{
+	
 	/**
 	* @fn initializeHeroPhysics
-	* @brief initialize with hero's physics body
-	* @warning the function should be used after the set of hero's texture
+	* @brief initialize the physics body of hero
 	*/
-	void initializeHeroPhysics(Hero* hero);
+	void initializeHeroPhysics();
 
-	/**
-	* @fn initializeBulletPhysics
-	* @brief initialize with bullet's physics body
-	*/
-	void initializeBulletPhysics(Bullet* bullet);
-
-	/**
+	/** 
 	* @fn initializeBloodStrip
 	* @brief draw the blood strip
-	* @warning the function should be used after the set of hero's texture
+	* @deprecated show the health point on the strip
 	*/
-	void initialzeBloodStrip(const int maxHealthPoint);
+	void initializeBloodStrip();
 
 	/**
 	* @fn initializeAmmoStrip
-	* @brief draw the ammo strip
-	* @warning the function should be used after the set of hero's texture
+	* @brief initialize the ammo strip with the max ammo
 	*/
 	void initializeAmmoStrip(const int maxAmmo);
 
+	/**
+	* @fn initializeEnergyStrip
+	* @brief add the energy strip to the hero
+	*/
+	void initializeEnergyStrip();
+
+	/**
+	* @fn initializeDiamondDisplay
+	* @brief display the number of diamonds
+	*/
+	void initializeDiamondDisplay(const int diamond = 0);
+
+	/// @}
+	/// end of Initializers in derived classes
+
 private:
-	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
-	cocos2d::Sprite* _ammoStrip[3];
+	bool _releaseSkill = false;                                     ///< control whether to release skill
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */
 	cocos2d::EventListenerKeyboard* _keyboardListener;
 	cocos2d::EventListenerTouchOneByOne* _touchListener;
-	cocos2d::EventListenerPhysicsContact* _contactListener;
+	static cocos2d::EventListenerPhysicsContact* _contactListener;
 
 	/** initializer of the event listeners */
 	void initializeKeyboardListener();
@@ -161,14 +274,12 @@ private:
 	void initializeContactListener();
 
 	/** callback functions of the event listeners */
-	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = true; }
-	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = false; }
-	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event) { return this->attack(touch, event); }
+	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
+	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
+	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	bool onContactBegin(cocos2d::PhysicsContact& contact);
+	void onContactSeperate(cocos2d::PhysicsContact& contact);
 
-	/**
-	* @fn moveHero
-	* @brief used by scheduler to move hero
-	*/
-	void moveHero(float fdelta = 1);
+DEPRECATED_ACCESS:
+
 };

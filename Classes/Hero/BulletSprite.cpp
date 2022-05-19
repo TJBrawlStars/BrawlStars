@@ -3,18 +3,21 @@
 
 USING_NS_CC;
 
-Bullet* Bullet::bulletCreate(const std::string& filename)
+Bullet* Bullet::createBullet(const std::string& filename)
 {
-    Bullet* pRet = new(std::nothrow) Bullet();
-    if (pRet && pRet->initWithFile(filename))
+    Bullet* bullet = new(std::nothrow) Bullet();
+    if (bullet && bullet->initWithFile(filename))
     {
-        pRet->autorelease();
-        return pRet;
+        bullet->autorelease();
+
+        bullet->initializeBulletPhysics();
+
+        return bullet;
     }
     else
     {
-        delete pRet;
-        pRet = nullptr;
+        delete bullet;
+        bullet = nullptr;
         return nullptr;
     }
 }
@@ -25,4 +28,14 @@ bool Bullet::initWithFile(const std::string& filename)
         return false;
 
     return true;
+}
+
+void Bullet::initializeBulletPhysics()
+{
+    auto bulletPhysicsBody = PhysicsBody::createBox(this->getContentSize());
+    bulletPhysicsBody->setDynamic(false);
+    bulletPhysicsBody->setCategoryBitmask(0x03);
+    bulletPhysicsBody->setContactTestBitmask(0x03);
+    this->setPhysicsBody(bulletPhysicsBody);
+    this->setName("bullet");
 }
