@@ -50,6 +50,7 @@ Beiya::Beiya() :Hero(3360, 1)
 	_healthPoint = _maxHealthPoint;
 	_ammo = _maxAmmo;
 	_hitPoint = 1120;
+	_skillHitPoint = 140;
 	_moveSpeed = Level::MEDIUM;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
@@ -57,9 +58,6 @@ Beiya::Beiya() :Hero(3360, 1)
 
 bool Beiya::attack(Touch* touch, Event* event)
 {
-	if (!_ammo)
-		return true;
-
 	/** the animation of attack */
 	//get the location of touch point
 	Point touchLocation = touch->getLocation();
@@ -78,18 +76,53 @@ bool Beiya::attack(Touch* touch, Event* event)
 
 	//get the vector of attack according to the range of hero
 	offset.normalize();
-	Vec2 attackVec = offset * 50 * static_cast<int>(_shotRange);
+	Vec2 attackVec = offset * 75 * static_cast<int>(_shotRange);
 
 	//create the animation
-	auto shot = MoveBy::create(static_cast<float>(_shotRange) / 5, attackVec);
+	auto shot = MoveBy::create(1.2, attackVec);
 	auto removeBullet = RemoveSelf::create();
 	projectile->runAction(Sequence::create(shot, removeBullet, nullptr));
 
-	//modify the ammunition quantity
-	if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
-		schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
-	--_ammo;
-	_ammoStrip[_ammo]->setVisible(false);
+	return true;
+}
+
+bool Beiya::superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event)
+{
+	/** the animation of skill */
+	//get the location of touch point
+	Point touchLocation = touch->getLocation();
+	//convert the location to offset
+	Vec2 offset = touchLocation - this->getPosition();
+	offset.normalize();
+
+	//the animation of skill
+	Bullet* bullet[5];
+	std::string bulletNo[5] = { "1","2","3","4","5" };
+	int count = 1;
+	for (auto i : bullet) {
+		//create a bullet
+		i = Bullet::createBullet("projectile.png");
+		if (i == nullptr)
+			problemLoading("projectile.png");
+		i->setHitPoint(this->getSkillHitPoint());
+		i->setEffect(Bullet::Effect::FREEZE);
+		i->setParentHero(this);
+		this->getParent()->addChild(i);
+		i->setVisible(false);
+		this->scheduleOnce(
+			[=](float fdelta)
+			{
+				i->setPosition(this->getPosition());
+				i->setVisible(true);
+				Vec2 attackVec = offset * 75 * static_cast<int>(_shotRange);
+				auto shot = MoveBy::create(static_cast<float>(_shotRange) / 3, attackVec);
+				auto removeBullet = RemoveSelf::create();
+				i->runAction(Sequence::create(shot, removeBullet, nullptr));
+			}
+		, 0.2 * count, bulletNo[count - 1]);
+		
+		count++;
+	}
 
 	return true;
 }

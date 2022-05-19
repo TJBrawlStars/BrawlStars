@@ -60,13 +60,13 @@ public:
 	/// @name Attribute Manipulators
 	/// @{
 
-	float getMoveSpeed() const noexcept { return static_cast<float>(_moveSpeed); }
-	int getHitPoint()    const noexcept { return _hitPoint; }
-	int getHP()          const noexcept { return _healthPoint; }
-	int getEnergy()      const noexcept { return _energy; }
-	int getDiamond()     const noexcept { return _diamond; }
+	float getMoveSpeed()   const noexcept { return static_cast<float>(_moveSpeed); }
+	int getHitPoint()      const noexcept { return _hitPoint; }
+	int getSkillHitPoint() const noexcept { return _skillHitPoint; }
+	int getHP()            const noexcept { return _healthPoint; }
+	int getEnergy()        const noexcept { return _energy; }
+	int getDiamond()       const noexcept { return _diamond; }
 
-	void addEnergy(int num = 250) noexcept { _energy = (_energy + num) < _maxEnergy ? (_energy + num) : _maxEnergy; }
 	void addDiamond(int num = 1)  noexcept { ++_diamond; }
 
 	/// @}
@@ -134,8 +134,14 @@ SELECTOR_ACCESS:
 
 	void heal(float fdelta = 1) noexcept;
 
-	///@}
-	///end of Schedule Selectors
+	/**
+	* @fn moveHero
+	* @brief used by scheduler to move hero
+	*/
+	void moveHero(float fdelta = 1) noexcept;
+
+	/// @}
+	/// end of Schedule Selectors
 
 protected:
 	/**
@@ -151,6 +157,7 @@ protected:
 	const double _maxEnergy = 1000;
 	int _healthPoint;
 	int _hitPoint;
+	int _skillHitPoint;
 	int _ammo;
 	double _energy = 0;
 	int _diamond = 0;
@@ -161,13 +168,22 @@ protected:
 	cocos2d::ui::LoadingBar* _energyStrip = cocos2d::ui::LoadingBar::create("energyStrip.png");  ///< the energy strip
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
 	
+	/// @name Pure Virtual Functions
+	/// @{
 	/**
 	* @fn attack
 	* @brief derived classes need to override the attack function, which will act as the listener callback
 	*/
 	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
 
+	/**
+	* @fn superChargedSkill
+	* @brief 
+	*/
+	virtual bool superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
 
+	/// @}
+	/// end of Pure Virtual Functions
 
 	/// @name Initializers in derived classes
 	/// @warning the function should be used after the set of hero's texture
@@ -192,6 +208,10 @@ protected:
 	*/
 	void initializeAmmoStrip(const int maxAmmo);
 
+	/**
+	* @fn initializeEnergyStrip
+	* @brief add the energy strip to the hero
+	*/
 	void initializeEnergyStrip();
 
 	/**
@@ -204,6 +224,7 @@ protected:
 	/// end of Initializers in derived classes
 
 private:
+	bool _releaseSkill = false;                                     ///< control whether to release skill
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */
@@ -217,19 +238,11 @@ private:
 	void initializeContactListener();
 
 	/** callback functions of the event listeners */
-	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = true; }
-	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*) { _keyCodeState[keyCode] = false; }
-	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event) { return this->attack(touch, event); }
+	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
+	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
+	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	bool onContactBegin(cocos2d::PhysicsContact& contact);
 	void onContactSeperate(cocos2d::PhysicsContact& contact);
-
-	/**
-	* @fn moveHero
-	* @brief used by scheduler to move hero
-	*/
-	void moveHero(float fdelta = 1);
-
-	void superchargedAbility(float fdelta = 1);
 
 DEPRECATED_ACCESS:
 

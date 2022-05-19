@@ -29,11 +29,9 @@ public:
 	static Beiya* create(const std::string&) = delete;
 
 protected:
-	/**
-	* @fn attack
-	* @brief the attack callback of Beiya
-	*/
-	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) override;
+	/** overrides */
+	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event)            override;
+	virtual bool superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event) override;
 
 private:
 	/** the initialization of Beiya */

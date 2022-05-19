@@ -103,7 +103,7 @@ void Hero::initializeBloodStrip()
 	_bloodStrip->setPercent(100);
 	_bloodStrip->setScale(0.1);
 	Size heroSize = this->getContentSize();
-	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 6));
+	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 5));
 	this->addChild(_bloodStrip);
 }
 
@@ -114,7 +114,7 @@ void Hero::initializeAmmoStrip(int maxAmmo)
 		Size heroSize = this->getContentSize();
 		auto strip = Sprite::create("ammoStrip.png");
 		_ammoStrip.push_back(strip);
-		strip->setPosition(Point(8 * i, heroSize.height + 3));
+		strip->setPosition(Point(8 * i, heroSize.height + 2));
 		strip->setScale(0.1);
 		this->addChild(strip);
 	}
@@ -127,8 +127,53 @@ void Hero::initializeEnergyStrip()
 	_energyStrip->setScale(0.1);
 	_energyStrip->setOpacity(150);
 	Size heroSize = this->getContentSize();
-	_energyStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 9));
+	_energyStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 8));
 	this->addChild(_energyStrip);
+}
+
+void Hero::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*)
+{
+	_keyCodeState[keyCode] = true;
+}
+
+void Hero::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*)
+{
+	_keyCodeState[keyCode] = false;
+
+	if (_energy == _maxEnergy) {
+		if (keyCode == EventKeyboard::KeyCode::KEY_F) {
+			if (_releaseSkill) {
+				_releaseSkill = false;
+				_energyStrip->setOpacity(255);
+			}
+			else {
+				_releaseSkill = true;
+				_energyStrip->setOpacity(150);
+			}
+		}
+	}
+}
+
+bool Hero::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
+{
+	if (!_releaseSkill) {
+		//modify the ammunition quantity
+		if (!_ammo)
+			return true;
+		if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
+			schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
+		--_ammo;
+		_ammoStrip[_ammo]->setVisible(false);
+
+		return this->attack(touch, event);
+	}
+	else {
+		//modify the energy
+		setEnergy(0);
+		_releaseSkill = false;
+
+		return this->superChargedSkill(touch, event);
+	}
 }
 
 /**
@@ -246,39 +291,6 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 	}
 }
 
-void Hero::moveHero(float fdelta)
-{
-	using code = cocos2d::EventKeyboard::KeyCode;
-
-	//judge whether the hero is moving
-	if (_moveSpeed == Level::ZERO)
-		return;
-
-	//record the offset of coordinate
-	int offsetX = 0, offsetY = 0;
-	if (_keyCodeState[code::KEY_W] == true)
-		offsetY = 1;
-	else if (_keyCodeState[code::KEY_S] == true)
-		offsetY = -1;
-	if (_keyCodeState[code::KEY_A] == true)
-		offsetX = -1;
-	else if (_keyCodeState[code::KEY_D] == true)
-		offsetX = 1;
-
-	//normalize the offset
-	Vec2 offset = Vec2(offsetX, offsetY);
-	offset.normalize();
-	offset *= 0.5;
-
-	//move the hero
-	this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
-}
-
-void Hero::superchargedAbility(float fdelta)
-{
-
-}
-
 int Hero::increaseHP(int increasePoint)
 {
 	//exception
@@ -315,8 +327,10 @@ int Hero::increaseEnergy(int increasePoint)
 	_energy = (_energy + increasePoint) < _maxEnergy ? (_energy + increasePoint) : _maxEnergy;
 	_energyStrip->setPercent(static_cast<double>(_energy) / _maxEnergy * 100);
 
-	if (_energy == _maxEnergy)
+	//update the energy strip and keyboard listener
+	if (_energy == _maxEnergy) {
 		_energyStrip->setOpacity(255);
+	}
 
 	return _energy;
 }
@@ -331,9 +345,10 @@ int Hero::deductEnergy(int deductPoint)
 	_energy = (_energy - deductPoint) > 0 ? (_energy - deductPoint) : 0;
 	_energyStrip->setPercent(static_cast<double>(_energy) / _maxEnergy * 100);
 
-	//update the energy strip
-	if (_energy != _maxEnergy)
+	//update the energy strip and keyboard listener
+	if (_energy != _maxEnergy) {
 		_energyStrip->setOpacity(150);
+	}
 
 	return _energy;
 }
@@ -350,12 +365,44 @@ int Hero::setEnergy(const int energy)
 	_energy = energy;
 
 	//update the energy strip
-	if (_energy == _maxEnergy)
+	if (_energy == _maxEnergy) {
 		_energyStrip->setOpacity(255);
-	else
+		_energyStrip->setPercent(static_cast<double>(_energy) / _maxEnergy * 100);
+	}
+	else {
 		_energyStrip->setOpacity(150);
+		_energyStrip->setPercent(static_cast<double>(_energy) / _maxEnergy * 100);
+	}
 
 	return _energy;
+}
+
+void Hero::moveHero(float fdelta) noexcept
+{
+	using code = cocos2d::EventKeyboard::KeyCode;
+
+	//judge whether the hero is moving
+	if (_moveSpeed == Level::ZERO)
+		return;
+
+	//record the offset of coordinate
+	int offsetX = 0, offsetY = 0;
+	if (_keyCodeState[code::KEY_W] == true)
+		offsetY = 1;
+	else if (_keyCodeState[code::KEY_S] == true)
+		offsetY = -1;
+	if (_keyCodeState[code::KEY_A] == true)
+		offsetX = -1;
+	else if (_keyCodeState[code::KEY_D] == true)
+		offsetX = 1;
+
+	//normalize the offset
+	Vec2 offset = Vec2(offsetX, offsetY);
+	offset.normalize();
+	offset *= 0.5;
+
+	//move the hero
+	this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
 }
 
 void Hero::load(float fdelta) noexcept
