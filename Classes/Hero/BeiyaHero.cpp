@@ -31,6 +31,9 @@ Beiya* Beiya::createBeiya()
 		//draw the energy strip
 		beiya->initializeEnergyStrip();
 
+		//dispaly the number of diamonds
+		beiya->initializeDiamondDisplay();
+
 		return beiya;
 	}
 	else
@@ -47,10 +50,9 @@ const std::string Beiya::_beiyaPicture = "player.png";
 
 Beiya::Beiya() :Hero(3360, 1)
 {
-	_healthPoint = _maxHealthPoint;
 	_ammo = _maxAmmo;
 	_hitPoint = 1120;
-	_skillHitPoint = 140;
+	_skillHitPoint = 762;
 	_moveSpeed = Level::MEDIUM;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
@@ -105,7 +107,7 @@ bool Beiya::superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event)
 		if (i == nullptr)
 			problemLoading("projectile.png");
 		i->setHitPoint(this->getSkillHitPoint());
-		i->setEffect(Bullet::Effect::FREEZE);
+		i->setEffect(Bullet::Effect::NONE);
 		i->setParentHero(this);
 		this->getParent()->addChild(i);
 		i->setVisible(false);

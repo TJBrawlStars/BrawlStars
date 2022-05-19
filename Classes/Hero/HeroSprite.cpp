@@ -12,6 +12,14 @@ namespace {
 		printf("Error while loading: %s\n", filename);
 		printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 	}
+
+	std::string intToString(const int number)
+	{
+		char result[5];
+		sprintf(result, "%d", number);
+
+		return result;
+	}
 }
 
 cocos2d::EventListenerPhysicsContact* Hero::_contactListener = nullptr;
@@ -51,8 +59,9 @@ void Hero::setContactListener(bool contactState) noexcept
 		_contactListener->setEnabled(contactState);
 }
 
-Hero::Hero(const int maxHealthPoint, const int maxAmmo)
-	:_maxHealthPoint(maxHealthPoint), _maxAmmo(maxAmmo)
+Hero::Hero(const int originalHP, const int maxAmmo)
+	:_originalHP(originalHP), _maxHealthPoint(originalHP), _healthPoint(originalHP)
+	, _maxAmmo(maxAmmo)
 {
 	//initialize the event listeners
 	initializeKeyboardListener();
@@ -129,6 +138,17 @@ void Hero::initializeEnergyStrip()
 	Size heroSize = this->getContentSize();
 	_energyStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 8));
 	this->addChild(_energyStrip);
+}
+
+void Hero::initializeDiamondDisplay(const int diamond)
+{
+	Size heroSize = this->getContentSize();
+	heroDiamond->setPosition(Point(0, heroSize.height + 12));
+	heroDiamond->setScale(0.6);
+	diamondNum = cocos2d::Label::createWithTTF(intToString(diamond), "fonts/Marker Felt.ttf", 5);
+	diamondNum->setPosition(Point(5, heroSize.height + 11));
+	this->addChild(heroDiamond);
+	this->addChild(diamondNum);
 }
 
 void Hero::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*)
@@ -217,7 +237,7 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 		dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->getHitPoint());
 
 		//add energy
-		dynamic_cast<Bullet*>(bullet)->getParentHero()->increaseEnergy(dynamic_cast<Bullet*>(bullet)->getEnergy());
+		dynamic_cast<Bullet*>(bullet)->getParentHero()->addEnergy(dynamic_cast<Bullet*>(bullet)->getEnergy());
 
 		//remove bullet
 		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
@@ -231,7 +251,7 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	}
 	else if (hero && diamond) {
 		//add diamond
-		dynamic_cast<Hero*>(hero)->_diamond++;
+		dynamic_cast<Hero*>(hero)->addDiamond(1);
 		diamond->getPhysicsBody()->setCategoryBitmask(0x00);
 		diamond->setVisible(false);
 
@@ -291,7 +311,7 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 	}
 }
 
-int Hero::increaseHP(int increasePoint)
+int Hero::addHP(int increasePoint)
 {
 	//exception
 	if (increasePoint < 0)
@@ -317,7 +337,7 @@ int Hero::deductHP(int deductPoint)
 	return _healthPoint;
 }
 
-int Hero::increaseEnergy(int increasePoint)
+int Hero::addEnergy(int increasePoint)
 {
 	//exception
 	if (increasePoint < 0)
@@ -377,6 +397,56 @@ int Hero::setEnergy(const int energy)
 	return _energy;
 }
 
+int Hero::addDiamond(const int increasePoint)
+{
+	//exception
+	if (increasePoint < 0)
+		throw std::out_of_range("negative diamond increasement point");
+
+	//modify the attribute
+	_diamond += increasePoint;
+	diamondNum->setString(intToString(_diamond));
+	updateAttributesWithDiamond();
+
+	return _diamond;
+}
+
+int Hero::deductDiamond(const int deductPoint)
+{
+	//exception
+	if (deductPoint < 0)
+		throw std::out_of_range("negative diamond increasement point");
+
+	//modify the attribute
+	_diamond = (_diamond - deductPoint) > 0 ? (_diamond - deductPoint) : 0;
+	diamondNum->setString(intToString(_diamond));
+	updateAttributesWithDiamond();
+
+	return _diamond;
+}
+
+int Hero::setDiamond(const int diamond)
+{
+	//exception
+	if (diamond < 0)
+		throw std::out_of_range("negative diamond point");
+
+	//modify the attribute
+	_diamond = diamond;
+	diamondNum->setString(intToString(_diamond));
+	updateAttributesWithDiamond();
+
+	return _diamond;
+}
+
+void Hero::updateAttributesWithDiamond()
+{
+	_maxHealthPoint = _originalHP + _diamond * 500;
+	_healthPoint += _diamond * 500;
+	_hitPoint += _diamond * 300;
+	_skillHitPoint += _diamond * 200;
+}
+
 void Hero::moveHero(float fdelta) noexcept
 {
 	using code = cocos2d::EventKeyboard::KeyCode;
@@ -415,6 +485,5 @@ void Hero::heal(float fdelta) noexcept
 {
 	if (!isScheduled(SEL_SCHEDULE(&Hero::heal)))
 		schedule(SEL_SCHEDULE(&Hero::heal), 0.75);
-	this->_healthPoint = (_healthPoint + 709) < _maxHealthPoint ? (_healthPoint + 709) : _maxHealthPoint;
-	this->_bloodStrip->setPercent(static_cast<float>(_healthPoint) / _maxHealthPoint * 100);
+	this->addHP(709);
 }

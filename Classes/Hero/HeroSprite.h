@@ -7,6 +7,7 @@
 #include "Hero/BulletSprite.h"
 #include <functional>
 #include <vector>
+#include <string>
 #include <map>
 
 #define DEPRECATED_ACCESS private
@@ -67,26 +68,19 @@ public:
 	int getEnergy()        const noexcept { return _energy; }
 	int getDiamond()       const noexcept { return _diamond; }
 
-	void addDiamond(int num = 1)  noexcept { ++_diamond; }
-
-	/// @}
-	/// end of Attribute Manipulators
-
-	/// @name Strip Manipulators
-	/// @brief modify the attributes and update the strips
-	/// @{
-
 	/**
-	* @fn increaseHP
+	* @fn addHP
+	* @brief modify the health point and update the health strip
 	* @param increasePoint: the hp increasement point
 	* @return the HP after increasing
 	* @return the health point
 	* @exception out_of_range the increasement point is negative
 	*/
-	int increaseHP(const int increasePoint);
+	int addHP(const int increasePoint);
 
 	/**
 	* @fn deductHP
+	* @brief modify the health point and update the health strip
 	* @param deductPoint: the hp deduction point
 	* @return the health point
 	* @exception out_of_range the deduction point is negative
@@ -96,15 +90,17 @@ public:
 	int setHP(const int HP) = delete;
 
 	/**
-	* @fn increaseEnergy
+	* @fn addEnergy
+	* @brief modify the energy point and update the energy strip
 	* @param increasePoint: the energy increasement point
 	* @return the energy point
 	* @exception out_of_range the increasement point is negative
 	*/
-	int increaseEnergy(const int increasePoint);
+	int addEnergy(const int increasePoint);
 
 	/**
 	* @fn deductEnergy
+	* @brief modify the energy point and update the energy strip
 	* @param deductPoint: the energy deduction point
 	* @return the energy point
 	* @exception out_of_range the deduction point is negative
@@ -113,14 +109,42 @@ public:
 
 	/**
 	* @fn setEnergy
+	* @brief modify the energy point and update the energy strip
 	* @param energy: the energy point
 	* @return the energy point
 	* @exception out_of_range the input is negative or larger than max energy
 	*/
 	int setEnergy(const int energy);
 
+	/**
+	* @fn addDiamond
+	* @brief modify the attributes and update the diamond number
+	* @param increasePoint: the diamond increasement point
+	* @return the number of diamond
+	* @exception out_of_range the increasement point is negative
+	*/
+	int addDiamond(const int increasePoint);
+
+	/**
+	* @fn deductDiamond
+	* @brief modify the attributes and update the diamond number
+	* @param deductPoint: the diamond deduction point
+	* @return the number of diamond
+	* @exception out_of_range the deduction point is negative
+	*/
+	int deductDiamond(const int deductPoint);
+
+	/**
+	* @fn setDiamond
+	* @brief modify the attributes and update the diamond number
+	* @param diamond: the diamond number
+	* @return the number of diamond
+	* @exception out_of_range the input is negative
+	*/
+	int setDiamond(const int diamond);
+
 	/// @}
-	/// end of Strip Manipulators
+	/// end of Attribute Manipulators
 
 SELECTOR_ACCESS:
 	/// @name Schedule Selectors
@@ -148,13 +172,14 @@ protected:
 	* @brief the constructor is used to initialize the constant variables
 	* @details derived classes must give the constant parameters, so the default constructor is deleted
 	*/
-	Hero(const int maxHealthPoint, const int maxAmmo);
+	Hero(const int originalHP, const int maxAmmo);
 	Hero() = delete;
 
 	/** the attributes of a hero */
-	const int _maxHealthPoint;
 	const int _maxAmmo;
 	const double _maxEnergy = 1000;
+	const int _originalHP;
+	int _maxHealthPoint;
 	int _healthPoint;
 	int _hitPoint;
 	int _skillHitPoint;
@@ -166,21 +191,32 @@ protected:
 	Level _loadSpeed;
 	std::vector<cocos2d::Sprite*> _ammoStrip;
 	cocos2d::ui::LoadingBar* _energyStrip = cocos2d::ui::LoadingBar::create("energyStrip.png");  ///< the energy strip
-	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");  ///< the blood strip
+	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");    ///< the blood strip
+	cocos2d::Sprite* heroDiamond = cocos2d::Sprite::create("diamond.png");                       ///< the diamond to be displayed
+	cocos2d::Label* diamondNum;                                                                  ///< the number of diamonds
 	
 	/// @name Pure Virtual Functions
 	/// @{
+	/// 
 	/**
 	* @fn attack
-	* @brief derived classes need to override the attack function, which will act as the listener callback
+	* @brief the animation of attack
+	* @details derived classes need to override the function, which will act as a listener callback
 	*/
 	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
 
 	/**
 	* @fn superChargedSkill
-	* @brief 
+	* @brief the animation of super charged skill
+	* @details derived classes need to override the function, which will act as a listener callback
 	*/
 	virtual bool superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
+
+	/**
+	* @fn updateAttributesWithDiamond
+	* @brief the default update strategy, which can be overrided
+	*/
+	virtual void updateAttributesWithDiamond();
 
 	/// @}
 	/// end of Pure Virtual Functions
@@ -218,7 +254,7 @@ protected:
 	* @fn initializeDiamondDisplay
 	* @brief display the number of diamonds
 	*/
-	void initializeDiamondDisplay(const int diamond = 0) = delete;
+	void initializeDiamondDisplay(const int diamond = 0);
 
 	/// @}
 	/// end of Initializers in derived classes
