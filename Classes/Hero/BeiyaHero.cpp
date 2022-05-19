@@ -14,13 +14,34 @@ namespace {
 
 Beiya* Beiya::createBeiya()
 {
-	auto beiya = Beiya::create();
+	Beiya* beiya = new(std::nothrow) Beiya();
+	if (beiya && beiya->initWithFile(_beiyaPicture))
+	{
+		beiya->autorelease();
 
-	//initialize the physics body
-	beiya->initializeHeroPhysics(beiya);
+		//initialize the physics body
+		beiya->initializeHeroPhysics();
 
-	//draw the blood strip
-	beiya->initialzeBloodStrip(beiya->_maxHealthPoint);
+		//draw the blood strip
+		beiya->initializeBloodStrip();
+
+		//draw the ammo strip
+		beiya->initializeAmmoStrip(beiya->_maxAmmo);
+
+		//draw the energy strip
+		beiya->initializeEnergyStrip();
+
+		//dispaly the number of diamonds
+		beiya->initializeDiamondDisplay();
+
+		return beiya;
+	}
+	else
+	{
+		delete beiya;
+		beiya = nullptr;
+		return nullptr;
+	}
 
 	return beiya;
 }
@@ -29,65 +50,81 @@ const std::string Beiya::_beiyaPicture = "player.png";
 
 Beiya::Beiya() :Hero(3360, 1)
 {
-	_healthPoint = _maxHealthPoint;
 	_ammo = _maxAmmo;
 	_hitPoint = 1120;
+	_skillHitPoint = 762;
 	_moveSpeed = Level::MEDIUM;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
 }
 
-bool Beiya::init()
-{
-	if (!Sprite::init())
-		return false;
-
-    _fileName = _beiyaPicture;
-
-    Texture2D* texture = _director->getTextureCache()->addImage(_beiyaPicture);
-    if (texture)
-    {
-        Rect rect = Rect::ZERO;
-        rect.size = texture->getContentSize();
-        return initWithTexture(texture, rect);
-    }
-
-    // don't release here.
-    // when load texture failed, it's better to get a "transparent" sprite then a crashed program
-    // this->release();
-    return false;
-}
-
 bool Beiya::attack(Touch* touch, Event* event)
 {
-	/** @note the animation of attack */
+	/** the animation of attack */
 	//get the location of touch point
 	Point touchLocation = touch->getLocation();
 	//convert the location to offset
 	Vec2 offset = touchLocation - this->getPosition();
 
 	//add projectile
-	auto projectile = Bullet::bulletCreate("projectile.png");
+	auto projectile = Bullet::createBullet("projectile.png");
 	if (projectile == nullptr)
 		problemLoading("projectile.png");
-	projectile->sethitPoint(this->getHitPoint());
+	projectile->setHitPoint(this->getHitPoint());
+	projectile->setEnergy(_maxEnergy / 3 + 1);
+	projectile->setParentHero(this);
 	projectile->setPosition(this->getPosition());
-	initializeBulletPhysics(projectile);
 	this->getParent()->addChild(projectile);
 
 	//get the vector of attack according to the range of hero
 	offset.normalize();
-	Vec2 attackVec = offset * 50 * static_cast<int>(_shotRange);
+	Vec2 attackVec = offset * 75 * static_cast<int>(_shotRange);
 
 	//create the animation
-	auto shot = MoveBy::create(static_cast<float>(_shotRange) / 5, attackVec);
+	auto shot = MoveBy::create(1.2, attackVec);
 	auto removeBullet = RemoveSelf::create();
 	projectile->runAction(Sequence::create(shot, removeBullet, nullptr));
 
-	/** @note modify hero attributes */
-	--_ammo;
-	if (_ammo == _maxAmmo - 1)
-		startLoading();
+	return true;
+}
+
+bool Beiya::superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event)
+{
+	/** the animation of skill */
+	//get the location of touch point
+	Point touchLocation = touch->getLocation();
+	//convert the location to offset
+	Vec2 offset = touchLocation - this->getPosition();
+	offset.normalize();
+
+	//the animation of skill
+	Bullet* bullet[5];
+	std::string bulletNo[5] = { "1","2","3","4","5" };
+	int count = 1;
+	for (auto i : bullet) {
+		//create a bullet
+		i = Bullet::createBullet("projectile.png");
+		if (i == nullptr)
+			problemLoading("projectile.png");
+		i->setHitPoint(this->getSkillHitPoint());
+		i->setEffect(Bullet::Effect::NONE);
+		i->setParentHero(this);
+		this->getParent()->addChild(i);
+		i->setVisible(false);
+		this->scheduleOnce(
+			[=](float fdelta)
+			{
+				i->setPosition(this->getPosition());
+				i->setVisible(true);
+				Vec2 attackVec = offset * 75 * static_cast<int>(_shotRange);
+				auto shot = MoveBy::create(static_cast<float>(_shotRange) / 3, attackVec);
+				auto removeBullet = RemoveSelf::create();
+				i->runAction(Sequence::create(shot, removeBullet, nullptr));
+			}
+		, 0.2 * count, bulletNo[count - 1]);
+		
+		count++;
+	}
 
 	return true;
 }
