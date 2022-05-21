@@ -4,6 +4,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include <random>
 
 #define CLASS_DECLARATION_ACCESS public
 
@@ -55,10 +56,21 @@ CLASS_DECLARATION_ACCESS:
 	public:
 		static Diamond* createDiamond();
 
+		/**
+		* @fn dropDiamond
+		* @brief drop a diamond close to the point
+		* @details the position of the diamond is automatically set
+		* @warning dont modify the position of the diamond
+		*/
+		static Diamond* dropDiamond(cocos2d::Point dropPoint);
+
 	private:
 		Diamond() {}
 		bool initWithFile(const std::string& filename);
 		void initializeDiamondPhysics();
+
+		static std::default_random_engine _diamondRand;
+		static bool _initRand;
 	};
 
 public:

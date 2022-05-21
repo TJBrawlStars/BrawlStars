@@ -197,7 +197,7 @@ protected:
 	
 	/// @name Pure Virtual Functions
 	/// @{
-	/// 
+	
 	/**
 	* @fn attack
 	* @brief the animation of attack

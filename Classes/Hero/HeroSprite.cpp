@@ -244,8 +244,10 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 		bullet->setVisible(false);
 
 		//blood return
-		hero->unschedule(SEL_SCHEDULE(&Hero::heal));
-		hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
+		if (dynamic_cast<Hero*>(hero)->getHP()) {
+			hero->unschedule(SEL_SCHEDULE(&Hero::heal));
+			hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
+		}
 
 		return false;
 	}
@@ -333,6 +335,20 @@ int Hero::deductHP(int deductPoint)
 	//modify the hp
 	_healthPoint = (_healthPoint - deductPoint) > 0 ? (_healthPoint - deductPoint) : 0;
 	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
+
+	//remove hero and drop diamonds if blood is empty
+	scheduleOnce([=](float fdelta) 
+		{
+			if (!_healthPoint) {
+				this->getPhysicsBody()->setCategoryBitmask(0x00);
+				this->setVisible(false);
+				for (int i = 0; i < _diamond; i++) {
+					auto heroDiamond = TreasureBox::Diamond::dropDiamond(this->getPosition());
+					this->getParent()->addChild(heroDiamond);
+				}
+			}
+		}
+	, 0.1, "drop diamond");
 
 	return _healthPoint;
 }

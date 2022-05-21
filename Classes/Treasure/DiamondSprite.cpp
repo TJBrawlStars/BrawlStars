@@ -4,6 +4,9 @@
 USING_NS_CC;
 using Diamond = TreasureBox::Diamond;
 
+std::default_random_engine Diamond::_diamondRand;
+bool Diamond::_initRand = false;
+
 Diamond* Diamond::createDiamond()
 {
     Diamond* diamond = new(std::nothrow) Diamond();
@@ -13,6 +16,11 @@ Diamond* Diamond::createDiamond()
 
         diamond->initializeDiamondPhysics();
 
+        if (!_initRand) {
+            _diamondRand.seed(time(0));
+            _initRand = true;
+        }
+
         return diamond;
     }
     else
@@ -21,6 +29,17 @@ Diamond* Diamond::createDiamond()
         diamond = nullptr;
         return nullptr;
     }
+}
+
+Diamond* Diamond::dropDiamond(Point dropPoint)
+{
+    auto diamond = Diamond::createDiamond();
+    std::uniform_real_distribution<double> u(-15, 15);
+    float x = dropPoint.x + u(_diamondRand);
+    float y = dropPoint.y + u(_diamondRand);
+    diamond->setPosition(Point(x, y));
+
+    return diamond;
 }
 
 bool Diamond::initWithFile(const std::string& filename)
