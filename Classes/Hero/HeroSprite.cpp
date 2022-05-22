@@ -211,7 +211,7 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 {
 	//distinguish the nodes
 	typedef Node* NodePtr;
-	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, box = nullptr;
+	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, box = nullptr, poison = nullptr;
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
 	if (nodeA->getName() == "hero") hero = nodeA;
@@ -226,6 +226,8 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	if (nodeB->getName() == "diamond") diamond = nodeB;
 	if (nodeA->getName() == "box") box = nodeA;
 	if (nodeB->getName() == "box") box = nodeB;
+	if (nodeA->getName() == "poison") poison = nodeA;
+	if (nodeB->getName() == "poison") poison = nodeB;
 
 	//handle the contacts
 	if (hero && bullet) {
@@ -243,11 +245,14 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
 		bullet->setVisible(false);
 
-		//blood return
-		if (dynamic_cast<Hero*>(hero)->getHP()) {
-			hero->unschedule(SEL_SCHEDULE(&Hero::heal));
-			hero->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
-		}
+
+		return false;
+	}
+	else if (hero && poison) {
+		hero->schedule([=](float fdelta)
+			{
+				dynamic_cast<Hero*>(hero)->deductHP(300);
+			}, 0.75, "poison hit");
 
 		return false;
 	}
@@ -289,7 +294,7 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 {
 	//distinguish the nodes
 	typedef Node* NodePtr;
-	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr;
+	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, poison = nullptr;
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
 	if (nodeA->getName() == "hero") hero = nodeA;
@@ -302,14 +307,19 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 	if (nodeB->getName() == "grass") grass = nodeB;
 	if (nodeA->getName() == "diamond") diamond = nodeA;
 	if (nodeB->getName() == "diamond") diamond = nodeB;
+	if (nodeA->getName() == "poison") poison = nodeA;
+	if (nodeB->getName() == "poison") poison = nodeB;
 
 	if (hero && grass) {
 		//make hero and grass visible
 		hero->setOpacity(255);
 		grass->setOpacity(255);
 	}
-	if (hero && diamond) {
+	else if (hero && diamond) {
 		diamond->getParent()->removeFromParent();
+	}
+	else if (hero && poison) {
+		hero->unschedule("poison hit");
 	}
 }
 
@@ -336,10 +346,15 @@ int Hero::deductHP(int deductPoint)
 	_healthPoint = (_healthPoint - deductPoint) > 0 ? (_healthPoint - deductPoint) : 0;
 	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
 
-	//remove hero and drop diamonds if blood is empty
-	scheduleOnce([=](float fdelta) 
-		{
-			if (!_healthPoint) {
+	if (_healthPoint) {
+		//blood return
+		this->unschedule(SEL_SCHEDULE(&Hero::heal));
+		this->scheduleOnce(SEL_SCHEDULE(&Hero::heal), 2.0);
+	}
+	else {
+		//remove hero and drop diamonds if blood is empty
+		scheduleOnce([=](float fdelta)
+			{
 				this->getPhysicsBody()->setCategoryBitmask(0x00);
 				this->setVisible(false);
 				for (int i = 0; i < _diamond; i++) {
@@ -347,8 +362,8 @@ int Hero::deductHP(int deductPoint)
 					this->getParent()->addChild(heroDiamond);
 				}
 			}
-		}
-	, 0.1, "drop diamond");
+		, 0.1, "drop diamond");
+	}
 
 	return _healthPoint;
 }
