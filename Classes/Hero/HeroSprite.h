@@ -65,8 +65,9 @@ public:
 	int getHitPoint()      const noexcept { return _hitPoint; }
 	int getSkillHitPoint() const noexcept { return _skillHitPoint; }
 	int getHP()            const noexcept { return _healthPoint; }
-	int getEnergy()        const noexcept { return _energy; }
+	double getEnergy()     const noexcept { return _energy; }
 	int getDiamond()       const noexcept { return _diamond; }
+	bool alive()           const noexcept { return _alive; }
 
 	/**
 	* @fn addHP
@@ -203,14 +204,14 @@ protected:
 	* @brief the animation of attack
 	* @details derived classes need to override the function, which will act as a listener callback
 	*/
-	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
+	virtual bool attack(cocos2d::Point) = 0;
 
 	/**
 	* @fn superChargedSkill
 	* @brief the animation of super charged skill
 	* @details derived classes need to override the function, which will act as a listener callback
 	*/
-	virtual bool superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event) = 0;
+	virtual bool superChargedSkill(cocos2d::Point) = 0;
 
 	/**
 	* @fn updateAttributesWithDiamond
@@ -261,6 +262,7 @@ protected:
 
 private:
 	bool _releaseSkill = false;                                     ///< control whether to release skill
+	bool _alive = true;                                             ///< mark whether the hero is alive
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */

@@ -26,12 +26,13 @@ public:
 	* @warning the create function with filename is disabled
 	*/
 	static Beiya* createBeiya();
+	static Beiya* create() { return createBeiya(); }
 	static Beiya* create(const std::string&) = delete;
 
 protected:
 	/** overrides */
-	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event)            override;
-	virtual bool superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event) override;
+	virtual bool attack(cocos2d::Point touchLocation)            override;
+	virtual bool superChargedSkill(cocos2d::Point touchLocation) override;
 
 private:
 	/** the initialization of Beiya */

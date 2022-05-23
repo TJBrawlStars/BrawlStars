@@ -176,6 +176,9 @@ void Hero::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event
 
 bool Hero::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 {
+	//get the location of touch point
+	Point touchLocation = touch->getLocation();
+
 	if (!_releaseSkill) {
 		//modify the ammunition quantity
 		if (!_ammo)
@@ -185,14 +188,14 @@ bool Hero::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 		--_ammo;
 		_ammoStrip[_ammo]->setVisible(false);
 
-		return this->attack(touch, event);
+		return this->attack(touchLocation);
 	}
 	else {
 		//modify the energy
 		setEnergy(0);
 		_releaseSkill = false;
 
-		return this->superChargedSkill(touch, event);
+		return this->superChargedSkill(touchLocation);
 	}
 }
 
@@ -244,7 +247,6 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 		//remove bullet
 		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
 		bullet->setVisible(false);
-
 
 		return false;
 	}
@@ -328,6 +330,8 @@ int Hero::addHP(int increasePoint)
 	//exception
 	if (increasePoint < 0)
 		throw std::out_of_range("negative HP increasement point");
+	if (!this->alive())
+		return 0;
 
 	//modify the hp
 	_healthPoint = (_healthPoint + increasePoint) < _maxHealthPoint ? (_healthPoint + increasePoint) : _maxHealthPoint;
@@ -341,6 +345,8 @@ int Hero::deductHP(int deductPoint)
 	//exception
 	if (deductPoint < 0)
 		throw std::out_of_range("negative HP deduction point");
+	if (!this->alive())
+		return 0;
 
 	//modify the hp
 	_healthPoint = (_healthPoint - deductPoint) > 0 ? (_healthPoint - deductPoint) : 0;
@@ -353,16 +359,19 @@ int Hero::deductHP(int deductPoint)
 	}
 	else {
 		//remove hero and drop diamonds if blood is empty
+		_alive = false;
 		scheduleOnce([=](float fdelta)
 			{
 				this->getPhysicsBody()->setCategoryBitmask(0x00);
 				this->setVisible(false);
+				this->setTouchListener(false);
+				this->setKeyboardListener(false);
 				for (int i = 0; i < _diamond; i++) {
 					auto heroDiamond = TreasureBox::Diamond::dropDiamond(this->getPosition());
 					this->getParent()->addChild(heroDiamond);
 				}
 			}
-		, 0.1, "drop diamond");
+		, 1.0 / 60, "drop diamond");
 	}
 
 	return _healthPoint;
@@ -373,6 +382,8 @@ int Hero::addEnergy(int increasePoint)
 	//exception
 	if (increasePoint < 0)
 		throw std::out_of_range("negative energy increasement point");
+	if (!this->alive())
+		return 0;
 
 	//modify the energy
 	_energy = (_energy + increasePoint) < _maxEnergy ? (_energy + increasePoint) : _maxEnergy;
@@ -391,6 +402,8 @@ int Hero::deductEnergy(int deductPoint)
 	//exception
 	if (deductPoint < 0)
 		throw std::out_of_range("negative energy deduction point");
+	if (!this->alive())
+		return 0;
 
 	//modify the energy
 	_energy = (_energy - deductPoint) > 0 ? (_energy - deductPoint) : 0;
@@ -411,6 +424,8 @@ int Hero::setEnergy(const int energy)
 		throw std::out_of_range("negative energy point");
 	else if (energy > _maxEnergy)
 		throw std::out_of_range("energy point larger than max energy");
+	if (!this->alive())
+		return 0;
 
 	//modify the energy
 	_energy = energy;
@@ -433,6 +448,8 @@ int Hero::addDiamond(const int increasePoint)
 	//exception
 	if (increasePoint < 0)
 		throw std::out_of_range("negative diamond increasement point");
+	if (!this->alive())
+		return 0;
 
 	//modify the attribute
 	_diamond += increasePoint;
@@ -447,6 +464,8 @@ int Hero::deductDiamond(const int deductPoint)
 	//exception
 	if (deductPoint < 0)
 		throw std::out_of_range("negative diamond increasement point");
+	if (!this->alive())
+		return 0;
 
 	//modify the attribute
 	_diamond = (_diamond - deductPoint) > 0 ? (_diamond - deductPoint) : 0;
@@ -461,6 +480,8 @@ int Hero::setDiamond(const int diamond)
 	//exception
 	if (diamond < 0)
 		throw std::out_of_range("negative diamond point");
+	if (!this->alive())
+		return 0;
 
 	//modify the attribute
 	_diamond = diamond;
