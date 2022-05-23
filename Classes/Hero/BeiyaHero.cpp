@@ -58,7 +58,7 @@ Beiya::Beiya() :Hero(3360, 1)
 	_loadSpeed = Level::EXTREME_HIGH;
 }
 
-bool Beiya::attack(cocos2d::Point touchLocation)
+bool Beiya::attackAnimation(cocos2d::Point touchLocation)
 {
 	/** the animation of attack */
 	//convert the location to offset
@@ -86,7 +86,7 @@ bool Beiya::attack(cocos2d::Point touchLocation)
 	return true;
 }
 
-bool Beiya::superChargedSkill(cocos2d::Point touchLocation)
+bool Beiya::skillAnimation(cocos2d::Point touchLocation)
 {
 	/** the animation of skill */
 	//convert the location to offset

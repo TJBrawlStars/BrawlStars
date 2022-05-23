@@ -62,12 +62,14 @@ public:
 	/// @{
 
 	float getMoveSpeed()   const noexcept { return static_cast<float>(_moveSpeed); }
+	double getEnergy()     const noexcept { return _energy; }
+	int getShotRange()     const noexcept { return 75 * static_cast<int>(_shotRange); }
 	int getHitPoint()      const noexcept { return _hitPoint; }
 	int getSkillHitPoint() const noexcept { return _skillHitPoint; }
 	int getHP()            const noexcept { return _healthPoint; }
-	double getEnergy()     const noexcept { return _energy; }
 	int getDiamond()       const noexcept { return _diamond; }
 	bool alive()           const noexcept { return _alive; }
+	bool skillStatus()     const noexcept { return _energy == _maxEnergy; }
 
 	/**
 	* @fn addHP
@@ -146,6 +148,10 @@ public:
 
 	/// @}
 	/// end of Attribute Manipulators
+	
+	bool attack(cocos2d::Point target);
+
+	bool releaseSkill(cocos2d::Point target);
 
 SELECTOR_ACCESS:
 	/// @name Schedule Selectors
@@ -157,6 +163,10 @@ SELECTOR_ACCESS:
 	*/
 	void load(float fdelta = 1) noexcept;
 
+	/**
+	* @fn heal
+	* @brief the function will use itself as a schedule selector to heal the hero automatically
+	*/
 	void heal(float fdelta = 1) noexcept;
 
 	/**
@@ -204,14 +214,14 @@ protected:
 	* @brief the animation of attack
 	* @details derived classes need to override the function, which will act as a listener callback
 	*/
-	virtual bool attack(cocos2d::Point) = 0;
+	virtual bool attackAnimation(cocos2d::Point) = 0;
 
 	/**
 	* @fn superChargedSkill
 	* @brief the animation of super charged skill
 	* @details derived classes need to override the function, which will act as a listener callback
 	*/
-	virtual bool superChargedSkill(cocos2d::Point) = 0;
+	virtual bool skillAnimation(cocos2d::Point) = 0;
 
 	/**
 	* @fn updateAttributesWithDiamond

@@ -31,8 +31,8 @@ public:
 
 protected:
 	/** overrides */
-	virtual bool attack(cocos2d::Point touchLocation)            override;
-	virtual bool superChargedSkill(cocos2d::Point touchLocation) override;
+	virtual bool attackAnimation(cocos2d::Point touchLocation) override;
+	virtual bool skillAnimation(cocos2d::Point touchLocation)  override;
 
 private:
 	/** the initialization of Beiya */

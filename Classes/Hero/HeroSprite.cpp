@@ -179,24 +179,11 @@ bool Hero::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 	//get the location of touch point
 	Point touchLocation = touch->getLocation();
 
-	if (!_releaseSkill) {
-		//modify the ammunition quantity
-		if (!_ammo)
-			return true;
-		if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
-			schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
-		--_ammo;
-		_ammoStrip[_ammo]->setVisible(false);
-
-		return this->attack(touchLocation);
-	}
-	else {
-		//modify the energy
-		setEnergy(0);
-		_releaseSkill = false;
-
-		return this->superChargedSkill(touchLocation);
-	}
+	//callback functions
+	if (!_releaseSkill)
+		return attack(touchLocation);
+	else
+		return releaseSkill(touchLocation);
 }
 
 /**
@@ -323,6 +310,30 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 	else if (hero && poison) {
 		hero->unschedule("poison hit");
 	}
+}
+
+bool Hero::attack(Point target)
+{
+	//modify the ammunition quantity
+	if (!_ammo)
+		return true;
+	if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
+		schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
+	--_ammo;
+	_ammoStrip[_ammo]->setVisible(false);
+
+	//run the animation
+	return this->attackAnimation(target);
+}
+
+bool Hero::releaseSkill(Point target)
+{
+	//modify the energy
+	setEnergy(0);
+	_releaseSkill = false;
+
+	//run the animation
+	return this->skillAnimation(target);
 }
 
 int Hero::addHP(int increasePoint)
