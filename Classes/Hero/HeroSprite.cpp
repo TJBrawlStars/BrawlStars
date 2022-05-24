@@ -312,8 +312,30 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 	}
 }
 
+void Hero::setAlive(bool alive)
+{
+	if (alive) {
+		_alive = true;
+		this->setVisible(true);
+		this->getPhysicsBody()->setCategoryBitmask(0x1F);
+		this->setName("hero");
+	}
+	else {
+		_alive = false;
+		this->setVisible(false);
+		this->getPhysicsBody()->setCategoryBitmask(0x00);
+		this->setTouchListener(false);
+		this->setKeyboardListener(false);
+		this->setName("null");
+	}
+}
+
 bool Hero::attack(Point target)
 {
+	//judge the status of hero
+	if (!this->alive())
+		return false;
+
 	//modify the ammunition quantity
 	if (!_ammo)
 		return true;
@@ -328,12 +350,49 @@ bool Hero::attack(Point target)
 
 bool Hero::releaseSkill(Point target)
 {
+	//judge the status of hero
+	if (!this->alive())
+		return false;
+
 	//modify the energy
 	setEnergy(0);
 	_releaseSkill = false;
 
 	//run the animation
 	return this->skillAnimation(target);
+}
+
+void Hero::moveStep(Point target)
+{
+	//get the offset
+	Vec2 offset = target - this->getPosition();
+	offset.normalize();
+	offset *= 0.5;
+
+	//query the contact with wall
+	bool contactWall = false;
+	Point movePos = this->getPosition() + static_cast<int>(_moveSpeed) * offset;
+	Size heroSize = this->getContentSize();
+	dynamic_cast<Scene*>(this->getParent())->getPhysicsWorld()->queryRect(
+		PhysicsQueryRectCallbackFunc([&contactWall](PhysicsWorld& world, PhysicsShape& shape, void* data)->bool
+			{
+				//recognize the node
+				typedef Node* NodePtr;
+				NodePtr wall = nullptr;
+				NodePtr queryNode = shape.getBody()->getNode();
+				if (queryNode->getName() == "wall") wall = queryNode;
+
+				//callbacks
+				if (wall) {
+					contactWall = true;
+				}
+
+				return true;
+			}),
+		Rect(movePos.x - heroSize.width / 2, movePos.y - heroSize.height / 2, heroSize.width, heroSize.height), nullptr);
+
+	if (!contactWall)
+		this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
 }
 
 int Hero::addHP(int increasePoint)
@@ -370,13 +429,9 @@ int Hero::deductHP(int deductPoint)
 	}
 	else {
 		//remove hero and drop diamonds if blood is empty
-		_alive = false;
+		this->setAlive(false);
 		scheduleOnce([=](float fdelta)
 			{
-				this->getPhysicsBody()->setCategoryBitmask(0x00);
-				this->setVisible(false);
-				this->setTouchListener(false);
-				this->setKeyboardListener(false);
 				for (int i = 0; i < _diamond; i++) {
 					auto heroDiamond = TreasureBox::Diamond::dropDiamond(this->getPosition());
 					this->getParent()->addChild(heroDiamond);
@@ -529,13 +584,10 @@ void Hero::moveHero(float fdelta) noexcept
 	else if (_keyCodeState[code::KEY_D] == true)
 		offsetX = 1;
 
-	//normalize the offset
+	//move hero
 	Vec2 offset = Vec2(offsetX, offsetY);
-	offset.normalize();
-	offset *= 0.5;
-
-	//move the hero
-	this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
+	Point target = this->getPosition() + offset;
+	this->moveStep(target);
 }
 
 void Hero::load(float fdelta) noexcept

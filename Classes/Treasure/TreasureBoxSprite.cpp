@@ -12,8 +12,8 @@ TreasureBox::TreasureBox()
 {
 	_box = Box::createBox();
 	_diamond = Diamond::createDiamond();
-	_diamond->setVisible(false);
-	_diamond->getPhysicsBody()->setCategoryBitmask(0x00);
+	_box->setExist(true);
+	_diamond->setExist(false);
 	this->addChild(_box);
 	this->addChild(_diamond);
 }

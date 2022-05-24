@@ -59,3 +59,17 @@ void Diamond::initializeDiamondPhysics()
     this->setPhysicsBody(diamondPhysicsBody);
     this->setName("diamond");
 }
+
+void Diamond::setExist(bool exist)
+{
+    if (exist) {
+        this->setVisible(true);
+        this->getPhysicsBody()->setCategoryBitmask(0x08);
+        this->setName("diamond");
+    }
+    else {
+        this->setVisible(false);
+        this->getPhysicsBody()->setCategoryBitmask(0x00);
+        this->setName("null");
+    }
+}

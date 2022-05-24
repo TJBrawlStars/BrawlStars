@@ -34,6 +34,8 @@ CLASS_DECLARATION_ACCESS:
 
 		int getHP() const noexcept { return _healthPoint; }
 
+		void setExist(bool exist);
+
 	private:
 		/** the initializers */
 		Box() :_healthPoint(_maxHealthPoint) {}
@@ -63,6 +65,8 @@ CLASS_DECLARATION_ACCESS:
 		* @warning dont modify the position of the diamond
 		*/
 		static Diamond* dropDiamond(cocos2d::Point dropPoint);
+
+		void setExist(bool exist);
 
 	private:
 		Diamond() {}

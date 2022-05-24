@@ -149,9 +149,31 @@ public:
 	/// @}
 	/// end of Attribute Manipulators
 	
+	/// @name Hero Manipulators
+	/// @{
+	
+	void setAlive(bool alive);
+	
+	/**
+	* @fn attack
+	* @brief attack toward the target
+	*/
 	bool attack(cocos2d::Point target);
 
+	/**
+	* @fn releaseSkill
+	* @brief release the skill toward the target
+	*/
 	bool releaseSkill(cocos2d::Point target);
+
+	/**
+	* @fn moveStep
+	* @brief a single step of moving hero toward the target
+	*/
+	void moveStep(cocos2d::Point target);
+
+	/// @}
+	/// end of Hero Manipulators
 
 SELECTOR_ACCESS:
 	/// @name Schedule Selectors
@@ -171,7 +193,7 @@ SELECTOR_ACCESS:
 
 	/**
 	* @fn moveHero
-	* @brief used by scheduler to move hero
+	* @brief used by scheduler to move hero with keyboard listener
 	*/
 	void moveHero(float fdelta = 1) noexcept;
 
