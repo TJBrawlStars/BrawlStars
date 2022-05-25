@@ -7,7 +7,7 @@
 
 /**
 * @class Participant
-* @brief
+* @brief the participants of game
 */
 template<typename HeroType>
 class Participant :public cocos2d::Node
