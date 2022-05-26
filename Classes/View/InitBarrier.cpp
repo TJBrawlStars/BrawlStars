@@ -23,7 +23,7 @@ void GameScene::addBarrier()
         PhysicsBody* tmpPhysicsBody = PhysicsBody::createBox(Size(width, height),
             PhysicsMaterial(100.0f, 0.0f, 0.0f));
         tmpPhysicsBody->setDynamic(false);
-        tmpPhysicsBody->setCategoryBitmask(0x02);
+        tmpPhysicsBody->setCategoryBitmask(0x01);
         tmpPhysicsBody->setCollisionBitmask(1);
         tmpPhysicsBody->setContactTestBitmask(0x01);
         tmpPhysicsBody->setGravityEnable(false);
@@ -53,11 +53,11 @@ bool GameScene::isBarrierExist(Point position)
         if ((fabs(barrierPos.x - position.x) < barrierSize.width / 2) && (fabs(barrierPos.y - position.y) < barrierSize.height / 2))
         {
             //log("barrierPos.x=%f,position.x=%f", barrierPos.x, position.x);
-            log("yes");
+            //log("yes");
             return true;
         }
     }
-    log("false");
+    //log("false");
     return false;
 }
 
