@@ -63,6 +63,14 @@ void Box::initializeBloodStrip(const int maxHealthPoint)
 	this->addChild(_bloodStrip);
 }
 
+const Vec2& Box::getPosition() const
+{
+	if (this->getParent()->getName() == "treasure")
+		return this->getParent()->getPosition();
+	else
+		return Node::getPosition();
+}
+
 int Box::deductHP(const int deductPoint)
 {
 	if (deductPoint < 0)

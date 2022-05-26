@@ -60,6 +60,14 @@ void Diamond::initializeDiamondPhysics()
     this->setName("diamond");
 }
 
+const Vec2& Diamond::getPosition() const
+{
+    if (this->getParent()->getName() == "treasure")
+        return this->getParent()->getPosition();
+    else
+        return Node::getPosition();
+}
+
 void Diamond::setExist(bool exist)
 {
     if (exist) {
