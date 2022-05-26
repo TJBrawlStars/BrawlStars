@@ -4,7 +4,6 @@
 
 #include "cocos2d.h"
 #include "Hero/HeroSprite.h"
-#include "Participant/ParticipantNode.hpp"
 
 /**
 * @class Robot
@@ -13,15 +12,22 @@
 *          the robot will automatically move and attack
 */
 template<typename HeroType>
-class Robot :public Participant<HeroType>
+class Robot :public Node
 {
 public:
     /**
     */
-    static Robot* create();
+    static Robot* createRobot();
+
+    virtual void setPosition(const cocos2d::Vec2& position) { return _robot->setPosition(position); }
+    virtual void setPosition(float x, float y) { return _robot->setPosition(x, y); }
+    virtual const cocos2d::Vec2& getPosition() const { return _robot->getPosition(); }
 
     void setAutoMove(bool state)   noexcept = delete;
     void setAutoAttack(bool state) noexcept = delete;
+
+protected:
+    HeroType* _robot;
 
 private:
     Robot();
@@ -32,7 +38,7 @@ private:
 };
 
 template<typename HeroType>
-Robot<HeroType>* Robot<HeroType>::create()
+Robot<HeroType>* Robot<HeroType>::createRobot()
 {
     Robot* robot = new(std::nothrow) Robot();
     if (robot)
@@ -52,9 +58,14 @@ Robot<HeroType>* Robot<HeroType>::create()
 template<typename HeroType>
 Robot<HeroType>::Robot()
 {
+    _robot = HeroType::create();
+    this->setPosition(0, 0);
+    this->addChild(_robot);
     this->setName("robot");
     this->schedule(SEL_SCHEDULE(&Robot::autoMove));
     this->schedule(SEL_SCHEDULE(&Robot::autoAttack));
+
+    _robot->setDiamond(5);
 }
 
 template<typename HeroType>
@@ -63,8 +74,8 @@ void Robot<HeroType>::autoMove(float fdelta)
     USING_NS_CC;
 
     //get hero information
-    auto heroPos = _hero->getPosition();
-    int shotRange = _hero->getShotRange();
+    auto heroPos = _robot->getPosition();
+    int shotRange = _robot->getShotRange();
 
     static Node* moveTarget = nullptr;
 
@@ -79,18 +90,13 @@ void Robot<HeroType>::autoMove(float fdelta)
                 if (queryNode->getName() == "hero")    hero = queryNode;
                 if (queryNode->getName() == "box")     box = queryNode;
                 if (queryNode->getName() == "diamond") diamond = queryNode;
-                
+
                 //callbacks
                 if (diamond) {
                     moveTarget = diamond;
-
-                    return true;
                 }
-                else if (hero) {
-                    if (moveTarget && moveTarget->getName() == "diamond")
-                        return true;
-
-                    moveTarget = hero;
+                else if (box) {
+                    moveTarget = box;
                 }
 
                 return true;
@@ -99,7 +105,7 @@ void Robot<HeroType>::autoMove(float fdelta)
 
     //move robot
     if (moveTarget) {
-        _hero->moveStep(moveTarget->getPosition());
+        _robot->moveStep(moveTarget->getPosition());
     }
     else {
 
@@ -112,8 +118,8 @@ void Robot<HeroType>::autoAttack(float fdelta)
     USING_NS_CC;
 
     //get hero information
-    auto heroPos = _hero->getPosition();
-    int shotRange = _hero->getShotRange();
+    auto heroPos = _robot->getPosition();
+    int shotRange = _robot->getShotRange();
 
     //query
     dynamic_cast<Scene*>(this->getParent())->getPhysicsWorld()->queryRect(
@@ -128,15 +134,15 @@ void Robot<HeroType>::autoAttack(float fdelta)
 
                 //callbacks
                 if (hero) {
-                    if (_hero != hero && dynamic_cast<Hero*>(hero)->alive()) {
-                        if (_hero->skillStatus())
-                            _hero->releaseSkill(hero->getPosition());
+                    if (_robot != hero&&dynamic_cast<Hero*>(hero)->alive()) {
+                        if (_robot->skillStatus())
+                            _robot->releaseSkill(hero->getPosition());
                         else
-                            _hero->attack(hero->getPosition());
+                            _robot->attack(hero->getPosition());
                     }
                 }
                 else if (box) {
-                    _hero->attack(box->getParent()->getPosition());
+                    _robot->attack(box->getParent()->getPosition());
                 }
 
                 return true;

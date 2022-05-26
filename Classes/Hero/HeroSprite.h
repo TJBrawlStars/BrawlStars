@@ -5,6 +5,7 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "Hero/BulletSprite.h"
+
 #include <functional>
 #include <vector>
 #include <string>
@@ -36,18 +37,6 @@ public:
 
 	/// @name Listener Set-ups
 	/// @{
-
-	/**
-	* @fn setKeyboardListener
-	* @brief choose whether to use the keyboard to move hero. The function is disabled by default
-	*/
-	void setKeyboardListener(bool keyboardState) noexcept;
-
-	/**
-	* @fn setTouchListener
-	* @brief choose whether to use the mouse to shot. The function is disabled by default
-	*/
-	void setTouchListener(bool touchState) noexcept;
 
 	/**
 	* @fn setContactListener
@@ -161,6 +150,13 @@ public:
 	bool attack(cocos2d::Point target);
 
 	/**
+	* @fn prepareSkillRelease
+	* @brief update the energy strip to prepare releasing skill
+	* @return whether skill is charged ( energy == maxEnergy )
+	*/
+	bool prepareSkillRelease();
+
+	/**
 	* @fn releaseSkill
 	* @brief release the skill toward the target
 	*/
@@ -190,12 +186,6 @@ SELECTOR_ACCESS:
 	* @brief the function will use itself as a schedule selector to heal the hero automatically
 	*/
 	void heal(float fdelta = 1) noexcept;
-
-	/**
-	* @fn moveHero
-	* @brief used by scheduler to move hero with keyboard listener
-	*/
-	void moveHero(float fdelta = 1) noexcept;
 
 	/// @}
 	/// end of Schedule Selectors
@@ -228,7 +218,7 @@ protected:
 	cocos2d::Sprite* heroDiamond = cocos2d::Sprite::create("diamond.png");                       ///< the diamond to be displayed
 	cocos2d::Label* diamondNum;                                                                  ///< the number of diamonds
 	
-	/// @name Pure Virtual Functions
+	/// @name Virtual Functions
 	/// @{
 	
 	/**
@@ -252,7 +242,7 @@ protected:
 	virtual void updateAttributesWithDiamond();
 
 	/// @}
-	/// end of Pure Virtual Functions
+	/// end of Virtual Functions
 
 	/// @name Initializers in derived classes
 	/// @warning the function should be used after the set of hero's texture
@@ -293,24 +283,15 @@ protected:
 	/// end of Initializers in derived classes
 
 private:
-	bool _releaseSkill = false;                                     ///< control whether to release skill
 	bool _alive = true;                                             ///< mark whether the hero is alive
-	std::map<cocos2d::EventKeyboard::KeyCode, bool> _keyCodeState;  ///< control the state of keys
 
 	/** event listeners */
-	cocos2d::EventListenerKeyboard* _keyboardListener;
-	cocos2d::EventListenerTouchOneByOne* _touchListener;
 	static cocos2d::EventListenerPhysicsContact* _contactListener;
 
 	/** initializer of the event listeners */
-	void initializeKeyboardListener();
-	void initializeTouchListener();
 	void initializeContactListener();
 
 	/** callback functions of the event listeners */
-	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
-	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
-	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	bool onContactBegin(cocos2d::PhysicsContact& contact);
 	void onContactSeperate(cocos2d::PhysicsContact& contact);
 

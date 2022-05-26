@@ -24,32 +24,6 @@ namespace {
 
 cocos2d::EventListenerPhysicsContact* Hero::_contactListener = nullptr;
 
-void Hero::setKeyboardListener(bool keyboardState) noexcept
-{
-	//judge whether the keyboard state needs to be reset
-	if (_keyboardListener->isEnabled() == keyboardState)
-		return;
-
-	//set the state of keyboardlistener and scheduler
-	if (keyboardState) {
-		_keyboardListener->setEnabled(true);
-		this->schedule(SEL_SCHEDULE(&Hero::moveHero));
-	}
-	else {
-		_keyboardListener->setEnabled(false);
-		this->unschedule(SEL_SCHEDULE(&Hero::moveHero));
-	}
-}
-
-void Hero::setTouchListener(bool touchState) noexcept
-{
-	//judge whether the touch state needs to be reset
-	if (_touchListener->isEnabled() == touchState)
-		return;
-	else
-		_touchListener->setEnabled(touchState);
-}
-
 void Hero::setContactListener(bool contactState) noexcept
 {
 	//judge whether the contact state needs to be reset
@@ -64,26 +38,7 @@ Hero::Hero(const int originalHP, const int maxAmmo)
 	, _maxAmmo(maxAmmo)
 {
 	//initialize the event listeners
-	initializeKeyboardListener();
-	initializeTouchListener();
 	initializeContactListener();
-}
-
-void Hero::initializeKeyboardListener()
-{
-	_keyboardListener = EventListenerKeyboard::create();
-	_keyboardListener->onKeyPressed = CC_CALLBACK_2(Hero::onKeyPressed, this);
-	_keyboardListener->onKeyReleased = CC_CALLBACK_2(Hero::onKeyReleased, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(_keyboardListener, this);
-	_keyboardListener->setEnabled(false);
-}
-
-void Hero::initializeTouchListener()
-{
-	_touchListener = EventListenerTouchOneByOne::create();
-	_touchListener->onTouchBegan = CC_CALLBACK_2(Hero::onTouchBegan, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(_touchListener, this);
-	_touchListener->setEnabled(false);
 }
 
 void Hero::initializeContactListener()
@@ -151,41 +106,6 @@ void Hero::initializeDiamondDisplay(const int diamond)
 	this->addChild(diamondNum);
 }
 
-void Hero::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*)
-{
-	_keyCodeState[keyCode] = true;
-}
-
-void Hero::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*)
-{
-	_keyCodeState[keyCode] = false;
-
-	if (_energy == _maxEnergy) {
-		if (keyCode == EventKeyboard::KeyCode::KEY_F) {
-			if (_releaseSkill) {
-				_releaseSkill = false;
-				_energyStrip->setOpacity(255);
-			}
-			else {
-				_releaseSkill = true;
-				_energyStrip->setOpacity(150);
-			}
-		}
-	}
-}
-
-bool Hero::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
-{
-	//get the location of touch point
-	Point touchLocation = touch->getLocation();
-
-	//callback functions
-	if (!_releaseSkill)
-		return attack(touchLocation);
-	else
-		return releaseSkill(touchLocation);
-}
-
 /**
 * the physics bitmasks:
 * name           categoryBitmask         contactTestBitmask
@@ -204,20 +124,20 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, box = nullptr, poison = nullptr;
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
-	if (nodeA->getName() == "hero") hero = nodeA;
-	if (nodeB->getName() == "hero") hero = nodeB;
-	if (nodeA->getName() == "bullet") bullet = nodeA;
-	if (nodeB->getName() == "bullet") bullet = nodeB;
-	if (nodeA->getName() == "wall") wall = nodeA;
-	if (nodeB->getName() == "wall") wall = nodeB;
-	if (nodeA->getName() == "grass") grass = nodeA;
-	if (nodeB->getName() == "grass") grass = nodeB;
+	if (nodeA->getName() == "hero")    hero = nodeA;
+	if (nodeB->getName() == "hero")    hero = nodeB;
+	if (nodeA->getName() == "bullet")  bullet = nodeA;
+	if (nodeB->getName() == "bullet")  bullet = nodeB;
+	if (nodeA->getName() == "wall")    wall = nodeA;
+	if (nodeB->getName() == "wall")    wall = nodeB;
+	if (nodeA->getName() == "grass")   grass = nodeA;
+	if (nodeB->getName() == "grass")   grass = nodeB;
 	if (nodeA->getName() == "diamond") diamond = nodeA;
 	if (nodeB->getName() == "diamond") diamond = nodeB;
-	if (nodeA->getName() == "box") box = nodeA;
-	if (nodeB->getName() == "box") box = nodeB;
-	if (nodeA->getName() == "poison") poison = nodeA;
-	if (nodeB->getName() == "poison") poison = nodeB;
+	if (nodeA->getName() == "box")     box = nodeA;
+	if (nodeB->getName() == "box")     box = nodeB;
+	if (nodeA->getName() == "poison")  poison = nodeA;
+	if (nodeB->getName() == "poison")  poison = nodeB;
 
 	//handle the contacts
 	if (hero && bullet) {
@@ -248,8 +168,7 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 	else if (hero && diamond) {
 		//add diamond
 		dynamic_cast<Hero*>(hero)->addDiamond(1);
-		diamond->getPhysicsBody()->setCategoryBitmask(0x00);
-		diamond->setVisible(false);
+		dynamic_cast<TreasureBox::Diamond*>(diamond)->setExist(false);
 
 		return false;
 	}
@@ -286,18 +205,18 @@ void Hero::onContactSeperate(PhysicsContact& contact)
 	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, poison = nullptr;
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
-	if (nodeA->getName() == "hero") hero = nodeA;
-	if (nodeB->getName() == "hero") hero = nodeB;
-	if (nodeA->getName() == "bullet") bullet = nodeA;
-	if (nodeB->getName() == "bullet") bullet = nodeB;
-	if (nodeA->getName() == "wall") wall = nodeA;
-	if (nodeB->getName() == "wall") wall = nodeB;
-	if (nodeA->getName() == "grass") grass = nodeA;
-	if (nodeB->getName() == "grass") grass = nodeB;
+	if (nodeA->getName() == "hero")    hero = nodeA;
+	if (nodeB->getName() == "hero")    hero = nodeB;
+	if (nodeA->getName() == "bullet")  bullet = nodeA;
+	if (nodeB->getName() == "bullet")  bullet = nodeB;
+	if (nodeA->getName() == "wall")    wall = nodeA;
+	if (nodeB->getName() == "wall")    wall = nodeB;
+	if (nodeA->getName() == "grass")   grass = nodeA;
+	if (nodeB->getName() == "grass")   grass = nodeB;
 	if (nodeA->getName() == "diamond") diamond = nodeA;
 	if (nodeB->getName() == "diamond") diamond = nodeB;
-	if (nodeA->getName() == "poison") poison = nodeA;
-	if (nodeB->getName() == "poison") poison = nodeB;
+	if (nodeA->getName() == "poison")  poison = nodeA;
+	if (nodeB->getName() == "poison")  poison = nodeB;
 
 	if (hero && grass) {
 		//make hero and grass visible
@@ -324,8 +243,6 @@ void Hero::setAlive(bool alive)
 		_alive = false;
 		this->setVisible(false);
 		this->getPhysicsBody()->setCategoryBitmask(0x00);
-		this->setTouchListener(false);
-		this->setKeyboardListener(false);
 		this->setName("null");
 	}
 }
@@ -348,15 +265,31 @@ bool Hero::attack(Point target)
 	return this->attackAnimation(target);
 }
 
+bool Hero::prepareSkillRelease()
+{
+	if (_energy != _maxEnergy)
+		return false;
+
+	if (_energyStrip->getOpacity() == static_cast<uint8_t>(150)) {
+		_energyStrip->setOpacity(255);
+	}
+	else {
+		_energyStrip->setOpacity(150);
+	}
+
+	return true;
+}
+
 bool Hero::releaseSkill(Point target)
 {
 	//judge the status of hero
 	if (!this->alive())
 		return false;
+	if (!skillStatus())
+		return false;
 
 	//modify the energy
 	setEnergy(0);
-	_releaseSkill = false;
 
 	//run the animation
 	return this->skillAnimation(target);
@@ -364,16 +297,23 @@ bool Hero::releaseSkill(Point target)
 
 void Hero::moveStep(Point target)
 {
+	//judge whether the hero is moving
+	if (_moveSpeed == Level::ZERO)
+		return;
+
 	//get the offset
 	Vec2 offset = target - this->getPosition();
 	offset.normalize();
 	offset *= 0.5;
 
 	//query the contact with wall
-	bool contactWall = false;
-	Point movePos = this->getPosition() + static_cast<int>(_moveSpeed) * offset;
-	Size heroSize = this->getContentSize();
-	dynamic_cast<Scene*>(this->getParent())->getPhysicsWorld()->queryRect(
+	bool contactWall = false;  ///< judgement
+	Point movePos = this->getPosition() + static_cast<int>(_moveSpeed) * offset;  ///< mark the position after moving
+	Size heroSize = this->getContentSize();  ///< the content size of hero
+	Node* parentScene = nullptr;
+	if (this->getParent()->getName() == "robot" || this->getParent()->getName() == "player")
+		parentScene = this->getParent()->getParent();
+	dynamic_cast<Scene*>(parentScene)->getPhysicsWorld()->queryRect(
 		PhysicsQueryRectCallbackFunc([&contactWall](PhysicsWorld& world, PhysicsShape& shape, void* data)->bool
 			{
 				//recognize the node
@@ -391,6 +331,7 @@ void Hero::moveStep(Point target)
 			}),
 		Rect(movePos.x - heroSize.width / 2, movePos.y - heroSize.height / 2, heroSize.width, heroSize.height), nullptr);
 
+	//move hero
 	if (!contactWall)
 		this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
 }
@@ -563,31 +504,6 @@ void Hero::updateAttributesWithDiamond()
 	_healthPoint += _diamond * 500;
 	_hitPoint += _diamond * 300;
 	_skillHitPoint += _diamond * 200;
-}
-
-void Hero::moveHero(float fdelta) noexcept
-{
-	using code = cocos2d::EventKeyboard::KeyCode;
-
-	//judge whether the hero is moving
-	if (_moveSpeed == Level::ZERO)
-		return;
-
-	//record the offset of coordinate
-	int offsetX = 0, offsetY = 0;
-	if (_keyCodeState[code::KEY_W] == true)
-		offsetY = 1;
-	else if (_keyCodeState[code::KEY_S] == true)
-		offsetY = -1;
-	if (_keyCodeState[code::KEY_A] == true)
-		offsetX = -1;
-	else if (_keyCodeState[code::KEY_D] == true)
-		offsetX = 1;
-
-	//move hero
-	Vec2 offset = Vec2(offsetX, offsetY);
-	Point target = this->getPosition() + offset;
-	this->moveStep(target);
 }
 
 void Hero::load(float fdelta) noexcept

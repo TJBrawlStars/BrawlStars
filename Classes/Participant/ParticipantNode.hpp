@@ -22,12 +22,20 @@ public:
 	std::string getUserName() const noexcept { return _userName; }
 
 protected:
-	std::string _userName;  ///< the participant's name
-	HeroType* _hero;        ///< the hero the participant use
+	std::string _userName = "???";  ///< the participant's name
+	HeroType* _hero;                ///< the hero the participant use
 
 	/** instantiation is not allowed */
-	Participant() = default;
+	Participant();
 
 private:
 
 };
+
+template<typename HeroType>
+Participant<HeroType>::Participant()
+{
+	_hero = HeroType::create();
+	this->setPosition(0, 0);
+	this->addChild(_hero);
+}
