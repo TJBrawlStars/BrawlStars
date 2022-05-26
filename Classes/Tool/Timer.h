@@ -20,9 +20,17 @@ public:
     //CC_SYNTHESIZE(cocos2d::Label*, _timerInfo, TimerInfo)
     CREATE_FUNC(MyTimer);
 
-    MyTimer() :_name() { restart();}
+    MyTimer() :_name() 
+    {
+        restart();
+        createUI(); 
+    }
 
-    explicit MyTimer(const std::string& name) :_name(name + ":") { restart(); }
+    explicit MyTimer(const std::string& name) :_name(name + ":") 
+    { 
+        restart();
+        createUI();
+    }
 
     std::string getHour() { return std::to_string(static_cast<int>(elapsed() / 1000.0) / 3600); }
     std::string getMinute() { return std::to_string(static_cast<int>(elapsed() / 1000.0) / 60); }

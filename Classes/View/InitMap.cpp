@@ -5,19 +5,20 @@
 #include"cocos2d.h"
 #include "View\GameScene.h"
 #include "Const/Const.h"
+#include <algorithm>
 using namespace std;
 USING_NS_CC;
 
-void GameScene::addMap()
+void GameScene::addMap(int chooseNum)
 {
-    //初始化各个变量！！！！！！！！
-    const int mapChooseNum = random(1, 3);
+    ////初始化各个变量！！！！！！！！
+    //const int mapChooseNum = random(1, 3);
     string mapChooseStr;
-    if (mapChooseNum == 1)
+    if (chooseNum == 1)
         mapChooseStr = Path::map1;
-    else if (mapChooseNum == 2)
+    else if (chooseNum == 2)
         mapChooseStr = Path::map2;
-    else if (mapChooseNum == 3)
+    else if (chooseNum == 3)
         mapChooseStr = Path::map3;
 
     _mapinfo._map = TMXTiledMap::create(mapChooseStr);
@@ -43,6 +44,7 @@ void GameScene::addMap()
     _mapinfo._tiledSize = _mapinfo._map->getTileSize();
     //初始化结束
 }
+
 
 Vec2 GameScene::tiledCoordFromPosition(Vec2 position)
 {
@@ -83,6 +85,18 @@ Vec2 GameScene::destPos(Point position)
     return Vec2(x, y);
 }
 
+
+Vec2 GameScene::randomPosWithoutBarrier()
+{
+    float x = cocos2d::random(32, maxWidth - 32);
+    float y = cocos2d::random(32, maxHeight - 32);
+
+    if (!isGrassExist(Point(x, y)) && !isBarrierExist(Point(x, y)))
+        return Vec2(x, y);
+    else
+        return randomPosWithoutBarrier();
+}
+
 void GameScene::setViewPointByPlayer(Point position)
 {
     //精灵不存在就退出
@@ -99,6 +113,40 @@ void GameScene::setViewPointByPlayer(Point position)
 
     //屏幕中点和所要移动的目标点之间的距离
     Vec2 viewPos = centerPos - destPosition;
-    log("destPos.x=%f", destPosition.x);
+    //log("destPos.x=%f", destPosition.x);
     this->setPosition(viewPos);
+}
+
+
+
+//初始化地图的10个位置
+void GameScene::initObjPosition()
+{
+    int i = 0;
+    auto group = _mapinfo._map->getObjectGroup("initobj");
+    ValueVector initobjPos = group->getObjects();
+    for (auto posi : initobjPos) 
+    {
+        ValueMap& dict = posi.asValueMap();
+        float x = dict["x"].asFloat();
+        float y = dict["y"].asFloat();
+
+        //把对象代表的地址放入容器
+        _tenPosition.insert(std::pair<int, Vec2>(i,Vec2(x,y)));
+        i++;
+    }
+}
+
+
+//n个位置产生(0~9）
+std::vector<int> GameScene::randTenNumberVec(int Num)
+{
+    vector<int> temp;
+    for (int i = 0; i < Num; ++i)
+    {
+        temp.push_back(i);
+    }
+    random_shuffle(temp.begin(), temp.end());
+    
+    return temp;
 }

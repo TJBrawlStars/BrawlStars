@@ -1,15 +1,40 @@
 #pragma once
 #include "cocos2d.h"
+#include <vector>
+
+/**
+* @brief 角色数据
+*/
+struct HeroData
+{
+	std::string name_isRobot;
+
+	HeroData(std::string iname_isRobot) :name_isRobot(iname_isRobot){};
+};
+
+//游戏人数
+const int playerNum = 10;
 
 //从左下角（0,0）开始的瓦片地图
 typedef std::vector<std::vector<bool>> TileVector;
 const int maxWidth = 32 * 75;
 const int maxHeight = 32 * 75;
 
+
+
+/**
+* @brief Tag值
+* ***
+* @这里没写 10是主角 11-19是其他玩家或机器人
+* @即使用getChildByTag()
+*/
 namespace SceneTag
 {
 	const int kGameSceneTag = 1;
 }
+
+
+
 
 //物理引擎设置了Tag和Name，方便碰撞检测接口
 //Tag

@@ -21,12 +21,13 @@
 * 15:初始化列表
 * 16:STL的emplace函数                          将参数传递给构造函数，emplace使用这些参数在容器管理的内存空间中直接构造元素
 *
-* 接口:insert_sum 总排行榜，可以试试整成全局变量，开一个全局变量的cpp或者h文件，我寻思毕竟是这个榜单要存在于整个程序运行过程的
-* 所以还是用这个类建立一个全局对象作为总排行榜，使用insert_sum函数插入对应的内容
+* 接口:insert_sum 用于总排行榜，可以试试整成全局变量，开一个全局变量的cpp或者h文件，我寻思毕竟是这个榜单要存在于整个程序运行过程的
+*      所以还是用这个类建立一个全局对象作为总排行榜，使用insert_sum函数插入对应的内容，就是每一局都要用到这边变量，试试我的就懂了
 * 
-* 接口:insert 单局游戏的排行榜，还是这个类创建的东西，使用insert函数即可
+* 接口:insert 单局游戏的排行榜，还是这个类创建的东西，使用insert函数即可，就是插入每一个角色的奖杯和吃鸡数
 * 
-* 有疑问：为什么不能类内成员重载+
+* 也就是这一个类可以设置一个总排行榜对象，也可以设置一个单局排行榜对象
+* 
 */
 #include <iostream>
 #include <memory>
@@ -70,13 +71,7 @@ public:
     LeaderBoard& operator=(const LeaderBoard&) = delete;
     ~LeaderBoard() = default;
 
-    LeaderBoard(LeaderBoard&& right) noexcept
-    {
-        _top = right._top;
-        _map = std::move(right._map);
-        _set = std::move(right._set);
-        return *this;
-    }
+    LeaderBoard(LeaderBoard&& right) noexcept;
 
     LeaderBoard& operator=(LeaderBoard&& right) noexcept
     {
@@ -95,115 +90,19 @@ public:
     auto _setend() { return _set.end(); }
 
 
-    //总榜单
-    void insert_sum(const key_type& k, const value_type& v)
-    {
-        auto add = [&] {
-            key_value_ptr ptr = std::make_shared<key_value_type>(k, v);
-            _map.emplace(k, ptr);
-            _set.insert(ptr);
-        };
+    //总榜单插入
+    void insert_sum(const key_type& k, const value_type& v);
+   
+    //一次游戏的榜单插入
+    void insert(const key_type& k, const value_type& v);
 
-        auto it = _map.find(k);
-        if (it == _map.end())
-        {
-            if (_set.size() < _top)
-            {
-                add();
-            }
-            else if (_set.size() == _top)
-            {
-                auto val = v;
-                if (val < (*_set.begin())->second)
-                    return;
-
-                _map.erase((*_set.begin())->first);
-                _set.erase(_set.begin());
-                add();
-            }
-        }
-        else
-        {
-            //不同于下一个insert
-            value_type tmp_value = ((*it).second)->second;
-            value_type res_value = v + tmp_value;
-
-            _set.erase(it->second);
-            _map.erase(it);
-
-            _map.emplace(k, std::make_shared<key_value_type>(k, res_value));
-            _set.insert(std::make_shared<key_value_type>(k, res_value));
-        }
-    }
-
-    //一次游戏的榜单
-    void insert(const key_type& k, const value_type& v)
-    {
-        auto add = [&] {
-            key_value_ptr ptr = std::make_shared<key_value_type>(k, v);
-            _map.emplace(k, ptr);
-            _set.insert(ptr);
-        };
-
-        auto it = _map.find(k);
-        if (it == _map.end())
-        {
-            if (_set.size() < _top)
-            {
-                add();
-            }
-            else if (_set.size() == _top)
-            {
-                auto val = v;
-                if (val < (*_set.begin())->second)
-                    return;
-
-                _map.erase((*_set.begin())->first);
-                _set.erase(_set.begin());
-                add();
-            }
-        }
-        else
-        {
-            _set.erase(it->second);
-            _map.erase(it);
-            add();
-        }
-    }
-
-    void erase(const key_type& k) {
-        auto it = _map.find(k);
-
-        if (it == _map.end())
-            return;
-
-        _set.erase(it->second);
-        _map.erase(it);
-    }
-
-    void clear() {
-        _set.clear();
-        _map.clear();
-    }
-
+    //暂时不用
+    void erase(const key_type& k);
+    void clear() {_set.clear(); _map.clear();}
     size_type size() { return _set.size(); }
 
-    size_type rank(const key_type& k) {
-        auto it = _map.find(k);
-
-        if (it == _map.end() || _set.empty())
-            return 0;
-
-        size_type rank = 0;
-
-        for (auto n = _set.rbegin(); n != _set.rend(); ++n) {
-            ++rank;
-            if ((*n)->first == k)
-                return rank;
-        }
-
-        return 0;
-    }
+    //传入Key，返回排名
+    size_type rank(const key_type& k);
 
 private:
     size_type _top;
@@ -211,6 +110,126 @@ private:
     std::set<key_value_ptr, key_value_less> _set;
 };
 
+
+//类外实现
+template <class Key, class T>
+LeaderBoard<Key, T>::LeaderBoard<Key,T>(LeaderBoard&& right) noexcept
+{
+    _top = right._top;
+    _map = std::move(right._map);
+    _set = std::move(right._set);
+    return *this;
+}
+
+template <class Key, class T>
+void LeaderBoard<Key, T>::insert_sum(const key_type& k, const value_type& v)
+{
+    auto add = [&] {
+        key_value_ptr ptr = std::make_shared<key_value_type>(k, v);
+        _map.emplace(k, ptr);
+        _set.insert(ptr);
+    };
+
+    auto it = _map.find(k);
+    if (it == _map.end())
+    {
+        if (_set.size() < _top)
+        {
+            add();
+        }
+        else if (_set.size() == _top)
+        {
+            auto val = v;
+            if (val < (*_set.begin())->second)
+                return;
+
+            _map.erase((*_set.begin())->first);
+            _set.erase(_set.begin());
+            add();
+        }
+    }
+    else
+    {
+        //不同于下一个insert
+        value_type tmp_value = ((*it).second)->second;
+        value_type res_value = v + tmp_value;
+
+        _set.erase(it->second);
+        _map.erase(it);
+
+        _map.emplace(k, std::make_shared<key_value_type>(k, res_value));
+        _set.insert(std::make_shared<key_value_type>(k, res_value));
+    }
+}
+
+template <class Key, class T>
+void LeaderBoard<Key, T>::insert(const key_type& k, const value_type& v)
+{
+    auto add = [&] {
+        key_value_ptr ptr = std::make_shared<key_value_type>(k, v);
+        _map.emplace(k, ptr);
+        _set.insert(ptr);
+    };
+
+    auto it = _map.find(k);
+    if (it == _map.end())
+    {
+        if (_set.size() < _top)
+        {
+            add();
+        }
+        else if (_set.size() == _top)
+        {
+            auto val = v;
+            if (val < (*_set.begin())->second)
+                return;
+
+            _map.erase((*_set.begin())->first);
+            _set.erase(_set.begin());
+            add();
+        }
+    }
+    else
+    {
+        _set.erase(it->second);
+        _map.erase(it);
+        add();
+    }
+}
+
+template <class Key, class T>
+void LeaderBoard<Key, T>::erase(const key_type& k)
+{
+    auto it = _map.find(k);
+
+    if (it == _map.end())
+        return;
+
+    _set.erase(it->second);
+    _map.erase(it);
+}
+
+template <class Key, class T>
+LeaderBoard<Key, T>::size_type LeaderBoard<Key, T>::rank(const key_type& k)
+{
+    auto it = _map.find(k);
+
+    if (it == _map.end() || _set.empty())
+        return 0;
+
+    size_type rank = 0;
+
+    for (auto n = _set.rbegin(); n != _set.rend(); ++n) {
+        ++rank;
+        if ((*n)->first == k)
+            return rank;
+    }
+
+    return 0;
+}
+
+
+//value的类型
 struct Rank
 {
     int _trophy = 0;

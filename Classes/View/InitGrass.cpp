@@ -25,9 +25,9 @@ void GameScene::addGrass()
             PhysicsMaterial(100.0f, 0.0f, 0.0f));
         tmpPhysicsBody->setDynamic(false);
         //²Ý´ÔµÄ
-        tmpPhysicsBody->setCategoryBitmask(0x02);
+        tmpPhysicsBody->setCategoryBitmask(0x04);
         tmpPhysicsBody->setCollisionBitmask(1);
-        tmpPhysicsBody->setContactTestBitmask(0x01);
+        tmpPhysicsBody->setContactTestBitmask(0x04);
         tmpPhysicsBody->setGravityEnable(false);
 
         Sprite* tmpSprite = Sprite::create();
@@ -41,13 +41,8 @@ void GameScene::addGrass()
         _grass.pushBack(tmpSprite);
         //log("x=%f,y=%f", x, y);
         this->addChild(tmpSprite, kGrassPriority);
-        log(" grass:%f", width);
+        //log(" grass:%f", width);
     }
-}
-
-void GameScene::inTimerViewScreen()
-{
-    
 }
 
 bool GameScene::isGrassExist(cocos2d::Point position)
@@ -60,11 +55,11 @@ bool GameScene::isGrassExist(cocos2d::Point position)
         if ((fabs(grassPos.x - position.x) < grassSize.width / 2) && (fabs(grassPos.y - position.y) < grassSize.height / 2))
         {
             //log("barrierPos.x=%f,position.x=%f", barrierPos.x, position.x);
-            log("yes");
+            //log("yes");
             return true;
         }
     }
-    log("false");
+    //log("false");
     return false;
 }
 

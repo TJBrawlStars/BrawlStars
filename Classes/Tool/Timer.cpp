@@ -39,7 +39,7 @@ void MyTimer::log(bool reset, const std::string& tip, bool unit_ms, bool kill)
         }
     }
 
-
+    int i = (int)('c');
 
     if (reset)
         this->restart();
@@ -71,7 +71,7 @@ void MyTimer::update(float dlt)
     auto parentNode = dynamic_cast<GameScene*>(this->getParent());
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-    _timerInfoBG->setPosition(parentNode->destPos(parentNode->getBeiya()->getPosition()) + Vec2(-visibleSize.width / 2, visibleSize.height / 2));
-    _timerInfo->setPosition(parentNode->destPos(parentNode->getBeiya()->getPosition()) + Vec2(55-visibleSize.width / 2, visibleSize.height / 2));
+    _timerInfoBG->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + Vec2(-visibleSize.width / 2, visibleSize.height / 2));
+    _timerInfo->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + Vec2(55-visibleSize.width / 2, visibleSize.height / 2));
     _timerInfo->setString((getHour()+":"+getMinute()+":"+getSecond()));
 }
