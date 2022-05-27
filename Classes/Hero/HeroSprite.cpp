@@ -307,24 +307,28 @@ void Hero::moveStep(Point target)
 	offset *= 0.5;
 
 	//query the contact with wall
-	bool contactWall = false;  ///< judgement
+	bool contactBarrier = false;  ///< judgement
 	Point movePos = this->getPosition() + static_cast<int>(_moveSpeed) * offset;  ///< mark the position after moving
 	Size heroSize = this->getContentSize();  ///< the content size of hero
 	Node* parentScene = nullptr;
 	if (this->getParent()->getName() == "robot" || this->getParent()->getName() == "player")
 		parentScene = this->getParent()->getParent();
 	dynamic_cast<Scene*>(parentScene)->getPhysicsWorld()->queryRect(
-		PhysicsQueryRectCallbackFunc([&contactWall](PhysicsWorld& world, PhysicsShape& shape, void* data)->bool
+		PhysicsQueryRectCallbackFunc([&contactBarrier](PhysicsWorld& world, PhysicsShape& shape, void* data)->bool
 			{
 				//recognize the node
 				typedef Node* NodePtr;
-				NodePtr wall = nullptr;
+				NodePtr wall = nullptr, box = nullptr;
 				NodePtr queryNode = shape.getBody()->getNode();
 				if (queryNode->getName() == "wall") wall = queryNode;
+				if (queryNode->getName() == "box")  box = queryNode;
 
 				//callbacks
 				if (wall) {
-					contactWall = true;
+					contactBarrier = true;
+				}
+				else if (box) {
+					contactBarrier = true;
 				}
 
 				return true;
@@ -332,7 +336,7 @@ void Hero::moveStep(Point target)
 		Rect(movePos.x - heroSize.width / 2, movePos.y - heroSize.height / 2, heroSize.width, heroSize.height), nullptr);
 
 	//move hero
-	if (!contactWall)
+	if (!contactBarrier)
 		this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
 }
 
