@@ -79,7 +79,8 @@ template<typename HeroType>
 Player<HeroType>::Player()
 {
     _hero = HeroType::create();
-    this->setParticipant();
+    this->Node::setPosition(0, 0);
+    this->addChild(_hero);
     this->setName("player");
     this->initializeKeyboardListener();
     this->initializeTouchListener();

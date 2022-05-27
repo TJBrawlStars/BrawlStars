@@ -52,7 +52,8 @@ template<typename HeroType>
 Robot<HeroType>::Robot()
 {
     _hero = HeroType::create();
-    this->setParticipant();
+    this->Node::setPosition(0, 0);
+    this->addChild(_hero);
     this->setName("robot");
     this->schedule(SEL_SCHEDULE(&Robot::autoMove));
     this->schedule(SEL_SCHEDULE(&Robot::autoAttack));

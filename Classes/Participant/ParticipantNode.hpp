@@ -27,14 +27,8 @@ protected:
 
 	/** instantiation is not allowed */
 	Participant() = default;
-	void setParticipant();
+	void setParticipant() = delete;
 
 private:
 
 };
-
-void Participant::setParticipant()
-{
-	this->Node::setPosition(0, 0);
-	this->addChild(_hero);
-}
