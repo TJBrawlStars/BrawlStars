@@ -8,12 +8,11 @@
 
 /**
 * @class Robot
-* @brief use the class as a given kind of hero
-* @details give the type of robot when creating it
-*          the robot will automatically move and attack
+* @brief derived from Participant and use template parameter to create hero
+* @details the robot will automatically move and attack
 */
 template<typename HeroType>
-class Robot :public Participant<HeroType>
+class Robot :public Participant
 {
 public:
     /**
@@ -52,6 +51,8 @@ Robot<HeroType>* Robot<HeroType>::create()
 template<typename HeroType>
 Robot<HeroType>::Robot()
 {
+    _hero = HeroType::create();
+    this->setParticipant();
     this->setName("robot");
     this->schedule(SEL_SCHEDULE(&Robot::autoMove));
     this->schedule(SEL_SCHEDULE(&Robot::autoAttack));

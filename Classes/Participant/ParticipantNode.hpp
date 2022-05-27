@@ -7,9 +7,8 @@
 
 /**
 * @class Participant
-* @brief the participants of game
+* @brief the participants of game which has the informaiton of hero and username
 */
-template<typename HeroType>
 class Participant :public cocos2d::Node
 {
 public:
@@ -23,19 +22,19 @@ public:
 
 protected:
 	std::string _userName = "???";  ///< the participant's name
-	HeroType* _hero;                ///< the hero the participant use
+	std::string _heroid;            ///< use hero id to create hero
+	Hero* _hero;                    ///< the hero the participant use
 
 	/** instantiation is not allowed */
-	Participant();
+	Participant() = default;
+	void setParticipant();
 
 private:
 
 };
 
-template<typename HeroType>
-Participant<HeroType>::Participant()
+void Participant::setParticipant()
 {
-	_hero = HeroType::create();
-	this->setPosition(0, 0);
+	this->Node::setPosition(0, 0);
 	this->addChild(_hero);
 }

@@ -9,13 +9,15 @@
 
 /**
 * @class Player
-* @brief
+* @brief derived from Participant and use template parameter to create hero
+* @details the hero can be controled by mouse and keyboard
 */
 template<typename HeroType>
-class Player :public Participant<HeroType>
+class Player :public Participant
 {
 public:
 	static Player* create();
+    static Player* createWithHeroID(std::string heroid) = delete;
 
     /**
     * @fn setKeyboardListener
@@ -76,6 +78,8 @@ Player<HeroType>* Player<HeroType>::create()
 template<typename HeroType>
 Player<HeroType>::Player()
 {
+    _hero = HeroType::create();
+    this->setParticipant();
     this->setName("player");
     this->initializeKeyboardListener();
     this->initializeTouchListener();
@@ -152,7 +156,7 @@ template<typename HeroType>
 bool Player<HeroType>::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 {
     //get the location of touch point
-    cocos2d::Point touchLocation = touch->getLocation();
+    cocos2d::Point touchLocation = dynamic_cast<Scene*>(this->getParent())->convertToNodeSpace(touch->getLocation());
 
     //callback functions
     if (!_releaseSkill) {
