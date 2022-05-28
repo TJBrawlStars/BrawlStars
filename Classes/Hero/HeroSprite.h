@@ -197,6 +197,7 @@ protected:
 	*/
 	Hero(const int originalHP, const int maxAmmo);
 	Hero() = delete;
+	virtual ~Hero() = default;
 
 	/** the attributes of a hero */
 	const int _maxAmmo;

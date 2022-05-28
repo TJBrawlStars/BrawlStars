@@ -27,7 +27,6 @@ public:
 	*/
 	static Beiya* createBeiya();
 	static Beiya* create() { return createBeiya(); }
-	static Beiya* create(const std::string&) = delete;
 
 protected:
 	/** overrides */

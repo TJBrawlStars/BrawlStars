@@ -1,9 +1,10 @@
-//2150266 时天逸
+/** @author 时天逸 */
 
 #pragma once
 
 #include "cocos2d.h"
 #include "Hero/HeroSprite.h"
+#include <memory>
 
 /**
 * @class Participant
@@ -16,6 +17,8 @@ public:
 	virtual void setPosition(const cocos2d::Vec2& position) override { return _hero->setPosition(position); }
 	virtual void setPosition(float x, float y)              override { return _hero->setPosition(x, y); }
 	virtual const cocos2d::Vec2& getPosition() const        override { return _hero->getPosition(); }
+
+	void setHeroType(std::string HeroID);
 
 	bool alive()              const noexcept { return _hero->alive(); }
 	std::string getUserName() const noexcept { return _userName; }

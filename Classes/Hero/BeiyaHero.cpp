@@ -1,5 +1,6 @@
 //2150266  ±ÃÏ“›
 #include "Hero/BeiyaHero.h"
+#include "Factory/HeroFactory.h"
 
 USING_NS_CC;
 
@@ -11,6 +12,8 @@ namespace {
 		printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 	}
 }
+
+HeroRegister registerCreator(std::string("Beiya"), HeroCreator(Beiya::create));
 
 Beiya* Beiya::createBeiya()
 {

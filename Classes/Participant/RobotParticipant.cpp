@@ -1,42 +1,22 @@
-//2150266 时天逸
+/** @author 时天逸 */
 
-#pragma once
+#include "Participant/RobotParticipant.h"
 
-#include "cocos2d.h"
-#include "Hero/HeroSprite.h"
-#include "Participant/ParticipantNode.hpp"
+USING_NS_CC;
 
-/**
-* @class Robot
-* @brief derived from Participant and use template parameter to create hero
-* @details the robot will automatically move and attack
-*/
-template<typename HeroType>
-class Robot :public Participant
+Robot* Robot::create()
 {
-public:
-    /**
-    */
-    static Robot* create();
+    return Robot::createWithHeroID("Beiya");
+}
 
-    void setAutoMove(bool state)   noexcept = delete;
-    void setAutoAttack(bool state) noexcept = delete;
-
-private:
-    Robot();
-
-    /** schedule selectors */
-    void autoMove(float fdelta = 1);
-    void autoAttack(float fdelta = 1);
-};
-
-template<typename HeroType>
-Robot<HeroType>* Robot<HeroType>::create()
+Robot* Robot::createWithHeroID(std::string HeroID)
 {
     Robot* robot = new(std::nothrow) Robot();
     if (robot)
     {
         robot->autorelease();
+
+        robot->setHeroType(HeroID);
 
         return robot;
     }
@@ -48,19 +28,15 @@ Robot<HeroType>* Robot<HeroType>::create()
     }
 }
 
-template<typename HeroType>
-Robot<HeroType>::Robot()
+Robot::Robot()
 {
-    _hero = HeroType::create();
     this->Node::setPosition(0, 0);
-    this->addChild(_hero);
     this->setName("robot");
     this->schedule(SEL_SCHEDULE(&Robot::autoMove));
     this->schedule(SEL_SCHEDULE(&Robot::autoAttack));
 }
 
-template<typename HeroType>
-void Robot<HeroType>::autoMove(float fdelta)
+void Robot::autoMove(float fdelta)
 {
     USING_NS_CC;
 
@@ -81,7 +57,7 @@ void Robot<HeroType>::autoMove(float fdelta)
                 if (queryNode->getName() == "hero")    hero = queryNode;
                 if (queryNode->getName() == "box")     box = queryNode;
                 if (queryNode->getName() == "diamond") diamond = queryNode;
-                
+
                 //callbacks
                 if (diamond) {
                     moveTarget = diamond;
@@ -108,8 +84,7 @@ void Robot<HeroType>::autoMove(float fdelta)
     }
 }
 
-template<typename HeroType>
-void Robot<HeroType>::autoAttack(float fdelta)
+void Robot::autoAttack(float fdelta)
 {
     USING_NS_CC;
 
@@ -126,7 +101,7 @@ void Robot<HeroType>::autoAttack(float fdelta)
                 NodePtr hero = nullptr, box = nullptr;
                 NodePtr queryNode = shape.getBody()->getNode();
                 if (queryNode->getName() == "hero") hero = queryNode;
-                if (queryNode->getName() == "box") box = queryNode;
+                if (queryNode->getName() == "box")  box = queryNode;
 
                 //callbacks
                 if (hero) {
