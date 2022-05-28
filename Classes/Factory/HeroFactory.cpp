@@ -17,7 +17,7 @@ std::shared_ptr<HeroFactory> HeroFactory::getInstance()
 
 Hero* HeroFactory::createWithClassID(std::string classID)
 {
-	auto creator = _heroinits.find(classID);
+	auto creator = _heroFactoryMap.find(classID);
 
 	if (creator->second)
 		return creator->second();
@@ -27,5 +27,5 @@ Hero* HeroFactory::createWithClassID(std::string classID)
 
 void HeroFactory::registerClassCreator(std::string classID, HeroCreator creator)
 {
-	_heroinits.emplace(classID, creator);
+	_heroFactoryMap.emplace(classID, creator);
 }

@@ -7,6 +7,7 @@
 #include <memory>
 
 typedef Hero* (*HeroCreator)(void);
+typedef std::unordered_map<std::string, HeroCreator> HeroFactoryMap;
 
 class HeroFactory :protected Factory
 {
@@ -20,7 +21,7 @@ protected:
 
 private:
 	static std::shared_ptr<HeroFactory> _heroFactoryInstance;
-	std::map<std::string, HeroCreator> _heroinits;
+	HeroFactoryMap _heroFactoryMap;
 };
 
 class HeroRegister
@@ -30,4 +31,5 @@ public:
 	{
 		HeroFactory::getInstance()->registerClassCreator(classID, creator);
 	}
+	HeroRegister() = delete;
 };
