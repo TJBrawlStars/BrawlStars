@@ -2,12 +2,14 @@
 //#define NDEBUG
 #include<cassert>
 #include "cocos2d.h"
-#include"ui/CocosGUI.h"
-#include"Tool/SceneManager.h"
+#include "ui/CocosGUI.h"
+#include "Tool/SceneManager.h"
 #include "Tool/MapInfo.h"
-#include"Hero/HeroSprite.h"
-#include"Hero/BeiyaHero.h"
-#include"Tool/Timer.h"
+#include "Hero/HeroSprite.h"
+#include "Hero/BeiyaHero.h"
+#include "Tool/Timer.h"
+#include "Participant/PlayerParticipant.hpp"
+#include "Participant/ParticipantNode.hpp"
 
 
 class GameScene : public cocos2d::Scene
@@ -26,17 +28,9 @@ public:
     /**
     * @brief 返回值
     */
-    Hero* getHero() { return _player; }
-    //std::vector<HeroData> getHerodata() { return _herodataVec; }
+    Participant* getHero() { return _player; } 
     cocos2d::Vector<cocos2d::Sprite*> getObstacle();
     cocos2d::Vector<cocos2d::Sprite*> getGrass();
-
-
-    /**
-    * @brief 设置值
-    */
-    //std::vector<HeroData> setHerodata(std::vector<HeroData>& herodataVec) { _herodataVec = herodataVec; }
-
 
     /**
     * @brief 判断传入坐标是否有障碍层或草丛层
@@ -72,12 +66,6 @@ public:
 
 
     /**
-    * @初始化AI（未实现）
-    */
-    //void addAIHeroPlayer(); 
-
-
-    /**
     * @brief 创建障碍层
     */
     void addBarrier();
@@ -89,11 +77,7 @@ public:
     void addGrass();
 
 
-    /**
-    * @创建宝箱
-    */
     void addBox();
-
 
      /**
     * @brief 传入角色位置 返回屏幕中心的位置
@@ -108,16 +92,21 @@ public:
     cocos2d::Vec2 randomPosWithoutBarrier();
 
 
+    //暂时用不着
+    cocos2d::Vec2 tiledCoordFromPosition(cocos2d::Vec2 position);
+
 
     /********* @author:王琳************/
     //schedule update
     void update(float dt);
-    
+
+    void addPoisonCircle();
+
+    void initializePoiosnPhysics(cocos2d::Sprite* poison);
+
+   
 
 
-
-    //用不着!!!
-    cocos2d::Vec2 tiledCoordFromPosition(cocos2d::Vec2 position);
 private:
 
     //地图信息（initMap()函数初始化了里面的变量）
@@ -127,9 +116,26 @@ private:
     //草丛容器
     cocos2d::Vector<cocos2d::Sprite*> _grass;
     //主角
-    Hero* _player;
+    Participant* _player;
     //所有角色的容器
-    std::vector<Hero*> _heroVec; 
+    std::vector<Participant*> _heroVec; 
     //10个位置
     std::map<int, cocos2d::Vec2> _tenPosition;
+
+    cocos2d::Sprite* poisonCircleDown;
+    cocos2d::Sprite* poisonCircleUp;
+    cocos2d::Sprite* poisonCircleLeft;
+    cocos2d::Sprite* poisonCircleRight;
+    cocos2d::Sprite* poisonDown;
+    cocos2d::Sprite* poisonUp;
+    cocos2d::Sprite* poisonLeft;
+    cocos2d::Sprite* poisonRight;
+
+    float poisonCircleMarch = 0.05f;
+    float poisonCircleMax = 2400;
+   
+
 };
+
+
+
