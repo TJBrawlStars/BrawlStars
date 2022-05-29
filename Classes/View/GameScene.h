@@ -8,9 +8,9 @@
 #include "Hero/HeroSprite.h"
 #include "Hero/BeiyaHero.h"
 #include "Tool/Timer.h"
-#include "Participant/PlayerParticipant.hpp"
-#include "Participant/ParticipantNode.hpp"
-
+#include "Participant/PlayerParticipant.h"
+#include "Participant/ParticipantNode.h"
+//#include "Tool/ChatBox.h"
 
 class GameScene : public cocos2d::Scene
 {
@@ -40,11 +40,11 @@ public:
     bool isGrassExist(cocos2d::Point position);
 
 
-    /**
-    * @brief 使角色进入草丛变透明
-    * @放在update函数中
-    */
-    void grassPlayerOpacity();
+    ///**
+    //* @brief 使角色进入草丛变透明
+    //* @放在update函数中
+    //*/
+    //void grassPlayerOpacity();
 
 
     /**
@@ -76,8 +76,15 @@ public:
     */
     void addGrass();
 
-
+    /**
+    * @创建宝箱
+    */
     void addBox();
+
+    ///**
+    //* @创建聊天框
+    //*/
+    //void addChatBox();
 
      /**
     * @brief 传入角色位置 返回屏幕中心的位置
@@ -103,10 +110,7 @@ public:
     void addPoisonCircle();
 
     void initializePoiosnPhysics(cocos2d::Sprite* poison);
-
-   
-
-
+    
 private:
 
     //地图信息（initMap()函数初始化了里面的变量）
@@ -121,6 +125,9 @@ private:
     std::vector<Participant*> _heroVec; 
     //10个位置
     std::map<int, cocos2d::Vec2> _tenPosition;
+    //聊天框按钮
+    //cocos2d::Sprite* _chatboxSwitch;
+
 
     cocos2d::Sprite* poisonCircleDown;
     cocos2d::Sprite* poisonCircleUp;
@@ -131,11 +138,6 @@ private:
     cocos2d::Sprite* poisonLeft;
     cocos2d::Sprite* poisonRight;
 
-    float poisonCircleMarch = 0.05f;
+    float poisonCircleMarch = 5.0f;
     float poisonCircleMax = 2400;
-   
-
 };
-
-
-

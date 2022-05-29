@@ -1,8 +1,5 @@
-/**
-* @author 张靖凯
-* @brief 计时器
-* @构造函数就开始计时
-*/
+//2151396 张靖凯
+
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
@@ -12,6 +9,11 @@
 #include "cocos2d.h"
 #include "Const/Const.h"
 #include "View/GameScene.h"
+
+/**
+* @brief 计时器
+* @构造函数就开始计时
+*/
 
 class MyTimer : public cocos2d::Node
 {

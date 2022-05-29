@@ -1,12 +1,16 @@
+//2151396 张靖凯
+
+#include"cocos2d.h"
+#include "View/GameScene.h"
+#include "Const/Const.h"
+#include "Participant/PlayerParticipant.h"
+#include "Participant/ParticipantNode.h"
+#include "Participant/RobotParticipant.h"
+#include <sstream>
+
 /**
-* @author 张靖凯
 * 初始化英雄
 */
-#include"cocos2d.h"
-#include "View\GameScene.h"
-#include "Const/Const.h"
-#include "Hero/Robot.hpp"
-#include <sstream>
 
 extern std::vector<HeroData> herodataVec;
 
@@ -20,37 +24,49 @@ void GameScene::addHeroPlayer()
 	std::vector<int> tenRandVector = randTenNumberVec(10);
 
 
+	//测试用
+	herodataVec.push_back({ "Beiya false" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+	herodataVec.push_back({ "Beiya true" });
+
+
 	//将第一个设置为主角
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		//初始化操作
-		Hero* player = nullptr;
-		
 		std::istringstream temp(herodataVec[i].name_isRobot);
 		std::string heroname;
 		std::string isRobot;
 		temp >> heroname;
 		temp >> isRobot;
 
-		if (heroname == "Beiya")
+		Participant* player;
+		if (isRobot == "true")
 		{
-			if (isRobot == "true")
-				/*player = Robot<Beiya>::createRobot()*/;
-			else if(isRobot == "false")
-			{
-				player = Beiya::createBeiya();
-			}
-
-			_heroVec.push_back(player);
-			player->setPosition(_tenPosition[tenRandVector[i]]);
-			this->addChild(player, kHeroPriority, i+10);
+			player = Robot::createWithHeroID(heroname);
 		}
-		///补else if其他类型的角色
+		else if (isRobot == "false")
+		{
+			player = Player::createWithHeroID(heroname);
+		}
+
+		_heroVec.push_back(player);
+		player->setPosition(_tenPosition[tenRandVector[i]]);
+		this->addChild(player, kHeroPriority, i + 10);
+
+		//特判主角
+		if (i == 0)
+		{
+			_player = _heroVec[0];
+			dynamic_cast<Player*>(_player)->setKeyboardListener(true);
+			dynamic_cast<Player*>(_player)->setTouchListener(true);
+		}
 	}
-
-
-	//设置主角
-	//_player = dynamic_cast<Hero*>(this->getChildByTag(10));
-	_player = _heroVec[0];
-
 }

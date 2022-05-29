@@ -1,6 +1,4 @@
 #include "GameScene.h"
-#include"Hero/HeroSprite.h"
-#include"Hero/BeiyaHero.h"
 #pragma execution_character_set("utf-8")  
 
 extern std::vector<HeroData> herodataVec;
@@ -18,7 +16,7 @@ bool GameScene::init()
 
 
 	//物理检测红框
-	this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	//this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 
 
 	//这是王佳垚写的，我先停掉了，停在我这个地图界面
@@ -50,13 +48,9 @@ bool GameScene::init()
 	addBox();
 	//添加毒圈
 	addPoisonCircle();
-	
-	
+
 	this->scheduleUpdate();
 	
-
-
-
 	return true;
 }
 
@@ -68,25 +62,22 @@ void GameScene::update(float dt)
 {
 	setViewPointByPlayer(_player->getPosition());
 
-	//
-	if (poisonCircleDown->getPosition().y < poisonCircleMax)
-	{
-		poisonCircleDown->setPosition(poisonCircleDown->getPosition().x, poisonCircleDown->getPosition().y + poisonCircleMarch);
-	}
 
-	if (poisonCircleUp->getPosition().y > 0)
+	if (poisonCircleDown->getPosition().y > poisonCircleMax / 2)
 	{
-		poisonCircleUp->setPosition(poisonCircleUp->getPosition().x, poisonCircleUp->getPosition().y - poisonCircleMarch);
+		poisonCircleDown->setPosition(poisonCircleDown->getPosition().x, poisonCircleDown->getPosition().y - poisonCircleMarch);
 	}
-
-	if (poisonCircleLeft->getPosition().x < poisonCircleMax)
+	if (poisonCircleUp->getPosition().y < poisonCircleMax / 2)
 	{
-		poisonCircleLeft->setPosition(poisonCircleLeft->getPosition().x + poisonCircleMarch, poisonCircleLeft->getPosition().y );
+		poisonCircleUp->setPosition(poisonCircleUp->getPosition().x, poisonCircleUp->getPosition().y + poisonCircleMarch);
 	}
-
-	if (poisonCircleRight->getPosition().x > 0)
+	if (poisonCircleLeft->getPosition().x > poisonCircleMax / 2)
 	{
-		poisonCircleRight->setPosition(poisonCircleRight->getPosition().x - poisonCircleMarch , poisonCircleRight->getPosition().y );
+		poisonCircleLeft->setPosition(poisonCircleLeft->getPosition().x - poisonCircleMarch, poisonCircleLeft->getPosition().y);
+	}
+	if (poisonCircleRight->getPosition().x < poisonCircleMax / 2)
+	{
+		poisonCircleRight->setPosition(poisonCircleRight->getPosition().x + poisonCircleMarch, poisonCircleRight->getPosition().y);
 	}
 }
 

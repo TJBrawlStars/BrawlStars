@@ -1,18 +1,18 @@
-/**
-* @author 张靖凯
-* @brief 初始化地图
-*/
+//2151396 张靖凯
+
 #include"cocos2d.h"
 #include "View\GameScene.h"
 #include "Const/Const.h"
 #include <algorithm>
+
 using namespace std;
 USING_NS_CC;
 
+/**
+* @brief 初始化地图，草丛，障碍物
+*/
 void GameScene::addMap(int chooseNum)
 {
-    ////初始化各个变量！！！！！！！！
-    //const int mapChooseNum = random(1, 3);
     string mapChooseStr;
     if (chooseNum == 1)
         mapChooseStr = Path::map1;
@@ -34,10 +34,6 @@ void GameScene::addMap(int chooseNum)
     _mapinfo._obstacleLayer = _mapinfo._map->getLayer("3");
     _mapinfo._obstacleLayer->setGlobalZOrder(kTMXlayer);
 
-    //草丛不能这样哦~~~~
-    //_mapinfo._obstacleLayer = _mapinfo._map->getLayer("4");
-    //_mapinfo._obstacleLayer->setGlobalZOrder(kTMXlayer);
-    // 
     //地图方块数量
     _mapinfo._mapTiledNum = _mapinfo._map->getMapSize();
     //单个格子大小
@@ -149,4 +145,113 @@ std::vector<int> GameScene::randTenNumberVec(int Num)
     random_shuffle(temp.begin(), temp.end());
     
     return temp;
+}
+
+/********************************************************草丛********************************************************/
+void GameScene::addGrass()
+{
+    auto group = _mapinfo._map->getObjectGroup("grass");
+    ValueVector grassObjects = group->getObjects();
+
+    for (auto grass : grassObjects)
+    {
+        ValueMap& dict = grass.asValueMap();
+        float x = dict["x"].asFloat();
+        float y = dict["y"].asFloat();
+        float width = dict["width"].asFloat();
+        float height = dict["height"].asFloat();
+
+        PhysicsBody* tmpPhysicsBody = PhysicsBody::createBox(Size(width, height),
+            PhysicsMaterial(100.0f, 0.0f, 0.0f));
+        tmpPhysicsBody->setDynamic(false);
+        //草丛的
+        tmpPhysicsBody->setCategoryBitmask(0x04);
+        tmpPhysicsBody->setCollisionBitmask(1);
+        tmpPhysicsBody->setContactTestBitmask(0x04);
+        tmpPhysicsBody->setGravityEnable(false);
+
+        Sprite* tmpSprite = Sprite::create();
+        tmpSprite->setPosition(Vec2(x, y));
+        tmpSprite->setAnchorPoint(Vec2::ZERO);
+        tmpSprite->setContentSize(Size(width, height));
+        tmpSprite->addComponent(tmpPhysicsBody);
+        tmpSprite->setTag(kGrassTag);
+        tmpSprite->setName(Name::kGrass);
+
+        _grass.pushBack(tmpSprite);
+        this->addChild(tmpSprite, kGrassPriority);
+    }
+}
+
+bool GameScene::isGrassExist(cocos2d::Point position)
+{
+    for (auto grass : _grass)
+    {
+        auto grassPos = grass->getPosition() + grass->getContentSize() / 2;
+        auto grassSize = grass->getContentSize();
+        if ((fabs(grassPos.x - position.x) < grassSize.width / 2) && (fabs(grassPos.y - position.y) < grassSize.height / 2))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+Vector<Sprite*> GameScene::getGrass()
+{
+    return _grass;
+}
+
+
+/********************************************************障碍物********************************************************/
+void GameScene::addBarrier()
+{
+    auto group = _mapinfo._map->getObjectGroup("barrier");
+    ValueVector barrierObjects = group->getObjects();
+    for (auto barrier : barrierObjects)
+    {
+        ValueMap& dict = barrier.asValueMap();
+        float x = dict["x"].asFloat();
+        float y = dict["y"].asFloat();
+        float width = dict["width"].asFloat();
+        float height = dict["height"].asFloat();
+
+        PhysicsBody* tmpPhysicsBody = PhysicsBody::createBox(Size(width, height),
+            PhysicsMaterial(100.0f, 0.0f, 0.0f));
+        tmpPhysicsBody->setDynamic(false);
+        tmpPhysicsBody->setCategoryBitmask(0x01);
+        tmpPhysicsBody->setCollisionBitmask(1);
+        tmpPhysicsBody->setContactTestBitmask(0x01);
+        tmpPhysicsBody->setGravityEnable(false);
+
+        Sprite* tmpSprite = Sprite::create();
+        tmpSprite->setPosition(Vec2(x, y));
+        tmpSprite->setAnchorPoint(Vec2::ZERO);
+        tmpSprite->setContentSize(Size(width, height));
+        tmpSprite->addComponent(tmpPhysicsBody);
+        tmpSprite->setTag(kBarrierTag);
+        tmpSprite->setName(Name::kBarrier);
+
+        _obstacle.pushBack(tmpSprite);
+        this->addChild(tmpSprite, kBarrierPriority);
+    }
+}
+
+bool GameScene::isBarrierExist(Point position)
+{
+    for (auto barrier : _obstacle)
+    {
+        auto barrierPos = barrier->getPosition() + barrier->getContentSize() / 2;
+        auto barrierSize = barrier->getContentSize();
+        if ((fabs(barrierPos.x - position.x) < barrierSize.width / 2) && (fabs(barrierPos.y - position.y) < barrierSize.height / 2))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+Vector<Sprite*> GameScene::getObstacle()
+{
+    return _obstacle;
 }
