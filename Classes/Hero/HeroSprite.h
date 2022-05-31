@@ -148,6 +148,7 @@ public:
 	* @brief attack toward the target
 	*/
 	bool attack(cocos2d::Point target);
+	bool attack(float x, float y) { return attack(cocos2d::Point(x, y)); }
 
 	/**
 	* @fn prepareSkillRelease
@@ -161,12 +162,14 @@ public:
 	* @brief release the skill toward the target
 	*/
 	bool releaseSkill(cocos2d::Point target);
+	bool releaseSkill(float x, float y) { return releaseSkill(cocos2d::Point(x, y)); }
 
 	/**
 	* @fn moveStep
 	* @brief a single step of moving hero toward the target
 	*/
 	void moveStep(cocos2d::Point target);
+	void moveStep(float x, float y) { return moveStep(cocos2d::Point(x, y)); }
 
 	/// @}
 	/// end of Hero Manipulators
@@ -285,6 +288,14 @@ protected:
 
 private:
 	bool _alive = true;                                             ///< mark whether the hero is alive
+
+	/**
+	* @fn turnTo
+	* @brief turn the hero's texture towards the target
+	* @param target: the relative position to hero
+	*/
+	void turnTo(cocos2d::Point target);
+	void turnTo(float x, float y) { return turnTo(cocos2d::Point(x, y)); }
 
 	/** event listeners */
 	static cocos2d::EventListenerPhysicsContact* _contactListener;

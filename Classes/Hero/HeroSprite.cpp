@@ -10,7 +10,6 @@ namespace {
 	void problemLoading(std::string filename)
 	{
 		printf("Error while loading: %s\n", filename);
-		printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 	}
 
 	std::string intToString(const int number)
@@ -39,12 +38,13 @@ Hero::Hero(const int originalHP, const int maxAmmo)
 {
 	//initialize the event listeners
 	initializeContactListener();
+	setContactListener(false);
 }
 
 void Hero::initializeContactListener()
 {
-	if (_contactListener)
-		return;
+//	if (_contactListener)
+//  	return;
 	_contactListener = EventListenerPhysicsContact::create();
 	_contactListener->onContactBegin = CC_CALLBACK_1(Hero::onContactBegin, this);
 	_contactListener->onContactSeparate = CC_CALLBACK_1(Hero::onContactSeperate, this);
@@ -141,6 +141,7 @@ bool Hero::onContactBegin(PhysicsContact& contact)
 
 	//handle the contacts
 	if (hero && bullet) {
+		log("physics test");
 		//make sure the bullet wont hit its parent hero
 		if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->getParentHero())
 			return false;
@@ -336,8 +337,31 @@ void Hero::moveStep(Point target)
 		Rect(movePos.x - heroSize.width / 2, movePos.y - heroSize.height / 2, heroSize.width, heroSize.height), nullptr);
 
 	//move hero
-	if (!contactBarrier)
+	if (!contactBarrier) {
 		this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
+		this->turnTo(offset);
+	}
+}
+
+void Hero::turnTo(Point target)
+{
+	if (target == Point(0, 0))
+		return;
+
+	float angle = 0;
+	if (target.x > 0) {
+		angle = 90 - atan(target.y / target.x);
+	}
+	else if (target.x < 0) {
+		angle = 270 - atan(target.y / target.x);
+	}
+	else {
+		if (target.y > 0)
+			angle = 0;
+		else if (target.y < 0)
+			angle = 180;
+	}
+	this->setRotation(angle);
 }
 
 int Hero::addHP(int increasePoint)
