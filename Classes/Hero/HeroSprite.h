@@ -20,7 +20,7 @@ class Bullet;
 * @class Hero
 * @brief Hero is the base class of the heroes in Brawl Stars
 */
-class Hero :public cocos2d::Sprite {
+class Hero :public cocos2d::Node {
 public:
 	/**
 	* @enum Level
@@ -35,17 +35,7 @@ public:
 		EXTREME_HIGH = 5
 	};
 
-	/// @name Listener Set-ups
-	/// @{
-
-	/**
-	* @fn setContactListener
-	* @brief choose whether to allow physics contact. The function is disabled by default
-	*/
-	void setContactListener(bool contactState) noexcept;
-
-	/// @}
-	/// end of Listener Set-ups
+	static Hero* create();
 
 	/// @name Attribute Manipulators
 	/// @{
@@ -216,7 +206,10 @@ protected:
 	Level _shotRange;
 	Level _moveSpeed;
 	Level _loadSpeed;
-	std::vector<cocos2d::Sprite*> _ammoStrip;
+
+	/** the sprite and ui commponents of a hero */
+	cocos2d::Sprite* _hero;                                                                      ///< hero
+	std::vector<cocos2d::Sprite*> _ammoStrip;                                                    ///< the ammo strip
 	cocos2d::ui::LoadingBar* _energyStrip = cocos2d::ui::LoadingBar::create("energyStrip.png");  ///< the energy strip
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");    ///< the blood strip
 	cocos2d::Sprite* heroDiamond = cocos2d::Sprite::create("diamond.png");                       ///< the diamond to be displayed
@@ -248,9 +241,10 @@ protected:
 	/// @}
 	/// end of Virtual Functions
 
-	/// @name Initializers in derived classes
-	/// @warning the function should be used after the set of hero's texture
+	/// @name Initializers
 	/// @{
+
+	virtual void initializeHeroSprite() = 0;
 	
 	/**
 	* @fn initializeHeroPhysics
@@ -296,16 +290,6 @@ private:
 	*/
 	void turnTo(cocos2d::Point target);
 	void turnTo(float x, float y) { return turnTo(cocos2d::Point(x, y)); }
-
-	/** event listeners */
-	static cocos2d::EventListenerPhysicsContact* _contactListener;
-
-	/** initializer of the event listeners */
-	void initializeContactListener();
-
-	/** callback functions of the event listeners */
-	bool onContactBegin(cocos2d::PhysicsContact& contact);
-	void onContactSeperate(cocos2d::PhysicsContact& contact);
 
 DEPRECATED_ACCESS:
 

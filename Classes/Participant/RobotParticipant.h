@@ -14,8 +14,7 @@
 class Robot :public Participant
 {
 public:
-    /**
-    */
+    /** creators */
     static Robot* create();
     static Robot* createWithHeroID(std::string HeroID);
 
@@ -24,6 +23,10 @@ public:
 
 private:
     Robot();
+
+    /** random engine */
+    static std::default_random_engine _robotRand;
+    static bool _initRand;
 
     /** schedule selectors */
     void autoMove(float fdelta = 1);

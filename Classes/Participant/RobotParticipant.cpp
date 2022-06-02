@@ -4,6 +4,9 @@
 
 USING_NS_CC;
 
+std::default_random_engine Robot::_robotRand;
+bool Robot::_initRand = false;
+
 Robot* Robot::create()
 {
     return Robot::createWithHeroID("Beiya");
@@ -17,6 +20,11 @@ Robot* Robot::createWithHeroID(std::string HeroID)
         robot->autorelease();
 
         robot->setHeroType(HeroID);
+
+        if (!_initRand) {
+            _robotRand.seed(time(0));
+            _initRand = true;
+        }
 
         return robot;
     }
@@ -45,6 +53,7 @@ void Robot::autoMove(float fdelta)
     int shotRange = _hero->getShotRange();
 
     static Node* moveTarget = nullptr;
+//    static Node randTarget;
 
     //query and get the target
     dynamic_cast<Scene*>(this->getParent())->getPhysicsWorld()->queryRect(
@@ -70,17 +79,39 @@ void Robot::autoMove(float fdelta)
 
                     moveTarget = hero;
                 }
+                else {
+//                    std::uniform_real_distribution<double> u(-1, 1);
+//                    float x = heroPos.x + u(_robotRand);
+//                    float y = heroPos.y + u(_robotRand);
+//                    randTarget.setPosition(x, y);
+//                    moveTarget = &randTarget;
+                }
 
                 return true;
             }),
         Rect(heroPos.x - shotRange, heroPos.y - shotRange, 2 * shotRange, 2 * shotRange), nullptr);
 
     //move robot
-    if (moveTarget) {
+    if (moveTarget->getPosition()!=_hero->getPosition()) {
         _hero->moveStep(moveTarget->getPosition());
     }
     else {
-
+//        this->unschedule(SEL_SCHEDULE(&Robot::autoMove));
+//        std::uniform_real_distribution<double> u(-10, 10);
+//        float x = heroPos.x + u(_robotRand);
+//        float y = heroPos.y + u(_robotRand);
+//        Point randTarget(x, y);
+//        this->schedule([=](float fdelta = 1)
+//            {
+//                _hero->moveStep(randTarget);
+//
+//               if (_hero->getPosition() == randTarget) {
+//                    this->unschedule("random move");
+//                    this->schedule(SEL_SCHEDULE(&Robot::autoMove));
+//                }
+//            }
+//        , "random move");
+//        _hero->moveStep(x, y);
     }
 }
 
@@ -100,7 +131,7 @@ void Robot::autoAttack(float fdelta)
                 typedef Node* NodePtr;
                 NodePtr hero = nullptr, box = nullptr;
                 NodePtr queryNode = shape.getBody()->getNode();
-                if (queryNode->getName() == "hero") hero = queryNode;
+                if (queryNode->getName() == "hero") hero = queryNode->getParent();
                 if (queryNode->getName() == "box")  box = queryNode;
 
                 //callbacks

@@ -17,9 +17,12 @@ namespace {
 Beiya* Beiya::createBeiya()
 {
 	Beiya* beiya = new(std::nothrow) Beiya();
-	if (beiya && beiya->initWithFile(_beiyaPicture))
+	if (beiya)
 	{
 		beiya->autorelease();
+
+		//initialilze the sprite
+		beiya->initializeHeroSprite();
 
 		//initialize the physics body
 		beiya->initializeHeroPhysics();
@@ -48,7 +51,7 @@ Beiya* Beiya::createBeiya()
 	return beiya;
 }
 
-const std::string Beiya::_beiyaPicture = "player.png";
+const std::string Beiya::_beiyaPicture = "HeroResource/GodPlane.png";
 
 Beiya::Beiya() :Hero(3360, 1)
 {
@@ -58,6 +61,13 @@ Beiya::Beiya() :Hero(3360, 1)
 	_moveSpeed = Level::MEDIUM;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
+}
+
+void Beiya::initializeHeroSprite()
+{
+	_hero = Sprite::create(_beiyaPicture);
+	_hero->setPosition(0, 0);
+	this->addChild(_hero);
 }
 
 bool Beiya::attackAnimation(cocos2d::Point touchLocation)

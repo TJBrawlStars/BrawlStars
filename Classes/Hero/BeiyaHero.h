@@ -30,6 +30,7 @@ public:
 
 protected:
 	/** overrides */
+	virtual void initializeHeroSprite()                        override;
 	virtual bool attackAnimation(cocos2d::Point touchLocation) override;
 	virtual bool skillAnimation(cocos2d::Point touchLocation)  override;
 
