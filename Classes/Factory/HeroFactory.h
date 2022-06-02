@@ -6,21 +6,23 @@
 #include "Hero/HeroSprite.h"
 #include <memory>
 
+class Hero;
+
 typedef Hero* (*HeroCreator)(void);
 typedef std::unordered_map<std::string, HeroCreator> HeroFactoryMap;
 
 class HeroFactory :protected Factory
 {
 public:
-	static std::shared_ptr<HeroFactory> getInstance();
+	static std::unique_ptr<HeroFactory>& getInstance();
 	Hero* createWithClassID(std::string classID);
-
+	
 	void registerClassCreator(std::string classID, HeroCreator creator);
 
 protected:
 
 private:
-	static std::shared_ptr<HeroFactory> _heroFactoryInstance;
+	static std::unique_ptr<HeroFactory> _heroFactoryInstance;
 	HeroFactoryMap _heroFactoryMap;
 };
 

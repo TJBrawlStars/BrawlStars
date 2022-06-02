@@ -27,6 +27,13 @@ Hero::Hero(const int originalHP, const int maxAmmo)
 {
 }
 
+void Hero::initializeHeroSprite()
+{
+	_hero = Sprite::create(_heroTexture);
+	_hero->setPosition(0, 0);
+	this->addChild(_hero);
+}
+
 void Hero::initializeHeroPhysics()
 {
 	auto heroPhysicsBody = PhysicsBody::createBox(_hero->getContentSize());
@@ -41,9 +48,9 @@ void Hero::initializeBloodStrip()
 {
 	_bloodStrip->setDirection(ui::LoadingBar::Direction::LEFT);
 	_bloodStrip->setPercent(100);
-	_bloodStrip->setScale(0.1);
+	_bloodStrip->setScale(0.18);
 	Size heroSize = _hero->getContentSize();
-	_bloodStrip->setPosition(Point(0, heroSize.height / 2 + 5));
+	_bloodStrip->setPosition(Point(0, heroSize.height / 2 + 7));
 	this->addChild(_bloodStrip);
 }
 
@@ -54,7 +61,7 @@ void Hero::initializeAmmoStrip(int maxAmmo)
 		Size heroSize = _hero->getContentSize();
 		auto strip = Sprite::create("ammoStrip.png");
 		_ammoStrip.push_back(strip);
-		strip->setPosition(Point(8 * i, heroSize.height / 2 + 2));
+		strip->setPosition(Point(8 * i - 8, heroSize.height / 2 + 2));
 		strip->setScale(0.1);
 		this->addChild(strip);
 	}
@@ -64,20 +71,20 @@ void Hero::initializeEnergyStrip()
 {
 	_energyStrip->setDirection(ui::LoadingBar::Direction::LEFT);
 	_energyStrip->setPercent(0);
-	_energyStrip->setScale(0.1);
+	_energyStrip->setScale(0.18);
 	_energyStrip->setOpacity(150);
 	Size heroSize = _hero->getContentSize();
-	_energyStrip->setPosition(Point(0, heroSize.height / 2 + 8));
+	_energyStrip->setPosition(Point(0, heroSize.height / 2 + 12));
 	this->addChild(_energyStrip);
 }
 
 void Hero::initializeDiamondDisplay(const int diamond)
 {
 	Size heroSize = _hero->getContentSize();
-	heroDiamond->setPosition(Point(0, heroSize.height / 2 + 12));
+	heroDiamond->setPosition(Point(0, heroSize.height / 2 + 17));
 	heroDiamond->setScale(0.6);
 	diamondNum = cocos2d::Label::createWithTTF(intToString(diamond), "fonts/Marker Felt.ttf", 5);
-	diamondNum->setPosition(Point(5, heroSize.height / 2 + 11));
+	diamondNum->setPosition(Point(5, heroSize.height / 2 + 16));
 	this->addChild(heroDiamond);
 	this->addChild(diamondNum);
 }

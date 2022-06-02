@@ -12,6 +12,7 @@
 #include <map>
 
 #define DEPRECATED_ACCESS private
+#define FACTORY_ACCESS private
 #define SELECTOR_ACCESS public
 
 class Bullet;
@@ -20,7 +21,9 @@ class Bullet;
 * @class Hero
 * @brief Hero is the base class of the heroes in Brawl Stars
 */
-class Hero :public cocos2d::Node {
+class Hero :public cocos2d::Sprite {
+	friend class HeroFactory;
+
 public:
 	/**
 	* @enum Level
@@ -34,8 +37,6 @@ public:
 		HIGH = 4,
 		EXTREME_HIGH = 5
 	};
-
-	static Hero* create();
 
 	/// @name Attribute Manipulators
 	/// @{
@@ -214,6 +215,15 @@ protected:
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");    ///< the blood strip
 	cocos2d::Sprite* heroDiamond = cocos2d::Sprite::create("diamond.png");                       ///< the diamond to be displayed
 	cocos2d::Label* diamondNum;                                                                  ///< the number of diamonds
+
+	/// @name Constructor Operations
+	/// @{
+
+	void setHeroTexture(std::string filePath) { _heroTexture = filePath; }
+	void setHeroScale(float scale) { _heroScale = scale; }
+
+	/// @}
+	/// end of  Constructor Operations
 	
 	/// @name Virtual Functions
 	/// @{
@@ -241,10 +251,12 @@ protected:
 	/// @}
 	/// end of Virtual Functions
 
+FACTORY_ACCESS:
+
 	/// @name Initializers
 	/// @{
 
-	virtual void initializeHeroSprite() = 0;
+	void initializeHeroSprite();
 	
 	/**
 	* @fn initializeHeroPhysics
@@ -281,7 +293,9 @@ protected:
 	/// end of Initializers in derived classes
 
 private:
-	bool _alive = true;                                             ///< mark whether the hero is alive
+	bool _alive = true;             ///< mark whether the hero is alive
+	std::string _heroTexture;       ///< the file path of hero picture
+	float _heroScale = 0;           ///< scale of sprite
 
 	/**
 	* @fn turnTo

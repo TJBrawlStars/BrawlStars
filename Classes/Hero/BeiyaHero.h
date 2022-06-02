@@ -11,8 +11,8 @@
 * @brief the class is derived from hero with detailed attributes
 * @details the attributes of Beiya
 *		_maxHealthPoint = 3360;
-*		_maxAmmo = 1;
 *		_hitPoint = 1120;
+*		_maxAmmo = 1;
 *		_moveSpeed = Level::MEDIUM;
 *		_shotRange = Level::HIGH;
 *		_loadSpeed = Level::EXTREME_HIGH;
@@ -21,22 +21,17 @@ class Beiya :public Hero
 {
 public:
 	/**
-	* @fn createBeiya
-	* @brief the only way to instantiate class Beiya
-	* @warning the create function with filename is disabled
+	* @fn create
+	* @brief to register the constructor to the factory
 	*/
-	static Beiya* createBeiya();
-	static Beiya* create() { return createBeiya(); }
+	static Beiya* create();
 
 protected:
 	/** overrides */
-	virtual void initializeHeroSprite()                        override;
 	virtual bool attackAnimation(cocos2d::Point touchLocation) override;
 	virtual bool skillAnimation(cocos2d::Point touchLocation)  override;
 
 private:
 	/** the initialization of Beiya */
 	Beiya();
-
-	static const std::string _beiyaPicture;  ///< The filename of the picture
 };

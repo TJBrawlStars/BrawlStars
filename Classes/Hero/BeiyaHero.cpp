@@ -14,46 +14,12 @@ namespace {
 	HeroRegister registerCreator(std::string("Beiya"), HeroCreator(Beiya::create));
 }
 
-Beiya* Beiya::createBeiya()
+Beiya* Beiya::create()
 {
-	Beiya* beiya = new(std::nothrow) Beiya();
-	if (beiya)
-	{
-		beiya->autorelease();
-
-		//initialilze the sprite
-		beiya->initializeHeroSprite();
-
-		//initialize the physics body
-		beiya->initializeHeroPhysics();
-
-		//draw the blood strip
-		beiya->initializeBloodStrip();
-
-		//draw the ammo strip
-		beiya->initializeAmmoStrip(beiya->_maxAmmo);
-
-		//draw the energy strip
-		beiya->initializeEnergyStrip();
-
-		//dispaly the number of diamonds
-		beiya->initializeDiamondDisplay();
-
-		return beiya;
-	}
-	else
-	{
-		delete beiya;
-		beiya = nullptr;
-		return nullptr;
-	}
-
-	return beiya;
+	return new(std::nothrow) Beiya();
 }
 
-const std::string Beiya::_beiyaPicture = "HeroResource/GodPlane.png";
-
-Beiya::Beiya() :Hero(3360, 1)
+Beiya::Beiya() :Hero(3360, 2)
 {
 	_ammo = _maxAmmo;
 	_hitPoint = 1120;
@@ -61,13 +27,8 @@ Beiya::Beiya() :Hero(3360, 1)
 	_moveSpeed = Level::MEDIUM;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
-}
 
-void Beiya::initializeHeroSprite()
-{
-	_hero = Sprite::create(_beiyaPicture);
-	_hero->setPosition(0, 0);
-	this->addChild(_hero);
+	this->setHeroTexture("HeroResource/GodPlane.png");
 }
 
 bool Beiya::attackAnimation(cocos2d::Point touchLocation)
