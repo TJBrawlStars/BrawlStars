@@ -29,7 +29,7 @@ bool FigureLayer::init()
 	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType)
 		{
 			//同时把主场景的和房间场景的设置了
-			MainScene::GetMainScene()->SetFigure(_figure);
+		    MainScene::GetMainScene()->SetFigure(_figure);
 			RoomLayer::setSelf(_figure);
 			PlistData::WriteDataByType(PlistData::DataType::Figure, _figure);
 			//做出划上划下的效果

@@ -1,4 +1,5 @@
 #pragma once
+#include<string>
 
 /**
 * @brief 对战成员数目和管理(机器人的数目和真人的数目）
@@ -27,5 +28,20 @@ private:
 	int _robot;
 
 	int _human;
+
+};
+
+class HumanData
+{
+
+private:
+	//我觉得联机的话需要记录ip 
+	std::string _hero_name;
+
+public:
+
+	HumanData(std::string&& name) :_hero_name(name) {};
+
+	std::string GetName() { return _hero_name; }
 
 };

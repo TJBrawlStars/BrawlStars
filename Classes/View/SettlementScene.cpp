@@ -6,7 +6,11 @@ using namespace ui;
 #include "Tool/SceneManager.h"
 #include"Tool/Tools.h"
 #include"Tool/Data.h"
+#include "Const/Const.h"
+#include"Tool/LeaderBoard.hpp"
 #pragma execution_character_set("utf-8")  
+
+extern LeaderBoard<std::string, Rank> single;
 
 bool SettlementScene::init()
 {
@@ -35,8 +39,9 @@ bool SettlementScene::init()
 void SettlementScene::Win()
 {
 	//读游戏控制器的操作，这边就先直接win叭
-	std::string ranking = "1";
-	assert(Value(ranking).asInt() <= 10 && Value(ranking).asInt() >= 1);
+	unsigned int ranking = single.rank(PlistData::getDataByType(PlistData::DataType::ID));
+	assert(ranking <= 10 && ranking >= 1);
+	unsigned int cups = single.find(PlistData::getDataByType(PlistData::DataType::ID))->second->second._trophy;
 
 	//获得奖杯数目
 	auto cupslabel = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f), "获得奖杯", "微软雅黑", 35, this);
@@ -51,26 +56,8 @@ void SettlementScene::Win()
 	_money->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 	PlistData::WriteDataByType(PlistData::DataType::Money, Value(Value(PlistData::getDataByType(PlistData::DataType::Money)).asInt() + 100).asString());
 
-	if (ranking == "1")
-	{
-		auto label = Tools::LabelCreateTTF(Vec2(kVisibleSize.width / 2 - 450, kVisibleSize.height - 100), "W I N", "fonts/arial.ttf", 75, this);
-		_cups->setString("   2");
-		PlistData::WriteDataByType(PlistData::DataType::Cups, Value(Value(PlistData::getDataByType(PlistData::DataType::Cups)).asInt() + 2).asString());
-	}
-	else
-	{
-		auto label = Tools::LabelCreateTTF(Vec2(kVisibleSize.width / 2 - 450, kVisibleSize.height - 100), "第 " + ranking + " 名", "fonts/arial.ttf", 75, this);
-		if (Value(ranking).asInt() <= 3)
-		{
-			_cups->setString("   1");
-			PlistData::WriteDataByType(PlistData::DataType::Cups, Value(Value(PlistData::getDataByType(PlistData::DataType::Cups)).asInt() + 1).asString());
-		}
-		else if (Value(ranking).asInt() <= 6)
-			_cups->setString("   0");
-		else
-		{
-			_cups->setString("   -1");
-			PlistData::WriteDataByType(PlistData::DataType::Cups, Value(Value(PlistData::getDataByType(PlistData::DataType::Cups)).asInt() - 1).asString());
-		}
-	}
+	auto label = Tools::LabelCreateTTF(Vec2(kVisibleSize.width / 2 - 450, kVisibleSize.height - 100), "第 " + Value(ranking).asString() + " 名", "fonts/arial.ttf", 75, this);
+
+	_cups->setString("   " + Value(cups).asString());
+	PlistData::WriteDataByType(PlistData::DataType::Cups, Value(Value(PlistData::getDataByType(PlistData::DataType::Cups)).asInt() + cups).asString());
 }

@@ -51,6 +51,11 @@ private:
 	*/
 	void SetButton();
 
+	/**
+	* @brief 传递英雄数据给游戏场景
+	*/
+	void SetHero();
+
 private:
 
 	const cocos2d::Size kVisibleSize;
@@ -75,13 +80,9 @@ private:
 	//自动补全机器人按钮
 	cocos2d::ui::Button* _robots;
 
-	////敌方人数
-	//Member _enemy;
-
-	////我方人数
-	//Member _our;
-
 	Member _member;
+
+	std::vector<HumanData> _humandata;
 
 	//成员
 	cocos2d::Vector<cocos2d::MenuItemToggle*> _figures;

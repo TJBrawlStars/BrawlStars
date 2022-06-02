@@ -8,7 +8,11 @@ using namespace ui;
 #include"Tool/Setting.h"
 #include"Tool/Data.h"
 #include"FigureLayer.h"
+#include"Tool/Const.h"
 #pragma execution_character_set("utf-8")  
+
+//存放英雄信息传给游戏
+extern std::vector<HeroData> herodataVec;
 
 static constexpr int kEnemyTag = 0;
 static constexpr int kOurTag = 1;
@@ -35,6 +39,7 @@ bool RoomLayer::init()
 		{
 			if (type == Widget::TouchEventType::ENDED)
 			{
+				SetHero();
 				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_GameScene);
 			}
@@ -89,13 +94,7 @@ bool RoomLayer::onTouchBegan(cocos2d::Touch*, cocos2d::Event*)
 void RoomLayer::MemberCreate()
 {
 	//读取main场景的精灵
-	//先把我方房主设置上
-	PlusMemberCreate();
-}
-
-void RoomLayer::PlusMemberCreate()
-{
-	//把自己填上
+	//先把房主设置上
 	_self = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2 + (-2) * 150, kVisibleSize.height / 2 - 200)
 		, PlistData::getDataByType(PlistData::DataType::Figure), this);
 	_self->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
@@ -107,9 +106,16 @@ void RoomLayer::PlusMemberCreate()
 				assert(changeFigure != 0);
 				this->addChild(changeFigure);
 				Tools::SwitchScene(changeFigure, Tools::SwitchSceneType::Down);
+				_humandata.push_back(HumanData(PlistData::getDataByType(PlistData::DataType::Figure)));
 			}
 		});
+	_humandata.push_back(HumanData("human"));
 
+	PlusMemberCreate();
+}
+
+void RoomLayer::PlusMemberCreate()
+{
 	for (int i = 1; i <= 9; ++i)
 	{
 		auto box1 = MenuItemImage::create("ui/box.png", "ui/box.png");
@@ -146,6 +152,25 @@ void RoomLayer::SetButton()
 	//遍历_figures实现恢复使用(使用基于范围的For循环)
 	for (auto item : _figures)
 		item->setEnabled(true);
+}
+
+void RoomLayer::SetHero()
+{
+	std::string name;
+	for (auto temp : _humandata)
+	{
+		//这里之后用_humandata.get来获取角色英雄
+		name = "Beiya";
+		name += " false";
+		herodataVec.push_back(HeroData(name, PlistData::getDataByType(PlistData::DataType::ID)));
+	}
+	for (int i = 0; i < _member.getRobot(); ++i)
+	{
+		//之后这边给机器人随机一个hero吧
+		name = "Beiya";
+		name += " true";
+		herodataVec.push_back(HeroData(name));
+	}
 }
 
 void RoomLayer::menuCloseCallback(Ref* pSender)
@@ -209,7 +234,7 @@ void RoomLayer::setSelf(const std::string& filename)
 {
 	if (_that != NULL)
 	{
-		_that->scheduleOnce([&filename](float dlt)
+		_that->scheduleOnce([filename](float dlt)
 			{
 				_that->_self->runAction(RemoveSelf::create());
 				_that->_self = Tools::ButtonCreateN(Vec2(_that->kVisibleSize.width / 2 + (-2) * 150, _that->kVisibleSize.height / 2 - 200)

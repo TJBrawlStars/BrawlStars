@@ -163,7 +163,7 @@ void MainScene::SetFigure(const std::string& filename)
 {
 	if (filename != _figure->getNormalFile().file)
 	{
-		this->scheduleOnce([this, &filename](float dlt)
+		this->scheduleOnce([this, filename](float dlt)
 			{
 				_figure = Tools::ButtonCreateN(kVisibleSize / 2, filename, this);
 				_figure->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
