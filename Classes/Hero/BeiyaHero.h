@@ -4,7 +4,7 @@
 
 #include "cocos2d.h"
 #include "Hero/HeroSprite.h"
-#include "Hero/BulletSprite.h"
+#include "Bullet/BulletSprite.h"
 
 /**
 * @class Beiya
@@ -19,6 +19,8 @@
 */
 class Beiya :public Hero
 {
+	friend class HeroRegister;
+
 public:
 	/**
 	* @fn create

@@ -6,8 +6,6 @@
 #include "Hero/HeroSprite.h"
 #include <memory>
 
-class Hero;
-
 typedef Hero* (*HeroCreator)(void);
 typedef std::unordered_map<std::string, HeroCreator> HeroFactoryMap;
 

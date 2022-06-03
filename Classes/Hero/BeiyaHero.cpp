@@ -1,6 +1,7 @@
 //2150266 Ê±ÌìÒÝ
 #include "Hero/BeiyaHero.h"
 #include "Factory/HeroFactory.h"
+#include "Factory/BulletFactory.h"
 
 USING_NS_CC;
 
@@ -19,7 +20,7 @@ Beiya* Beiya::create()
 	return new(std::nothrow) Beiya();
 }
 
-Beiya::Beiya() :Hero(3360, 2)
+Beiya::Beiya() :Hero(3360, 1)
 {
 	_ammo = _maxAmmo;
 	_hitPoint = 1120;
@@ -38,9 +39,9 @@ bool Beiya::attackAnimation(cocos2d::Point touchLocation)
 	Vec2 offset = touchLocation - this->getPosition();
 
 	//add projectile
-	auto projectile = Bullet::createBullet("projectile.png");
+	auto projectile = BulletFactory::getInstance()->createWithClassID("NormalBullet");
 	if (projectile == nullptr)
-		problemLoading("projectile.png");
+		problemLoading("NormalBullet");
 	projectile->setHitPoint(this->getHitPoint());
 	projectile->setEnergy(_maxEnergy / 3 + 1);
 	projectile->setParentHero(this);
@@ -72,9 +73,9 @@ bool Beiya::skillAnimation(cocos2d::Point touchLocation)
 	int count = 1;
 	for (auto i : bullet) {
 		//create a bullet
-		i = Bullet::createBullet("projectile.png");
+		i = BulletFactory::getInstance()->createWithClassID("NormalBullet");
 		if (i == nullptr)
-			problemLoading("projectile.png");
+			problemLoading("NormalBullet");
 		i->setHitPoint(this->getSkillHitPoint());
 		i->setEffect(Bullet::Effect::NONE);
 		i->setParentHero(this);

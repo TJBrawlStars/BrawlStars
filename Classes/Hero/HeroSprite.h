@@ -4,7 +4,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
-#include "Hero/BulletSprite.h"
+#include "Bullet/BulletSprite.h"
 
 #include <functional>
 #include <vector>
@@ -193,7 +193,7 @@ protected:
 	Hero() = delete;
 	virtual ~Hero() = default;
 
-	/** the attributes of a hero */
+	/** Hero Attributes */
 	const int _maxAmmo;
 	const double _maxEnergy = 1000;
 	const int _originalHP;
@@ -208,7 +208,7 @@ protected:
 	Level _moveSpeed;
 	Level _loadSpeed;
 
-	/** the sprite and ui commponents of a hero */
+	/** Hero Sprite and Components */
 	cocos2d::Sprite* _hero;                                                                      ///< hero
 	std::vector<cocos2d::Sprite*> _ammoStrip;                                                    ///< the ammo strip
 	cocos2d::ui::LoadingBar* _energyStrip = cocos2d::ui::LoadingBar::create("energyStrip.png");  ///< the energy strip

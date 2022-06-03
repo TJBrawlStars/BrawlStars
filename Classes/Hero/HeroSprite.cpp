@@ -93,13 +93,13 @@ void Hero::setAlive(bool alive)
 {
 	if (alive) {
 		_alive = true;
-		_hero->setVisible(true);
+		this->setVisible(true);
 		_hero->getPhysicsBody()->setCategoryBitmask(0x1F);
 		_hero->setName("hero");
 	}
 	else {
 		_alive = false;
-		_hero->setVisible(false);
+		this->setVisible(false);
 		_hero->getPhysicsBody()->setCategoryBitmask(0x00);
 		_hero->setName("null");
 	}
