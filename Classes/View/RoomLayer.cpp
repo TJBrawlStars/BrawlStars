@@ -8,10 +8,10 @@ using namespace ui;
 #include"Tool/Setting.h"
 #include"Tool/Data.h"
 #include"FigureLayer.h"
-#include"Tool/Const.h"
+#include"Const/Const.h"
 #pragma execution_character_set("utf-8")  
 
-//´æ·ÅÓ¢ĞÛĞÅÏ¢´«¸øÓÎÏ·
+//å­˜æ”¾è‹±é›„ä¿¡æ¯ä¼ ç»™æ¸¸æˆ
 extern std::vector<HeroData> herodataVec;
 
 static constexpr int kEnemyTag = 0;
@@ -25,16 +25,16 @@ bool RoomLayer::init()
 
 	_that = this;
 
-	//ÉèÖÃÍÌÊÉµã»÷ÊÂ¼ş
+	//è®¾ç½®åå™¬ç‚¹å‡»äº‹ä»¶
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = CC_CALLBACK_2(RoomLayer::onTouchBegan, this);
 	Tools::LayerSwallow(listener, this);
 
-	//²ã±³¾°
+	//å±‚èƒŒæ™¯
 	_bg = Tools::SetBg(this);
 
-	//¿ªÊ¼ÓÎÏ·°´Å¥
-	_start = Tools::ButtonCreate("¿ªÊ¼¶ÔÕ½", Vec2(kVisibleSize.width - 130, 75), this);
+	//å¼€å§‹æ¸¸æˆæŒ‰é’®
+	_start = Tools::ButtonCreate("å¼€å§‹å¯¹æˆ˜", Vec2(kVisibleSize.width - 130, 75), this);
 	_start->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
 			if (type == Widget::TouchEventType::ENDED)
@@ -45,7 +45,7 @@ bool RoomLayer::init()
 			}
 		});
 
-	//·µ»Ø°´Å¥
+	//è¿”å›æŒ‰é’®
 	_back = Tools::ButtonCreate(Vec2(77, kVisibleSize.height - 40), "ui/back.png", this);
 	_back->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
@@ -56,24 +56,24 @@ bool RoomLayer::init()
 			}
 		});
 
-	//10¸ö·¿¼ä³ÉÔ±¿ò
+	//10ä¸ªæˆ¿é—´æˆå‘˜æ¡†
 	MemberCreate();
 
-	//VS×ÖÑù
-	_vs = Tools::LabelCreateSystem(kVisibleSize / 2, "ÓÑÒêÕ½", "Î¢ÈíÑÅºÚ", 70, this);
+	//VSå­—æ ·
+	_vs = Tools::LabelCreateSystem(kVisibleSize / 2, "å‹è°Šæˆ˜", "å¾®è½¯é›…é»‘", 70, this);
 
-	//×Ô¶¯²¹È«»úÆ÷ÈË°´Å¥
-	_robots = Tools::ButtonCreate("²¹È«»úÆ÷ÈË", Vec2(125, 100), this);
+	//è‡ªåŠ¨è¡¥å…¨æœºå™¨äººæŒ‰é’®
+	_robots = Tools::ButtonCreate("è¡¥å…¨æœºå™¨äºº", Vec2(125, 100), this);
 	_robots->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 		{
-			//ÉèÖÃÎÒ·½ºÍµĞ·½»úÆ÷ÈË¸öÊı
+			//è®¾ç½®æˆ‘æ–¹å’Œæ•Œæ–¹æœºå™¨äººä¸ªæ•°
 			if (type == Widget::TouchEventType::ENDED)
 			{
 				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				/*while (_enemy.setRobot(true));
 				while (_our.setRobot(true));*/
 				while (_member.setRobot(true));
-				//±éÀú_figuresÊµÏÖ·­×ª(Ê¹ÓÃ»ùÓÚ·¶Î§µÄForÑ­»·)
+				//éå†_figureså®ç°ç¿»è½¬(ä½¿ç”¨åŸºäºèŒƒå›´çš„Forå¾ªç¯)
 				for (auto item : _figures)
 				{
 					if (item->getSelectedIndex() == 1);
@@ -93,8 +93,8 @@ bool RoomLayer::onTouchBegan(cocos2d::Touch*, cocos2d::Event*)
 
 void RoomLayer::MemberCreate()
 {
-	//¶ÁÈ¡main³¡¾°µÄ¾«Áé
-	//ÏÈ°Ñ·¿Ö÷ÉèÖÃÉÏ
+	//è¯»å–mainåœºæ™¯çš„ç²¾çµ
+	//å…ˆæŠŠæˆ¿ä¸»è®¾ç½®ä¸Š
 	_self = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2 + (-2) * 150, kVisibleSize.height / 2 - 200)
 		, PlistData::getDataByType(PlistData::DataType::Figure), this);
 	_self->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
@@ -124,10 +124,10 @@ void RoomLayer::PlusMemberCreate()
 		assert(box1 != NULL);
 		assert(box2 != NULL);
 		assert(box3 != NULL);
-		//Õâ±ßÈç¹ûÁª»úµÄ»°Õâ¸öcallbackº¯ÊıÒª¸ÄÒ»ÏÂ
+		//è¿™è¾¹å¦‚æœè”æœºçš„è¯è¿™ä¸ªcallbackå‡½æ•°è¦æ”¹ä¸€ä¸‹
 		auto box0 = MenuItemToggle::createWithCallback(CC_CALLBACK_1(RoomLayer::menuCloseCallback, this), box1, box2, box3, NULL);
 		_figures.pushBack(box0);
-		////ÉèÖÃtag£¬·½±ã´ÓvectorÀïÈ¡
+		////è®¾ç½®tagï¼Œæ–¹ä¾¿ä»vectoré‡Œå–
 		//box0->setTag(i - 1);
 		auto box = Menu::create(box0, NULL);
 		this->addChild(box);
@@ -149,7 +149,7 @@ void RoomLayer::SetButton()
 {
 	_current->removeChildByName("button1");
 	_current->removeChildByName("button2");
-	//±éÀú_figuresÊµÏÖ»Ö¸´Ê¹ÓÃ(Ê¹ÓÃ»ùÓÚ·¶Î§µÄForÑ­»·)
+	//éå†_figureså®ç°æ¢å¤ä½¿ç”¨(ä½¿ç”¨åŸºäºèŒƒå›´çš„Forå¾ªç¯)
 	for (auto item : _figures)
 		item->setEnabled(true);
 }
@@ -159,14 +159,14 @@ void RoomLayer::SetHero()
 	std::string name;
 	for (auto temp : _humandata)
 	{
-		//ÕâÀïÖ®ºóÓÃ_humandata.getÀ´»ñÈ¡½ÇÉ«Ó¢ĞÛ
+		//è¿™é‡Œä¹‹åç”¨_humandata.getæ¥è·å–è§’è‰²è‹±é›„
 		name = "Beiya";
 		name += " false";
 		herodataVec.push_back(HeroData(name, PlistData::getDataByType(PlistData::DataType::ID)));
 	}
 	for (int i = 0; i < _member.getRobot(); ++i)
 	{
-		//Ö®ºóÕâ±ß¸ø»úÆ÷ÈËËæ»úÒ»¸öhero°É
+		//ä¹‹åè¿™è¾¹ç»™æœºå™¨äººéšæœºä¸€ä¸ªheroå§
 		name = "Beiya";
 		name += " true";
 		herodataVec.push_back(HeroData(name));
@@ -175,19 +175,19 @@ void RoomLayer::SetHero()
 
 void RoomLayer::menuCloseCallback(Ref* pSender)
 {
-	//Õâ±ßÈç¹ûÒªÓĞÕæÈË»¹ĞèÒªÀ´Ò»¸ö²ãÑ¡Ôñ£¬Ñ¡ÔñÖ®ºó´«¸øÕâÀï£¬È»ºóÀ´Ò»¸öÍæ¼ÒµÄ½ÇÉ«Í¼Ïñ°ÑÔ­±¾»úÆ÷ÈËµÄÍ¼Ïñ¸Ç×¡°É£¿£¨×ÜÖ®Ö®ºóÔÙËµ
-	//»òĞí¿ÉÒÔ¼ÓÒ»¸öÑ¡Ôñ°´Å¥µÄµÚ¶ş´Îµã»÷ÊÇÌí¼ÓÕæÈËÍæ¼Ò£¿
+	//è¿™è¾¹å¦‚æœè¦æœ‰çœŸäººè¿˜éœ€è¦æ¥ä¸€ä¸ªå±‚é€‰æ‹©ï¼Œé€‰æ‹©ä¹‹åä¼ ç»™è¿™é‡Œï¼Œç„¶åæ¥ä¸€ä¸ªç©å®¶çš„è§’è‰²å›¾åƒæŠŠåŸæœ¬æœºå™¨äººçš„å›¾åƒç›–ä½å§ï¼Ÿï¼ˆæ€»ä¹‹ä¹‹åå†è¯´
+	//æˆ–è®¸å¯ä»¥åŠ ä¸€ä¸ªé€‰æ‹©æŒ‰é’®çš„ç¬¬äºŒæ¬¡ç‚¹å‡»æ˜¯æ·»åŠ çœŸäººç©å®¶ï¼Ÿ
 	auto const item = dynamic_cast<MenuItemToggle*>(pSender);
 	if (item)
 	{
 		_current = item;
 		if (item->getSelectedIndex()==1)
 		{
-			//±éÀú_figuresÊµÏÖÆäËû²Ëµ¥²»ÄÜÊ¹ÓÃ(Ê¹ÓÃ»ùÓÚ·¶Î§µÄForÑ­»·)
+			//éå†_figureså®ç°å…¶ä»–èœå•ä¸èƒ½ä½¿ç”¨(ä½¿ç”¨åŸºäºèŒƒå›´çš„Forå¾ªç¯)
 			for (auto item : _figures)
 				item->setEnabled(false);
 			Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
-			auto button1 = Tools::ButtonCreate("»úÆ÷ÈË", Vec2(_current->getContentSize().width / 2, _current->getContentSize().height/2 + 75), item);
+			auto button1 = Tools::ButtonCreate("æœºå™¨äºº", Vec2(_current->getContentSize().width / 2, _current->getContentSize().height/2 + 75), item);
 			button1->setName("button1");
 			button1->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 				{
@@ -200,12 +200,12 @@ void RoomLayer::menuCloseCallback(Ref* pSender)
 						SetButton();
 					}
 				});
-			//Íæ¼ÒÕâÀïÒÔºó×öÒ»¸ö»Øµ÷º¯Êı°É
+			//ç©å®¶è¿™é‡Œä»¥ååšä¸€ä¸ªå›è°ƒå‡½æ•°å§
 			//
 			//
 			//
 			//
-			auto button2 = Tools::ButtonCreate("Íæ¼Ò", Vec2(_current->getContentSize().width / 2, _current->getContentSize().height/2 - 75), item);
+			auto button2 = Tools::ButtonCreate("ç©å®¶", Vec2(_current->getContentSize().width / 2, _current->getContentSize().height/2 - 75), item);
 			button2->setName("button2");
 			button2->addTouchEventListener([&item, this](Ref*, Widget::TouchEventType type)
 				{

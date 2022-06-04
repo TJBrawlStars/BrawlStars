@@ -11,13 +11,13 @@
 USING_NS_CC;
 
 /**
-* @brief ×Ô¶¨ÒåµÄ³¡¾°É¸Ñ¡Æ÷,ÊÇÒ»¸öµ¥ÀıÀà
+* @brief è‡ªå®šä¹‰çš„åœºæ™¯ç­›é€‰å™¨,æ˜¯ä¸€ä¸ªå•ä¾‹ç±»
 */
 class SceneManager : public Ref
 {
 public:
 
-    //³¡¾°Ã¶¾ÙÀà
+    //åœºæ™¯æšä¸¾ç±»
     enum class EnumSceneType
     {
         en_Min,
@@ -30,24 +30,24 @@ public:
 
 public:
 
-    //»ñµÃµ¥Àı
+    //è·å¾—å•ä¾‹
     static SceneManager* getInstance();
 
     /**
-    * @brief ¸Ä±ä³¡¾°
-    * @param £¨EnumSceneType type£© ÀàÄÚµÄÃ¶¾ÙÀà£¬ÓÃÓÚ±ê¼Ç³¡¾°
+    * @brief æ”¹å˜åœºæ™¯
+    * @param ï¼ˆEnumSceneType typeï¼‰ ç±»å†…çš„æšä¸¾ç±»ï¼Œç”¨äºæ ‡è®°åœºæ™¯
     */
     void changeScene(EnumSceneType type, int operate = 0);
 
     /**
-    * @brief ÅĞ¶ÏÊÇ²»ÊÇµÚÒ»´ÎÔËĞĞ³¡¾°
+    * @brief åˆ¤æ–­æ˜¯ä¸æ˜¯ç¬¬ä¸€æ¬¡è¿è¡Œåœºæ™¯
     */
     bool isFirst() { return _first; }
 
     /**
-    * @brief ÉèÖÃ³ÉµÚÒ»´ÎÔËĞĞ³¡¾°
+    * @brief è®¾ç½®æˆç¬¬ä¸€æ¬¡è¿è¡Œåœºæ™¯
     */
-    void SetFirst(){ _first = true; }
+    void SetFirst() { _first = true; }
 
 private:
 
@@ -55,7 +55,7 @@ private:
 
 private:
 
-    //³¡¾°¹ÜÀíÆ÷¶ÔÏó
+    //åœºæ™¯ç®¡ç†å™¨å¯¹è±¡
     static SceneManager* _scene_manager;
 
     bool _first;
