@@ -22,7 +22,6 @@
 * 15:初始化列表
 * 16:STL的emplace函数                          将参数传递给构造函数，emplace使用这些参数在容器管理的内存空间中直接构造元素
 * 
-* 有疑问：为什么不能类内成员重载+
 */
 #include <iostream>
 #include <memory>
@@ -120,7 +119,7 @@ public:
         {
             //不同于下一个insert
             value_type tmp_value = ((*it).second)->second;
-            value_type res_value = v + tmp_value;
+            value_type res_value = tmp_value + v;
 
             _set.erase(it->second);
             _map.erase(it);
@@ -223,18 +222,12 @@ struct Rank
         return _trophy == r._trophy && _chicken == r._chicken;
     }
 
-    //Rank operator+(const Rank& r)
-    //{
-    //    return Rank(this->_chicken + r._chicken, this->_trophy + r._trophy);
-    //}
+    Rank operator+(const Rank& r)
+    {
+        return Rank(this->_chicken + r._chicken, this->_trophy + r._trophy);
+    }
 
-    friend Rank operator+(const Rank& l, const Rank& r);
     Rank(int chicken, int trophy) :_chicken(chicken), _trophy(trophy) {}
 };
 
-Rank operator+(const Rank& l, const Rank& r)
-{
-    
-    return Rank(l._chicken + r._chicken, l._trophy + r._trophy);
-}
 

@@ -1,14 +1,14 @@
 //2151396 ÕÅ¾¸¿­
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#pragma once
 
 #include <iostream>
 #include <string>
 #include <chrono>
 #include "cocos2d.h"
 #include "Const/Const.h"
-#include "View/GameScene.h"
+
+class GameScene;
 
 /**
 * @brief ¼ÆÊ±Æ÷
@@ -70,7 +70,12 @@ public:
 
     void createUI();
 
-    void update(float dlt = 0.0001f);
+    //void updatePosition();
+
+    cocos2d::Sprite* getMyTimerInfoBG() { return _timerInfoBG; }
+    cocos2d::Label* getMyTimerInfo() { return _timerInfo; }
+
+   // void update(float dlt = 0.01f);
 private:
     std::chrono::steady_clock::time_point _start_time;
     std::chrono::steady_clock::time_point _end_time;
@@ -79,5 +84,3 @@ private:
     cocos2d::Sprite* _timerInfoBG;
     cocos2d::Label* _timerInfo;
 };
-
-#endif //_TIMER_H_

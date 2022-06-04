@@ -66,15 +66,26 @@ void MyTimer::createUI()
     this->addChild(_timerInfo);
     _timerInfo->setGlobalZOrder(kFightUI);
 
-    this->schedule(CC_SCHEDULE_SELECTOR(MyTimer::update));
+    //this->schedule(CC_SCHEDULE_SELECTOR(MyTimer::update));
 }
 
-void MyTimer::update(float dlt)
-{
-    auto parentNode = dynamic_cast<GameScene*>(this->getParent());
-    auto visibleSize = Director::getInstance()->getVisibleSize();
+//void MyTimer::updatePosition()
+//{
+//    auto parentNode = dynamic_cast<GameScene*>(this->getParent());
+//    auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
+//
+//    _timerInfoBG->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + cocos2d::Vec2(-visibleSize.width / 2, visibleSize.height / 2));
+//    _timerInfo->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + cocos2d::Vec2(55 - visibleSize.width / 2, visibleSize.height / 2));
+//    _timerInfo->setString((getHour() + ":" + getMinute() + ":" + getSecond()));
+//}
 
-    _timerInfoBG->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + Vec2(-visibleSize.width / 2, visibleSize.height / 2));
-    _timerInfo->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + Vec2(55-visibleSize.width / 2, visibleSize.height / 2));
-    _timerInfo->setString((getHour()+":"+getMinute()+":"+getSecond()));
-}
+
+//void MyTimer::update(float dlt)
+//{
+//    auto parentNode = dynamic_cast<GameScene*>(this->getParent());
+//    auto visibleSize = Director::getInstance()->getVisibleSize();
+//
+//    _timerInfoBG->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + Vec2(-visibleSize.width / 2, visibleSize.height / 2));
+//    _timerInfo->setPosition(parentNode->destPos(parentNode->getHero()->getPosition()) + Vec2(55-visibleSize.width / 2, visibleSize.height / 2));
+//    _timerInfo->setString((getHour()+":"+getMinute()+":"+getSecond()));
+//}

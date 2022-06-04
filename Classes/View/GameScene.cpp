@@ -7,13 +7,6 @@ bool GameScene::init()
 {
 	if (!Scene::init() || !Scene::initWithPhysics())
 		return false;
-	//设置场景的tag
-	this->setTag(SceneTag::kGameSceneTag);
-	
-	//开始计时
-	auto timer = MyTimer::create();
-	this->addChild(timer, kTimerPriority);
-
 
 	//物理检测红框
 	//this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
@@ -48,6 +41,15 @@ bool GameScene::init()
 	addBox();
 	//添加毒圈
 	addPoisonCircle();
+	//添加计时器
+	addTimer();
+	//添加聊天室
+	addChatBox();
+	//添加物理引擎碰撞检测
+	initializeContactListener();
+	//添加聊天框监听
+	initTouchAndKeyListener();
+	
 
 	this->scheduleUpdate();
 	
@@ -60,9 +62,16 @@ bool GameScene::init()
 */
 void GameScene::update(float dt)
 {
+	//跟随主角
 	setViewPointByPlayer(_player->getPosition());
 
+	//更新 计时器 聊天室
+	updateMyTimerPosition();
+	updateChatBoxPosition();
 
+	auto pos = _player->getPosition();
+	//log("ssx:%f", pos.x);
+	//log("ssy:%f", pos.y);
 	if (poisonCircleDown->getPosition().y > poisonCircleMax / 2)
 	{
 		poisonCircleDown->setPosition(poisonCircleDown->getPosition().x, poisonCircleDown->getPosition().y - poisonCircleMarch);

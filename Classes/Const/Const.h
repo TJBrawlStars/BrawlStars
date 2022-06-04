@@ -8,10 +8,9 @@
 struct HeroData
 {
 	std::string name_isRobot;
-
-	HeroData(std::string iname_isRobot) :name_isRobot(iname_isRobot){};
+	std::string heroID;
+	HeroData(std::string iname_isRobot, std::string heroID = "") :name_isRobot(iname_isRobot), heroID(heroID) {};
 };
-
 //游戏人数
 const int playerNum = 10;
 
@@ -45,7 +44,7 @@ const int kBarrierTag = 1;
 
 namespace Name
 {
-	static const std::string kBarrier = "Barrier";
+	static const std::string kBarrier = "wall";
 	//static const std::string kTreasureBox = "TreasureBox";
 	//static const std::string kDiamond = "Diamond";
 	static const std::string kGrass = "grass";
@@ -57,12 +56,14 @@ const int kGrassPriority = 0;//物理引擎，和地图同等级
 const int kHeroPriority = 1;
 const int kBarrierPriority = 2;//障碍物物理引擎的优先级
 const int kTimerPriority = 3;
+//const int kpoisonPriority = 4;
 //const int kBoxPriority = 3;/*delete!!!*/
 //const int kDiamondPriority = 4;/*delete!!!*/
 
 //global Priority （总是比general Priority高的！）
 const int kTMXlayer = 100;//障碍图片的优先级
-const int kFightUI = 101;//战斗时候的UI
+const int kpoisonPriority = 101;//毒圈
+const int kFightUI = 102;//战斗时候的UI
 
 //文件路径
 namespace Path

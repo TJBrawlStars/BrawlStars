@@ -216,15 +216,14 @@ void GameScene::addBarrier()
         float width = dict["width"].asFloat();
         float height = dict["height"].asFloat();
 
-        PhysicsBody* tmpPhysicsBody = PhysicsBody::createBox(Size(width, height),
-            PhysicsMaterial(100.0f, 0.0f, 0.0f));
+        PhysicsBody* tmpPhysicsBody = PhysicsBody::createBox(Size(width, height),PhysicsMaterial(100.0f, 0.0f, 0.0f));
         tmpPhysicsBody->setDynamic(false);
         tmpPhysicsBody->setCategoryBitmask(0x01);
         tmpPhysicsBody->setCollisionBitmask(1);
         tmpPhysicsBody->setContactTestBitmask(0x01);
         tmpPhysicsBody->setGravityEnable(false);
 
-        Sprite* tmpSprite = Sprite::create();
+        Sprite* tmpSprite = Sprite::create();       
         tmpSprite->setPosition(Vec2(x, y));
         tmpSprite->setAnchorPoint(Vec2::ZERO);
         tmpSprite->setContentSize(Size(width, height));

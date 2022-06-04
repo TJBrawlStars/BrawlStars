@@ -10,7 +10,9 @@
 #include "Tool/Timer.h"
 #include "Participant/PlayerParticipant.h"
 #include "Participant/ParticipantNode.h"
-//#include "Tool/ChatBox.h"
+#include "Tool/ChatBox.h"
+#include "Treasure/TreasureBoxSprite.h"
+#include "Tool/LeaderBoard.hpp"
 
 class GameScene : public cocos2d::Scene
 {
@@ -76,42 +78,81 @@ public:
     */
     void addGrass();
 
+
     /**
     * @创建宝箱
     */
     void addBox();
 
-    ///**
-    //* @创建聊天框
-    //*/
-    //void addChatBox();
+
+    /**
+    * @创建计时器
+    */
+    void addTimer();
+
+
+    /**
+    * @创建聊天框
+    */
+    void addChatBox();
+
+    /**
+    * @创建毒圈
+    */
+    void addPoisonCircle();
+    void initializePoiosnPhysics(cocos2d::Sprite* poison);
+
+
+    /** initializer of the event listeners */
+    void initializeContactListener();
+
 
      /**
     * @brief 传入角色位置 返回屏幕中心的位置
     * @param 角色的位置
     */
     cocos2d::Vec2 destPos(cocos2d::Point position);
-
-
     /**
     * @brief 返回随机位置不包括障碍物
     */
     cocos2d::Vec2 randomPosWithoutBarrier();
-
-
     //暂时用不着
     cocos2d::Vec2 tiledCoordFromPosition(cocos2d::Vec2 position);
 
 
-    /********* @author:王琳************/
+    /** callback functions of the event listeners */
+    bool onContactBegin(cocos2d::PhysicsContact& contact);
+    void onContactSeperate(cocos2d::PhysicsContact& contact);
+
+
     //schedule update
     void update(float dt);
 
-    void addPoisonCircle();
+    void updateMyTimerPosition();
+    void updateChatBoxPosition();
 
-    void initializePoiosnPhysics(cocos2d::Sprite* poison);
+
     
+
+    //鼠标点击事件
+    virtual bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+    //按键事件
+    virtual bool onPressKey(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+    virtual bool onReleaseKey(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+    //初始化以上函数
+    void initTouchAndKeyListener();
+
+
+    /** event listeners */
+    static cocos2d::EventListenerPhysicsContact* _contactListener;
+
 private:
+    //监听器
+    cocos2d::EventListenerTouchOneByOne* _gmlistenerTouch;
+    cocos2d::EventListenerKeyboard* _gmlistenerKeyBoard;
+
+    //聊天框是否开启
+    bool _isChatboxOpen;
 
     //地图信息（initMap()函数初始化了里面的变量）
     MapInfo _mapinfo;
@@ -126,8 +167,13 @@ private:
     //10个位置
     std::map<int, cocos2d::Vec2> _tenPosition;
     //聊天框按钮
-    //cocos2d::Sprite* _chatboxSwitch;
-
+    cocos2d::Sprite* _chatboxSwitch;
+    //计时器系统
+    MyTimer* _timer;
+    //聊天框
+    ChatBox* _chatBox;
+    //物理引擎初始化判断
+    bool _initContactListener = false;
 
     cocos2d::Sprite* poisonCircleDown;
     cocos2d::Sprite* poisonCircleUp;
@@ -138,6 +184,6 @@ private:
     cocos2d::Sprite* poisonLeft;
     cocos2d::Sprite* poisonRight;
 
-    float poisonCircleMarch = 5.0f;
+    float poisonCircleMarch = 0.05f;
     float poisonCircleMax = 2400;
 };
