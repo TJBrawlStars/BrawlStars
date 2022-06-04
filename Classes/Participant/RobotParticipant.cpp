@@ -63,7 +63,7 @@ void Robot::autoMove(float fdelta)
                 typedef Node* NodePtr;
                 NodePtr hero = nullptr, box = nullptr, diamond = nullptr;
                 NodePtr queryNode = shape.getBody()->getNode();
-                if (queryNode->getName() == "hero")    hero = queryNode;
+                if (queryNode->getName() == "hero")    hero = queryNode->getParent();
                 if (queryNode->getName() == "box")     box = queryNode;
                 if (queryNode->getName() == "diamond") diamond = queryNode;
 
@@ -90,6 +90,9 @@ void Robot::autoMove(float fdelta)
                 return true;
             }),
         Rect(heroPos.x - shotRange, heroPos.y - shotRange, 2 * shotRange, 2 * shotRange), nullptr);
+
+    if (moveTarget == nullptr)
+        return;
 
     //move robot
     if (moveTarget->getPosition()!=_hero->getPosition()) {
