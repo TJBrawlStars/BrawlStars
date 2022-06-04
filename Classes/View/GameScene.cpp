@@ -20,7 +20,5 @@ bool GameScene::init()
 			SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_SettlementScene);
 		});
 
-
-
 	return true;
 }
