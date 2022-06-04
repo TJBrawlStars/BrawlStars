@@ -25,6 +25,8 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "Tool/SceneManager.h"
+#include "View/PauseScene.h"
+#include"Tool/Setting.h"
 
 // #define USE_AUDIO_ENGINE 1
 
@@ -35,7 +37,7 @@ using namespace cocos2d::experimental;
 
 USING_NS_CC;
 
-static cocos2d::Size designResolutionSize = cocos2d::Size(1024, 768);
+static cocos2d::Size designResolutionSize = cocos2d::Size(1280, 720);
 static cocos2d::Size smallResolutionSize = cocos2d::Size(480, 320);
 static cocos2d::Size mediumResolutionSize = cocos2d::Size(1024, 768);
 static cocos2d::Size largeResolutionSize = cocos2d::Size(2048, 1536);
@@ -88,23 +90,23 @@ bool AppDelegate::applicationDidFinishLaunching() {
     director->setAnimationInterval(1.0f / 60);
 
     // Set the design resolution
-    glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
-    auto frameSize = glview->getFrameSize();
-    // if the frame's height is larger than the height of medium size.
-    if (frameSize.height > mediumResolutionSize.height)
-    {        
-        director->setContentScaleFactor(MIN(largeResolutionSize.height/designResolutionSize.height, largeResolutionSize.width/designResolutionSize.width));
-    }
-    // if the frame's height is larger than the height of small size.
-    else if (frameSize.height > smallResolutionSize.height)
-    {        
-        director->setContentScaleFactor(MIN(mediumResolutionSize.height/designResolutionSize.height, mediumResolutionSize.width/designResolutionSize.width));
-    }
-    // if the frame's height is smaller than the height of medium size.
-    else
-    {        
-        director->setContentScaleFactor(MIN(smallResolutionSize.height/designResolutionSize.height, smallResolutionSize.width/designResolutionSize.width));
-    }
+    glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::SHOW_ALL);
+    //auto frameSize = glview->getFrameSize();
+    //// if the frame's height is larger than the height of medium size.
+    //if (frameSize.height > mediumResolutionSize.height)
+    //{        
+    //    director->setContentScaleFactor(MIN(largeResolutionSize.height/designResolutionSize.height, largeResolutionSize.width/designResolutionSize.width));
+    //}
+    //// if the frame's height is larger than the height of small size.
+    //else if (frameSize.height > smallResolutionSize.height)
+    //{        
+    //    director->setContentScaleFactor(MIN(mediumResolutionSize.height/designResolutionSize.height, mediumResolutionSize.width/designResolutionSize.width));
+    //}
+    //// if the frame's height is smaller than the height of medium size.
+    //else
+    //{        
+    //    director->setContentScaleFactor(MIN(smallResolutionSize.height/designResolutionSize.height, smallResolutionSize.width/designResolutionSize.width));
+    //}
 
     register_all_packages();
 
@@ -119,9 +121,16 @@ bool AppDelegate::applicationDidFinishLaunching() {
     return true;
 }
 
-// This function will be called when the app is inactive. Note, when receiving a phone call it is invoked.
+// This function will be called when the app is inactive. Note, when receiving a phone call it is invoked改写
 void AppDelegate::applicationDidEnterBackground() {
     Director::getInstance()->stopAnimation();
+
+    //改写暂停与恢复功能
+    if (Director::getInstance()->getRunningScene()->getTag() != 777)
+    {
+        Setting::getInstance()->SoundSet(false);
+        SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_PauseScene, 1);
+    }
 
 #if USE_AUDIO_ENGINE
     AudioEngine::pauseAll();
@@ -131,7 +140,7 @@ void AppDelegate::applicationDidEnterBackground() {
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
     Director::getInstance()->startAnimation();
-
+    
 #if USE_AUDIO_ENGINE
     AudioEngine::resumeAll();
 #endif

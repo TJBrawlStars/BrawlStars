@@ -1,4 +1,4 @@
-//2150266 Ê±ÌìÒÝ
+//2150266 æ—¶å¤©é€¸
 #include "HeroSprite.h"
 #include "Treasure/TreasureBoxSprite.h"
 #include <cmath>
