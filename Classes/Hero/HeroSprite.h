@@ -41,7 +41,7 @@ public:
 	/// @name Attribute Manipulators
 	/// @{
 
-	float getMoveSpeed()   const noexcept { return static_cast<float>(_moveSpeed); }
+	Level getMoveSpeed()   const noexcept { return _moveSpeed; }
 	double getEnergy()     const noexcept { return _energy; }
 	int getShotRange()     const noexcept { return 75 * static_cast<int>(_shotRange); }
 	int getHitPoint()      const noexcept { return _hitPoint; }
@@ -50,6 +50,9 @@ public:
 	int getDiamond()       const noexcept { return _diamond; }
 	bool alive()           const noexcept { return _alive; }
 	bool skillStatus()     const noexcept { return _energy == _maxEnergy; }
+
+	void resetMoveSpeed(float fdelta = 1) noexcept { _moveSpeed = _originalMoveSpeed; }
+	void setMoveSpeed(Level speed)        noexcept { _moveSpeed = speed; }
 
 	/**
 	* @fn addHP
@@ -189,7 +192,7 @@ protected:
 	* @brief the constructor is used to initialize the constant variables
 	* @details derived classes must give the constant parameters, so the default constructor is deleted
 	*/
-	Hero(const int originalHP, const int maxAmmo);
+	Hero(const int originalHP, const int maxAmmo,const Level originalMoveSpeed);
 	Hero() = delete;
 	virtual ~Hero() = default;
 
@@ -197,6 +200,7 @@ protected:
 	const int _maxAmmo;
 	const double _maxEnergy = 1000;
 	const int _originalHP;
+	const Level _originalMoveSpeed;
 	int _maxHealthPoint;
 	int _healthPoint;
 	int _hitPoint;

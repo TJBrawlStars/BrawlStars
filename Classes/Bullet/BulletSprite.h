@@ -32,6 +32,7 @@ public:
 	Effect getEffect()     const noexcept { return _effect; }
 	Hero* getParentHero()  const noexcept { return _parentHero; }
 
+	void setExist(bool exist)                   noexcept;
 	void setHitPoint(int hitPoint)              noexcept { _hitPoint = hitPoint; }
 	void setEnergy(double energy)               noexcept { _energy = energy; }
 	void setEffect(Effect effect)               noexcept { _effect = effect; }
@@ -49,6 +50,7 @@ protected:
 
 	/** derived classes override the effect of the bullet */
 	virtual void bulletEffect(Hero* hero) = 0;
+	virtual void effectAnimation() {}
 
 private:
 	/** Initializers */

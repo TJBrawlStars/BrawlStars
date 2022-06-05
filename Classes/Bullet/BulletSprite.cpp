@@ -65,8 +65,8 @@ bool Bullet::onContactBegin(PhysicsContact& contact)
 		this->bulletEffect(dynamic_cast<Hero*>(hero));
 
 		//remove bullet
-		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
-		bullet->setVisible(false);
+		dynamic_cast<Bullet*>(bullet)->setExist(false);
+		dynamic_cast<Bullet*>(bullet)->effectAnimation();
 
 		return false;
 	}
@@ -87,4 +87,16 @@ void Bullet::onContactSeperate(PhysicsContact& contact)
 	if (nodeB->getName() == "hero")    hero = nodeB;
 	if (nodeA->getName() == "bullet")  bullet = nodeA;
 	if (nodeB->getName() == "bullet")  bullet = nodeB;
+}
+
+void Bullet::setExist(bool exist) noexcept
+{
+	if (exist) {
+		this->getPhysicsBody()->setCategoryBitmask(0x03);
+		this->setVisible(true);
+	}
+	else {
+		this->getPhysicsBody()->setCategoryBitmask(0x00);
+		this->setVisible(false);
+	}
 }

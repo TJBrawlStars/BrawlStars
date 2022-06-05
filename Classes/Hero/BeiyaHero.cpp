@@ -20,12 +20,11 @@ Beiya* Beiya::create()
 	return new(std::nothrow) Beiya();
 }
 
-Beiya::Beiya() :Hero(3360, 1)
+Beiya::Beiya() :Hero(3360, 1, Hero::Level::MEDIUM)
 {
 	_ammo = _maxAmmo;
-	_hitPoint = 1120;
-	_skillHitPoint = 762;
-	_moveSpeed = Level::MEDIUM;
+	_hitPoint = 1;
+	_skillHitPoint = 7;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
 
@@ -73,7 +72,7 @@ bool Beiya::skillAnimation(cocos2d::Point touchLocation)
 	int count = 1;
 	for (auto i : bullet) {
 		//create a bullet
-		i = BulletFactory::getInstance()->createWithClassID("NormalBullet");
+		i = BulletFactory::getInstance()->createWithClassID("FreezingBullet");
 		if (i == nullptr)
 			problemLoading("NormalBullet");
 		i->setHitPoint(this->getSkillHitPoint());

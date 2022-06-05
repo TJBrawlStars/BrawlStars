@@ -21,9 +21,13 @@ namespace {
 	}
 }
 
-Hero::Hero(const int originalHP, const int maxAmmo)
-	:_originalHP(originalHP), _maxHealthPoint(originalHP), _healthPoint(originalHP)
-	, _maxAmmo(maxAmmo)
+Hero::Hero(const int originalHP, const int maxAmmo,const Level originalMoveSpeed)
+	:_originalHP(originalHP),
+	_maxHealthPoint(originalHP),
+	_healthPoint(originalHP),
+	_originalMoveSpeed(originalMoveSpeed),
+	_moveSpeed(originalMoveSpeed),
+	_maxAmmo(maxAmmo)
 {
 }
 
