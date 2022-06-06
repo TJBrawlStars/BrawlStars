@@ -11,7 +11,7 @@ public:
 
 protected:
 	/** overrides */
-	void bulletEffect(Hero* hero) override;
+	void effectOnHero(Hero* hero) override;
 
 private:
 	BurningBullet();

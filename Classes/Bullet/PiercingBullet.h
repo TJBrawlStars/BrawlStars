@@ -4,15 +4,15 @@
 
 #include "Bullet/BulletSprite.h"
 
-class NormalBullet :public Bullet
+class PiercingBullet :public Bullet
 {
 public:
-	static NormalBullet* create();
+	static PiercingBullet* create();
 
 protected:
 	/** overrides */
 	void effectOnHero(Hero* hero) override {}
 
 private:
-	NormalBullet();
+	PiercingBullet();
 };

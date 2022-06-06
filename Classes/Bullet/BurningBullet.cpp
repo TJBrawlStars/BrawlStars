@@ -9,7 +9,7 @@ namespace {
 	BulletRegister registerCreator("BurningBullet", BulletCreator(BurningBullet::create));
 }
 
-void BurningBullet::bulletEffect(Hero* hero)
+void BurningBullet::effectOnHero(Hero* hero)
 {
 	if (hero->isScheduled("burning")) {
 		hero->unschedule("burning");

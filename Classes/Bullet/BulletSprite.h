@@ -49,7 +49,8 @@ protected:
 	Effect _effect = Effect::NONE;  ///< the special effect of bullet
 
 	/** derived classes override the effect of the bullet */
-	virtual void bulletEffect(Hero* hero) = 0;
+	virtual void effectOnHero(Hero* hero) {}
+	virtual void effectOnWall(cocos2d::Sprite* wall) {}
 	virtual void effectAnimation() {}
 
 private:

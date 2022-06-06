@@ -37,13 +37,15 @@ bool Bullet::onContactBegin(PhysicsContact& contact)
 {
 	//distinguish the nodes
 	typedef Node* NodePtr;
-	NodePtr hero = nullptr, bullet = nullptr;
+	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr;
 	auto nodeA = contact.getShapeA()->getBody()->getNode();
 	auto nodeB = contact.getShapeB()->getBody()->getNode();
 	if (nodeA->getName() == "hero")    hero = nodeA->getParent();
 	if (nodeB->getName() == "hero")    hero = nodeB->getParent();
 	if (nodeA->getName() == "bullet")  bullet = nodeA;
 	if (nodeB->getName() == "bullet")  bullet = nodeB;
+	if (nodeA->getName() == "wall")    wall = nodeA;
+	if (nodeB->getName() == "wall")    wall = nodeB;
 
 	//handle the physics contact of this object
 	if (bullet != this)
@@ -62,7 +64,7 @@ bool Bullet::onContactBegin(PhysicsContact& contact)
 		this->getParentHero()->addEnergy(dynamic_cast<Bullet*>(bullet)->getEnergy());
 
 		//the bullet effect
-		this->bulletEffect(dynamic_cast<Hero*>(hero));
+		this->effectOnHero(dynamic_cast<Hero*>(hero));
 
 		//remove bullet
 		dynamic_cast<Bullet*>(bullet)->setExist(false);
@@ -70,6 +72,7 @@ bool Bullet::onContactBegin(PhysicsContact& contact)
 
 		return false;
 	}
+
 
 	return false;
 }

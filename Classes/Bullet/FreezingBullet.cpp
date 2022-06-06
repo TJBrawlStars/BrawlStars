@@ -9,7 +9,7 @@ namespace {
 	BulletRegister registerCreator("FreezingBullet", BulletCreator(FreezingBullet::create));
 }
 
-void FreezingBullet::bulletEffect(Hero* hero)
+void FreezingBullet::effectOnHero(Hero* hero)
 {
 	hero->setMoveSpeed(Hero::Level::LOW);
 	if (hero->isScheduled(SEL_SCHEDULE(&Hero::resetMoveSpeed)))
