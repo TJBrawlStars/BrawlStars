@@ -97,7 +97,7 @@ void Player::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Eve
 bool Player::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
 {
     //get the location of touch point
-    cocos2d::Point touchLocation = dynamic_cast<Scene*>(this->getParent())->convertToNodeSpace(touch->getLocation());
+    cocos2d::Point touchLocation = this->getParent()->convertToNodeSpace(touch->getLocation());
 
     //callback functions
     if (!_releaseSkill) {

@@ -46,7 +46,7 @@ bool Diamond::initWithFile(const std::string& filename)
 {
     if (!Sprite::initWithFile(filename))
         return false;
-
+    
     return true;
 }
 

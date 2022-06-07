@@ -4,7 +4,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
-#include "Hero/BulletSprite.h"
+#include "Bullet/BulletSprite.h"
 
 #include <functional>
 #include <vector>
@@ -12,6 +12,7 @@
 #include <map>
 
 #define DEPRECATED_ACCESS private
+#define FACTORY_ACCESS private
 #define SELECTOR_ACCESS public
 
 class Bullet;
@@ -21,6 +22,8 @@ class Bullet;
 * @brief Hero is the base class of the heroes in Brawl Stars
 */
 class Hero :public cocos2d::Sprite {
+	friend class HeroFactory;
+
 public:
 	/**
 	* @enum Level
@@ -35,22 +38,10 @@ public:
 		EXTREME_HIGH = 5
 	};
 
-	/// @name Listener Set-ups
-	/// @{
-
-	/**
-	* @fn setContactListener
-	* @brief choose whether to allow physics contact. The function is disabled by default
-	*/
-	void setContactListener(bool contactState) noexcept;
-
-	/// @}
-	/// end of Listener Set-ups
-
 	/// @name Attribute Manipulators
 	/// @{
 
-	float getMoveSpeed()   const noexcept { return static_cast<float>(_moveSpeed); }
+	Level getMoveSpeed()   const noexcept { return _moveSpeed; }
 	double getEnergy()     const noexcept { return _energy; }
 	int getShotRange()     const noexcept { return 75 * static_cast<int>(_shotRange); }
 	int getHitPoint()      const noexcept { return _hitPoint; }
@@ -59,6 +50,9 @@ public:
 	int getDiamond()       const noexcept { return _diamond; }
 	bool alive()           const noexcept { return _alive; }
 	bool skillStatus()     const noexcept { return _energy == _maxEnergy; }
+
+	void resetMoveSpeed(float fdelta = 1) noexcept { _moveSpeed = _originalMoveSpeed; }
+	void setMoveSpeed(Level speed)        noexcept { _moveSpeed = speed; }
 
 	/**
 	* @fn addHP
@@ -148,6 +142,7 @@ public:
 	* @brief attack toward the target
 	*/
 	bool attack(cocos2d::Point target);
+	bool attack(float x, float y) { return attack(cocos2d::Point(x, y)); }
 
 	/**
 	* @fn prepareSkillRelease
@@ -161,12 +156,14 @@ public:
 	* @brief release the skill toward the target
 	*/
 	bool releaseSkill(cocos2d::Point target);
+	bool releaseSkill(float x, float y) { return releaseSkill(cocos2d::Point(x, y)); }
 
 	/**
 	* @fn moveStep
 	* @brief a single step of moving hero toward the target
 	*/
 	void moveStep(cocos2d::Point target);
+	void moveStep(float x, float y) { return moveStep(cocos2d::Point(x, y)); }
 
 	/// @}
 	/// end of Hero Manipulators
@@ -195,14 +192,15 @@ protected:
 	* @brief the constructor is used to initialize the constant variables
 	* @details derived classes must give the constant parameters, so the default constructor is deleted
 	*/
-	Hero(const int originalHP, const int maxAmmo);
+	Hero(const int originalHP, const int maxAmmo,const Level originalMoveSpeed);
 	Hero() = delete;
 	virtual ~Hero() = default;
 
-	/** the attributes of a hero */
+	/** Hero Attributes */
 	const int _maxAmmo;
 	const double _maxEnergy = 1000;
 	const int _originalHP;
+	const Level _originalMoveSpeed;
 	int _maxHealthPoint;
 	int _healthPoint;
 	int _hitPoint;
@@ -213,11 +211,23 @@ protected:
 	Level _shotRange;
 	Level _moveSpeed;
 	Level _loadSpeed;
-	std::vector<cocos2d::Sprite*> _ammoStrip;
+
+	/** Hero Sprite and Components */
+	cocos2d::Sprite* _hero;                                                                      ///< hero
+	std::vector<cocos2d::Sprite*> _ammoStrip;                                                    ///< the ammo strip
 	cocos2d::ui::LoadingBar* _energyStrip = cocos2d::ui::LoadingBar::create("energyStrip.png");  ///< the energy strip
 	cocos2d::ui::LoadingBar* _bloodStrip = cocos2d::ui::LoadingBar::create("bloodStrip.png");    ///< the blood strip
 	cocos2d::Sprite* heroDiamond = cocos2d::Sprite::create("diamond.png");                       ///< the diamond to be displayed
 	cocos2d::Label* diamondNum;                                                                  ///< the number of diamonds
+
+	/// @name Constructor Operations
+	/// @{
+
+	void setHeroTexture(std::string filePath) { _heroTexture = filePath; }
+	void setHeroScale(float scale) { _heroScale = scale; }
+
+	/// @}
+	/// end of  Constructor Operations
 	
 	/// @name Virtual Functions
 	/// @{
@@ -245,9 +255,12 @@ protected:
 	/// @}
 	/// end of Virtual Functions
 
-	/// @name Initializers in derived classes
-	/// @warning the function should be used after the set of hero's texture
+FACTORY_ACCESS:
+
+	/// @name Initializers
 	/// @{
+
+	void initializeHeroSprite();
 	
 	/**
 	* @fn initializeHeroPhysics
@@ -284,17 +297,17 @@ protected:
 	/// end of Initializers in derived classes
 
 private:
-	bool _alive = true;                                             ///< mark whether the hero is alive
+	bool _alive = true;             ///< mark whether the hero is alive
+	std::string _heroTexture;       ///< the file path of hero picture
+	float _heroScale = 0;           ///< scale of sprite
 
-	/** event listeners */
-	static cocos2d::EventListenerPhysicsContact* _contactListener;
-
-	/** initializer of the event listeners */
-	void initializeContactListener();
-
-	/** callback functions of the event listeners */
-	bool onContactBegin(cocos2d::PhysicsContact& contact);
-	void onContactSeperate(cocos2d::PhysicsContact& contact);
+	/**
+	* @fn turnTo
+	* @brief turn the hero's texture towards the target
+	* @param target: the relative position to hero
+	*/
+	void turnTo(cocos2d::Point target);
+	void turnTo(float x, float y) { return turnTo(cocos2d::Point(x, y)); }
 
 DEPRECATED_ACCESS:
 

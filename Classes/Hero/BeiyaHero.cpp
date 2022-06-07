@@ -1,6 +1,7 @@
 //2150266 Ê±ÌìÒÝ
 #include "Hero/BeiyaHero.h"
 #include "Factory/HeroFactory.h"
+#include "Factory/BulletFactory.h"
 
 USING_NS_CC;
 
@@ -9,56 +10,25 @@ namespace {
 	void problemLoading(std::string filename)
 	{
 		printf("Error while loading: %s\n", filename);
-		printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 	}
+
+	HeroRegister registerCreator(std::string("Beiya"), HeroCreator(Beiya::create));
 }
 
-HeroRegister registerCreator(std::string("Beiya"), HeroCreator(Beiya::create));
-
-Beiya* Beiya::createBeiya()
+Beiya* Beiya::create()
 {
-	Beiya* beiya = new(std::nothrow) Beiya();
-	if (beiya && beiya->initWithFile(_beiyaPicture))
-	{
-		beiya->autorelease();
-
-		//initialize the physics body
-		beiya->initializeHeroPhysics();
-
-		//draw the blood strip
-		beiya->initializeBloodStrip();
-
-		//draw the ammo strip
-		beiya->initializeAmmoStrip(beiya->_maxAmmo);
-
-		//draw the energy strip
-		beiya->initializeEnergyStrip();
-
-		//dispaly the number of diamonds
-		beiya->initializeDiamondDisplay();
-
-		return beiya;
-	}
-	else
-	{
-		delete beiya;
-		beiya = nullptr;
-		return nullptr;
-	}
-
-	return beiya;
+	return new(std::nothrow) Beiya();
 }
 
-const std::string Beiya::_beiyaPicture = "player.png";
-
-Beiya::Beiya() :Hero(3360, 1)
+Beiya::Beiya() :Hero(3360, 1, Level::MEDIUM)
 {
 	_ammo = _maxAmmo;
 	_hitPoint = 1120;
 	_skillHitPoint = 762;
-	_moveSpeed = Level::MEDIUM;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
+
+	this->setHeroTexture("HeroResource/GodPlane.png");
 }
 
 bool Beiya::attackAnimation(cocos2d::Point touchLocation)
@@ -68,9 +38,9 @@ bool Beiya::attackAnimation(cocos2d::Point touchLocation)
 	Vec2 offset = touchLocation - this->getPosition();
 
 	//add projectile
-	auto projectile = Bullet::createBullet("projectile.png");
+	auto projectile = BulletFactory::getInstance()->createWithClassID("NormalBullet");
 	if (projectile == nullptr)
-		problemLoading("projectile.png");
+		problemLoading("NormalBullet");
 	projectile->setHitPoint(this->getHitPoint());
 	projectile->setEnergy(_maxEnergy / 3 + 1);
 	projectile->setParentHero(this);
@@ -102,9 +72,9 @@ bool Beiya::skillAnimation(cocos2d::Point touchLocation)
 	int count = 1;
 	for (auto i : bullet) {
 		//create a bullet
-		i = Bullet::createBullet("projectile.png");
+		i = BulletFactory::getInstance()->createWithClassID("NormalBullet");
 		if (i == nullptr)
-			problemLoading("projectile.png");
+			problemLoading("NormalBullet");
 		i->setHitPoint(this->getSkillHitPoint());
 		i->setEffect(Bullet::Effect::NONE);
 		i->setParentHero(this);

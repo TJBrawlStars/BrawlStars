@@ -10,7 +10,6 @@ namespace {
 	void problemLoading(std::string filename)
 	{
 		printf("Error while loading: %s\n", filename);
-		printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 	}
 
 	std::string intToString(const int number)
@@ -22,52 +21,40 @@ namespace {
 	}
 }
 
-cocos2d::EventListenerPhysicsContact* Hero::_contactListener = nullptr;
-
-void Hero::setContactListener(bool contactState) noexcept
+Hero::Hero(const int originalHP, const int maxAmmo,const Level originalMoveSpeed)
+	:_originalHP(originalHP),
+	_maxHealthPoint(originalHP),
+	_healthPoint(originalHP),
+	_originalMoveSpeed(originalMoveSpeed),
+	_moveSpeed(originalMoveSpeed),
+	_maxAmmo(maxAmmo)
 {
-	//judge whether the contact state needs to be reset
-	if (_contactListener->isEnabled() == contactState)
-		return;
-	else
-		_contactListener->setEnabled(contactState);
 }
 
-Hero::Hero(const int originalHP, const int maxAmmo)
-	:_originalHP(originalHP), _maxHealthPoint(originalHP), _healthPoint(originalHP)
-	, _maxAmmo(maxAmmo)
+void Hero::initializeHeroSprite()
 {
-	//initialize the event listeners
-	initializeContactListener();
-}
-
-void Hero::initializeContactListener()
-{
-	if (_contactListener)
-		return;
-	_contactListener = EventListenerPhysicsContact::create();
-	_contactListener->onContactBegin = CC_CALLBACK_1(Hero::onContactBegin, this);
-	_contactListener->onContactSeparate = CC_CALLBACK_1(Hero::onContactSeperate, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(_contactListener, this);
+	_hero = Sprite::create(_heroTexture);
+	_hero->setPosition(0, 0);
+	this->addChild(_hero);
 }
 
 void Hero::initializeHeroPhysics()
 {
-	auto heroPhysicsBody = PhysicsBody::createBox(this->getContentSize());
+	auto heroPhysicsBody = PhysicsBody::createBox(_hero->getContentSize());
 	heroPhysicsBody->setDynamic(false);
 	heroPhysicsBody->setCategoryBitmask(0x1F);
 	heroPhysicsBody->setContactTestBitmask(0x1F);
-	this->setPhysicsBody(heroPhysicsBody);
-	this->setName("hero");
+	_hero->setPhysicsBody(heroPhysicsBody);
+	_hero->setName("hero");
 }
 
 void Hero::initializeBloodStrip()
 {
 	_bloodStrip->setDirection(ui::LoadingBar::Direction::LEFT);
 	_bloodStrip->setPercent(100);
-	_bloodStrip->setScale(0.1);
-	Size heroSize = this->getContentSize();
-	_bloodStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 5));
+	_bloodStrip->setScale(0.18);
+	Size heroSize = _hero->getContentSize();
+	_bloodStrip->setPosition(Point(0, heroSize.height / 2 + 7));
 	this->addChild(_bloodStrip);
 }
 
@@ -75,10 +62,10 @@ void Hero::initializeAmmoStrip(int maxAmmo)
 {
 	//add the picture of ammo strip
 	for (int i = 0; i < maxAmmo; i++) {
-		Size heroSize = this->getContentSize();
+		Size heroSize = _hero->getContentSize();
 		auto strip = Sprite::create("ammoStrip.png");
 		_ammoStrip.push_back(strip);
-		strip->setPosition(Point(8 * i, heroSize.height + 2));
+		strip->setPosition(Point(8 * i - 8, heroSize.height / 2 + 2));
 		strip->setScale(0.1);
 		this->addChild(strip);
 	}
@@ -88,147 +75,22 @@ void Hero::initializeEnergyStrip()
 {
 	_energyStrip->setDirection(ui::LoadingBar::Direction::LEFT);
 	_energyStrip->setPercent(0);
-	_energyStrip->setScale(0.1);
+	_energyStrip->setScale(0.18);
 	_energyStrip->setOpacity(150);
-	Size heroSize = this->getContentSize();
-	_energyStrip->setPosition(Point(heroSize.width / 2, heroSize.height + 8));
+	Size heroSize = _hero->getContentSize();
+	_energyStrip->setPosition(Point(0, heroSize.height / 2 + 12));
 	this->addChild(_energyStrip);
 }
 
 void Hero::initializeDiamondDisplay(const int diamond)
 {
-	Size heroSize = this->getContentSize();
-	heroDiamond->setPosition(Point(0, heroSize.height + 12));
+	Size heroSize = _hero->getContentSize();
+	heroDiamond->setPosition(Point(0, heroSize.height / 2 + 17));
 	heroDiamond->setScale(0.6);
 	diamondNum = cocos2d::Label::createWithTTF(intToString(diamond), "fonts/Marker Felt.ttf", 5);
-	diamondNum->setPosition(Point(5, heroSize.height + 11));
+	diamondNum->setPosition(Point(5, heroSize.height / 2 + 16));
 	this->addChild(heroDiamond);
 	this->addChild(diamondNum);
-}
-
-/**
-* the physics bitmasks:
-* name           categoryBitmask         contactTestBitmask
-* hero           0x1F                    0x1F
-* bullet         0x03                    0x03
-* wall           0x01                    0x01
-* grass          0x04                    0x04
-* diamond        0x08                    0x08
-* box            0x02                    0x02
-* poison         0x10                    0x10
-*/
-bool Hero::onContactBegin(PhysicsContact& contact)
-{
-	//distinguish the nodes
-	typedef Node* NodePtr;
-	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, box = nullptr, poison = nullptr;
-	auto nodeA = contact.getShapeA()->getBody()->getNode();
-	auto nodeB = contact.getShapeB()->getBody()->getNode();
-	if (nodeA->getName() == "hero")    hero = nodeA;
-	if (nodeB->getName() == "hero")    hero = nodeB;
-	if (nodeA->getName() == "bullet")  bullet = nodeA;
-	if (nodeB->getName() == "bullet")  bullet = nodeB;
-	if (nodeA->getName() == "wall")    wall = nodeA;
-	if (nodeB->getName() == "wall")    wall = nodeB;
-	if (nodeA->getName() == "grass")   grass = nodeA;
-	if (nodeB->getName() == "grass")   grass = nodeB;
-	if (nodeA->getName() == "diamond") diamond = nodeA;
-	if (nodeB->getName() == "diamond") diamond = nodeB;
-	if (nodeA->getName() == "box")     box = nodeA;
-	if (nodeB->getName() == "box")     box = nodeB;
-	if (nodeA->getName() == "poison")  poison = nodeA;
-	if (nodeB->getName() == "poison")  poison = nodeB;
-
-	//handle the contacts
-	if (hero && bullet) {
-		//make sure the bullet wont hit its parent hero
-		if (dynamic_cast<Hero*>(hero) == dynamic_cast<Bullet*>(bullet)->getParentHero())
-			return false;
-
-		//deduct hp
-		dynamic_cast<Hero*>(hero)->deductHP(dynamic_cast<Bullet*>(bullet)->getHitPoint());
-
-		//add energy
-		dynamic_cast<Bullet*>(bullet)->getParentHero()->addEnergy(dynamic_cast<Bullet*>(bullet)->getEnergy());
-
-		//remove bullet
-		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
-		bullet->setVisible(false);
-
-		return false;
-	}
-	else if (hero && poison) {
-		hero->schedule([=](float fdelta)
-			{
-				dynamic_cast<Hero*>(hero)->deductHP(300);
-			}, 0.75, "poison hit");
-
-		return false;
-	}
-	else if (hero && diamond) {
-		//add diamond
-		dynamic_cast<Hero*>(hero)->addDiamond(1);
-		dynamic_cast<TreasureBox::Diamond*>(diamond)->setExist(false);
-
-		return false;
-	}
-	else if (hero && grass) {
-		//make hero transparent
-		hero->setOpacity(150);
-		grass->setOpacity(150);
-
-		return false;
-	}
-	else if (bullet && wall) {
-		//remove bullet
-		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
-		bullet->setVisible(false);
-
-		return false;
-	}
-	else if (bullet && box) {
-		//deduct box hp and remove bullet
-		dynamic_cast<TreasureBox::Box*>(box)->deductHP(dynamic_cast<Bullet*>(bullet)->getHitPoint());
-		bullet->getPhysicsBody()->setCategoryBitmask(0x00);
-		bullet->setVisible(false);
-
-		return false;
-	}
-
-	return false;
-}
-
-void Hero::onContactSeperate(PhysicsContact& contact)
-{
-	//distinguish the nodes
-	typedef Node* NodePtr;
-	NodePtr hero = nullptr, bullet = nullptr, wall = nullptr, grass = nullptr, diamond = nullptr, poison = nullptr;
-	auto nodeA = contact.getShapeA()->getBody()->getNode();
-	auto nodeB = contact.getShapeB()->getBody()->getNode();
-	if (nodeA->getName() == "hero")    hero = nodeA;
-	if (nodeB->getName() == "hero")    hero = nodeB;
-	if (nodeA->getName() == "bullet")  bullet = nodeA;
-	if (nodeB->getName() == "bullet")  bullet = nodeB;
-	if (nodeA->getName() == "wall")    wall = nodeA;
-	if (nodeB->getName() == "wall")    wall = nodeB;
-	if (nodeA->getName() == "grass")   grass = nodeA;
-	if (nodeB->getName() == "grass")   grass = nodeB;
-	if (nodeA->getName() == "diamond") diamond = nodeA;
-	if (nodeB->getName() == "diamond") diamond = nodeB;
-	if (nodeA->getName() == "poison")  poison = nodeA;
-	if (nodeB->getName() == "poison")  poison = nodeB;
-
-	if (hero && grass) {
-		//make hero and grass visible
-		hero->setOpacity(255);
-		grass->setOpacity(255);
-	}
-	else if (hero && diamond) {
-		diamond->getParent()->removeFromParent();
-	}
-	else if (hero && poison) {
-		hero->unschedule("poison hit");
-	}
 }
 
 void Hero::setAlive(bool alive)
@@ -236,14 +98,14 @@ void Hero::setAlive(bool alive)
 	if (alive) {
 		_alive = true;
 		this->setVisible(true);
-		this->getPhysicsBody()->setCategoryBitmask(0x1F);
-		this->setName("hero");
+		_hero->getPhysicsBody()->setCategoryBitmask(0x1F);
+		_hero->setName("hero");
 	}
 	else {
 		_alive = false;
 		this->setVisible(false);
-		this->getPhysicsBody()->setCategoryBitmask(0x00);
-		this->setName("null");
+		_hero->getPhysicsBody()->setCategoryBitmask(0x00);
+		_hero->setName("null");
 	}
 }
 
@@ -309,7 +171,7 @@ void Hero::moveStep(Point target)
 	//query the contact with wall
 	bool contactBarrier = false;  ///< judgement
 	Point movePos = this->getPosition() + static_cast<int>(_moveSpeed) * offset;  ///< mark the position after moving
-	Size heroSize = this->getContentSize();  ///< the content size of hero
+	Size heroSize = _hero->getContentSize();  ///< the content size of hero
 	Node* parentScene = nullptr;
 	if (this->getParent()->getName() == "robot" || this->getParent()->getName() == "player")
 		parentScene = this->getParent()->getParent();
@@ -336,8 +198,35 @@ void Hero::moveStep(Point target)
 		Rect(movePos.x - heroSize.width / 2, movePos.y - heroSize.height / 2, heroSize.width, heroSize.height), nullptr);
 
 	//move hero
-	if (!contactBarrier)
+	if (!contactBarrier) {
 		this->setPosition(this->getPosition() + static_cast<int>(_moveSpeed) * offset);
+		this->turnTo(offset);
+	}
+}
+
+void Hero::turnTo(Point target)
+{
+	//judge whether to rotate
+	if (target == Point(0, 0))
+		return;
+
+	//record the angle
+	float angle = 0;
+	if (target.x > 0) {
+		angle = 90 - atan(target.y / target.x);
+	}
+	else if (target.x < 0) {
+		angle = 270 - atan(target.y / target.x);
+	}
+	else {
+		if (target.y > 0)
+			angle = 0;
+		else if (target.y < 0)
+			angle = 180;
+	}
+
+	//rotation
+	_hero->setRotation(angle);
 }
 
 int Hero::addHP(int increasePoint)
