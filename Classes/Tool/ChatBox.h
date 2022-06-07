@@ -12,20 +12,21 @@
 #include <vector>
 #include <string>
 
+extern std::vector<HeroData> herodataVec;
+
 class ChatBox : public cocos2d::Sprite
 {
 	//每一次的输入信息
 	CC_SYNTHESIZE(std::string, _message, Message);
 
 private:
-
-	//联机时每个人储存的信息
-	//std::vector<std::string> _messages;
-	//cocos2d::Label* _labelMessages[10];
-
+	std::vector<std::string> _messages;
+	std::vector<cocos2d::Label*> _labelMessages;
 	cocos2d::Label* _labelInputMessage;
 	std::string _defaultHeroName; 
 	std::size_t _messageSize;
+
+	int enterCount = 0;
 
 public:
 	/**
@@ -41,7 +42,13 @@ public:
 	*/
 	void updateMessage(char newchar);
 
+	void enterToUpdateMessage();
+
+	void backspaceTodateMessage();
+
 	void setDefaultHeroName(std::string heroid);
+
+	//void pushMessage(std::string newMessage);
 
 	virtual bool init() override;
 
