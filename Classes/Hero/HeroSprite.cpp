@@ -115,13 +115,23 @@ bool Hero::attack(Point target)
 	if (!this->alive())
 		return false;
 
-	//modify the ammunition quantity
+	/** modify the ammunition quantity */
+	//judge the ammo number
 	if (!_ammo)
 		return true;
+
+	//check the cool down of attack
+	if (this->isScheduled("attack CD"))
+		return true;
+
+	//modify attributes
 	if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
 		schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
 	--_ammo;
 	_ammoStrip[_ammo]->setVisible(false);
+
+	//start cool down
+	this->scheduleOnce([](float) {}, 0.5, "attack CD");
 
 	//run the animation
 	return this->attackAnimation(target);
