@@ -161,6 +161,7 @@ public:
 	/**
 	* @fn moveStep
 	* @brief a single step of moving hero toward the target
+	* @exception unexpected_parent: the parent of hero isnt player or robot
 	*/
 	void moveStep(cocos2d::Point target);
 	void moveStep(float x, float y) { return moveStep(cocos2d::Point(x, y)); }

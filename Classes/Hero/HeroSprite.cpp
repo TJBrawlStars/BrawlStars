@@ -1,6 +1,7 @@
 //2150266  ±ÃÏ“›
 #include "HeroSprite.h"
 #include "Treasure/TreasureBoxSprite.h"
+#include "exceptions/unexpected_parent.hpp"
 #include <cmath>
 
 USING_NS_CC;
@@ -185,6 +186,8 @@ void Hero::moveStep(Point target)
 	Node* parentScene = nullptr;
 	if (this->getParent()->getName() == "robot" || this->getParent()->getName() == "player")
 		parentScene = this->getParent()->getParent();
+	else
+		throw unexpected_parent(this->getParent());
 	dynamic_cast<Scene*>(parentScene)->getPhysicsWorld()->queryRect(
 		PhysicsQueryRectCallbackFunc([&contactBarrier](PhysicsWorld& world, PhysicsShape& shape, void* data)->bool
 			{
