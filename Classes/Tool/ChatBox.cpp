@@ -15,13 +15,23 @@ bool ChatBox::init()
 
 	_labelInputMessage = cocos2d::Label::createWithTTF("", "fonts/HELVETICAEXT-NORMAL.ttf", 15);
 	_labelInputMessage->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE_LEFT); 
-	_labelInputMessage->setPosition(cocos2d::Vec2(20, 44.5)); 
-	//_labelInputMessage->setOpacity(255);
+	_labelInputMessage->setPosition(cocos2d::Vec2(20, 14.5f));
 	_labelInputMessage->setGlobalZOrder(kFightUI + 1);
-	//_labelInputMessage->setTextColor(cocos2d::Color4B::WHITE);
 	this->addChild(_labelInputMessage);
 
 	return true;
+}
+
+void ChatBox::backspaceTodateMessage()
+{
+	if (_message.size() == 0)
+	{
+		return;
+	}
+	_messageSize--;
+	_message.pop_back();
+	_labelInputMessage->setString(_message);
+	return;
 }
 
 ChatBox::ChatBox()
@@ -30,6 +40,62 @@ ChatBox::ChatBox()
 	_defaultHeroName = "";
 	_message = "";
 }
+
+void ChatBox::updateMessage(char newchar)
+{
+	if (_messageSize < 15 && newchar != '*')
+	{
+		_messageSize++;
+		_message += newchar;
+		_labelInputMessage->setString(_message);
+	}
+}
+
+void ChatBox::enterToUpdateMessage()
+{
+	//按enter的次数
+	enterCount++;
+
+	//高度
+	float height = 14.5f;
+
+	cocos2d::Label* tempMessageLabel = cocos2d::Label::createWithTTF("", "fonts/HELVETICAEXT-NORMAL.ttf", 15);;
+	tempMessageLabel->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE_LEFT);
+	tempMessageLabel->setGlobalZOrder(kFightUI + 1);
+	this->addChild(tempMessageLabel);
+
+	_messages.push_back(_defaultHeroName+_message);
+	_labelMessages.push_back(tempMessageLabel);
+
+	for (int i = 0; i < enterCount; i++)
+	{
+		constexpr float jianGeHeight = 20.0f;
+		_labelMessages[i]->setString(_messages[i]);
+		_labelMessages[i]->setPosition(20, height + jianGeHeight * (enterCount - i));
+		if (_labelMessages[i]->getPosition().y > height + jianGeHeight * 11)
+		{
+			_labelMessages[i]->setVisible(false);
+		}
+	}
+
+	//更新当前message
+	_messageSize = 0;
+	_message = "";
+	_labelInputMessage->setString("");
+}
+
+void ChatBox::setDefaultHeroName(std::string heroid)
+{
+	_defaultHeroName = heroid + ":";
+}
+
+//void ChatBox::pushMessage(std::string newMessage)
+//{
+//	//_messages.push_back(_message);
+//
+//	;
+//	//_labelInputMessage->setString(_message);
+//}
 
 char ChatBox::switchKeycodeToChar(cocos2d::EventKeyboard::KeyCode keyCode)
 {
@@ -163,20 +229,4 @@ char ChatBox::switchKeycodeToChar(cocos2d::EventKeyboard::KeyCode keyCode)
 		return '*';
 		break;
 	}
-}
-
-void ChatBox::updateMessage(char newchar)
-{
-	if (_messageSize < 15 && newchar != '*')
-	{
-		_messageSize++;
-		_message += newchar;
-		_labelInputMessage->setString(_message);
-	}
-}
-
-void ChatBox::setDefaultHeroName(std::string heroid)
-{
-	_defaultHeroName = heroid + " :";
-	_message = _defaultHeroName;
 }

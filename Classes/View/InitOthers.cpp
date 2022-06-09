@@ -75,14 +75,6 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event)
 	Rect worldchatboxSwitch = Rect(_chatboxSwitch->getPosition().x-46, _chatboxSwitch->getPosition().y, 46, 41);
 	auto touchlocation = _player->convertToNodeSpace(touch->getLocation());
 
-	//log("rect.x=%f", worldchatboxSwitch.getMinX());
-	//log("rect.x=%f", worldchatboxSwitch.getMaxX());
-	//log("rect.y=%f", worldchatboxSwitch.getMinY());
-	//log("rect.y=%f", worldchatboxSwitch.getMaxY());
-	//log("touchlocation.x=%f", touchlocation.x);
-	//log("touchlocation.y=%f", touchlocation.y);
-
-
 	//µãÖĞ¿òÁË
 	if (worldchatboxSwitch.containsPoint(touchlocation))
 	{
@@ -106,7 +98,11 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 	{
 		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER)
 		{
-			log("ss");
+			_chatBox->enterToUpdateMessage(); 
+		} 
+		else if (keyCode == EventKeyboard::KeyCode::KEY_BACKSPACE)
+		{
+			_chatBox->backspaceTodateMessage();
 		}
 		else
 		{
