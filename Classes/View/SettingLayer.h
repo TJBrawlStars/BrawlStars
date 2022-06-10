@@ -21,10 +21,16 @@ private:
 	*/
 	void Set();
 
+	/**
+	* @brief 成员的点击函数
+	*/
+	void menuCloseCallback(Ref* pSender);
+
 	virtual bool onTouchBegan(cocos2d::Touch*, cocos2d::Event*);
 
 	SettingLayer() : kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
-		, _bg(NULL), _soundmenu(NULL), _soundbar(NULL), _back(NULL), _sound_effectMenu(NULL), _sound_effectBar(NULL) {};
+		, _bg(NULL), _soundmenu(NULL), _soundbar(NULL), _back(NULL), _sound_effectMenu(NULL), _sound_effectBar(NULL)
+		, _exit(NULL), _client_menu0(NULL) {};
 
 	/**
 	* @brief 背景音静音菜单的回调函数
@@ -35,6 +41,11 @@ private:
 	* @brief 音效静音菜单的回调函数
 	*/
 	void SoundEffectmenuCloseCallback(cocos2d::Ref* pSender);
+
+	/**
+	* @brief 文本框点击事件
+	*/
+	void TextFieldEvent(Ref* pSender, cocos2d::ui::TextField::EventType type);
 
 private:
 
@@ -60,6 +71,9 @@ private:
 
 	//退出登录
 	cocos2d::ui::Button* _exit;
+
+	//开关
+	cocos2d::MenuItemToggle* _client_menu0;
 
 };
 
