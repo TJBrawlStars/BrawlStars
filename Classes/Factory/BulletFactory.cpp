@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Factory/BulletFactory.h"
+#include "exceptions/bad_classid.hpp"
 
 std::unique_ptr<BulletFactory> BulletFactory::_bulletFactoryInstance = nullptr;
 
@@ -19,6 +20,8 @@ std::unique_ptr<BulletFactory>& BulletFactory::getInstance()
 Bullet* BulletFactory::createWithClassID(std::string classID)
 {
 	auto creator = _bulletFactoryMap.find(classID);
+	if (creator == _bulletFactoryMap.end())
+		throw bad_classid(classID);
 	if (!creator->second())
 		return nullptr;
 	auto bullet = creator->second();

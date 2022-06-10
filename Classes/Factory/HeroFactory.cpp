@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Factory/HeroFactory.h"
+#include "exceptions/bad_classid.hpp"
 
 std::unique_ptr<HeroFactory> HeroFactory::_heroFactoryInstance = nullptr;
 
@@ -18,6 +19,8 @@ std::unique_ptr<HeroFactory>& HeroFactory::getInstance()
 Hero* HeroFactory::createWithClassID(std::string classID)
 {
 	auto creator = _heroFactoryMap.find(classID);
+	if (creator == _heroFactoryMap.end())
+		throw bad_classid(classID);
 	if (!creator->second())
 		return nullptr;
 	auto hero = creator->second();
