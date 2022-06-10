@@ -2,6 +2,7 @@
 
 #include "cocos2d.h"
 #include"ui/CocosGUI.h"
+#include "Tool/ChatBox.h"
 
 class LoadingScene;
 class RoomLayer;
@@ -61,6 +62,11 @@ private:
 
     ~MainScene() { _that = NULL; }
 
+    void updateChatBoxPosition();
+
+    //schedule update
+    void update(float dt);
+
 private:
 
     const cocos2d::Size kVisibleSize;
@@ -110,5 +116,15 @@ private:
    //消息按钮 
    cocos2d::ui::Button* _messages;
 
-};
+   //聊天框按键
+   virtual bool onPressKey(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+   virtual bool onReleaseKey(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
+   cocos2d::EventListenerKeyboard* _gmlistenerKeyBoard;
+
+   //聊天框
+   ChatBox* _chatBox;
+
+   //记录点击次数
+   static int _countButton;
+};
