@@ -1,6 +1,9 @@
 //2151396 张靖凯
 
 #include "ChatBox.h"
+#include "Net/Client.h"
+
+int ChatBox::enterCount = 0;
 
 bool ChatBox::init()
 {
@@ -18,6 +21,8 @@ bool ChatBox::init()
 	_labelInputMessage->setPosition(cocos2d::Vec2(20, 14.5f));
 	_labelInputMessage->setGlobalZOrder(kFightUI + 1);
 	this->addChild(_labelInputMessage);
+
+	updateChatBox();
 
 	return true;
 }
@@ -41,6 +46,68 @@ ChatBox::ChatBox()
 	_message = "";
 }
 
+void ChatBox::updateChatBox()
+{
+	this->schedule(cocos2d::SEL_SCHEDULE(&ChatBox::messagesOnScreen),0.1f);
+}
+
+void ChatBox::messagesOnScreen(float fdelta)
+{
+	float height = 14.5f;
+
+	int count = static_cast<int>(_messages.size());
+
+	int tempenterCount = enterCount;
+	if (count - tempenterCount != 0)
+	{
+		for (int i = 1; i <= (count - tempenterCount); i++)
+		{
+			addLabelMessages();
+			enterCount++;
+		}
+	}
+
+	for (auto &i : _messages)
+	{
+		std::istringstream temp(i);
+		std::string datatype;
+		temp >> datatype;
+		if (datatype == "MSG")
+		{
+			std::string heroname;
+			std::string message;
+			temp >> heroname;
+			temp >> message;
+
+			i = heroname + ":" + message;
+		}
+	}
+
+	if (!Client::getInstance() == NULL)
+		Client::getInstance()->update(this->_messages);
+
+	for (int i = 0; i < count; i++)
+	{
+		constexpr float jianGeHeight = 20.0f;
+		_labelMessages[i]->setString(_messages[i]);
+		_labelMessages[i]->setPosition(20, height + jianGeHeight * (count - i));
+		if (_labelMessages[i]->getPosition().y > height + jianGeHeight * 11)
+		{
+			_labelMessages[i]->setVisible(false);
+		}
+	}
+}
+
+void ChatBox::addLabelMessages()
+{
+	_labelMessage = cocos2d::Label::createWithTTF("", "fonts/HELVETICAEXT-NORMAL.ttf", 15);
+	_labelMessage->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE_LEFT);
+	_labelMessage->setGlobalZOrder(kFightUI + 1);
+	this->addChild(_labelMessage);
+
+	_labelMessages.push_back(_labelMessage);
+}
+
 void ChatBox::updateMessage(char newchar)
 {
 	if (_messageSize < 15 && newchar != '*')
@@ -59,24 +126,9 @@ void ChatBox::enterToUpdateMessage()
 	//高度
 	float height = 14.5f;
 
-	cocos2d::Label* tempMessageLabel = cocos2d::Label::createWithTTF("", "fonts/HELVETICAEXT-NORMAL.ttf", 15);;
-	tempMessageLabel->setAnchorPoint(cocos2d::Vec2::ANCHOR_MIDDLE_LEFT);
-	tempMessageLabel->setGlobalZOrder(kFightUI + 1);
-	this->addChild(tempMessageLabel);
-
-	_messages.push_back(_defaultHeroName+_message);
-	_labelMessages.push_back(tempMessageLabel);
-
-	for (int i = 0; i < enterCount; i++)
-	{
-		constexpr float jianGeHeight = 20.0f;
-		_labelMessages[i]->setString(_messages[i]);
-		_labelMessages[i]->setPosition(20, height + jianGeHeight * (enterCount - i));
-		if (_labelMessages[i]->getPosition().y > height + jianGeHeight * 11)
-		{
-			_labelMessages[i]->setVisible(false);
-		}
-	}
+	addLabelMessages();
+	this->setDefaultHeroName(PlistData::getDataByType(PlistData::DataType::ID));
+	_messages.push_back(_defaultHeroName + _message);
 
 	//更新当前message
 	_messageSize = 0;
@@ -89,13 +141,6 @@ void ChatBox::setDefaultHeroName(std::string heroid)
 	_defaultHeroName = heroid + ":";
 }
 
-//void ChatBox::pushMessage(std::string newMessage)
-//{
-//	//_messages.push_back(_message);
-//
-//	;
-//	//_labelInputMessage->setString(_message);
-//}
 
 char ChatBox::switchKeycodeToChar(cocos2d::EventKeyboard::KeyCode keyCode)
 {
@@ -229,4 +274,26 @@ char ChatBox::switchKeycodeToChar(cocos2d::EventKeyboard::KeyCode keyCode)
 		return '*';
 		break;
 	}
+}
+
+int ChatBox::getHeroNotRobotNum()
+{
+	size_t heronum = herodataVec.size();
+
+	int count = 0;
+	//将第一个设置为主角
+	for (int i = 0; i < heronum; i++)
+	{
+		//初始化操作
+		std::istringstream temp(herodataVec[i].name_isRobot);
+		std::string heroname;
+		std::string isRobot;
+		temp >> heroname;
+		temp >> isRobot;
+
+		if (isRobot == "false")
+			count++;
+	}
+
+	return count;
 }
