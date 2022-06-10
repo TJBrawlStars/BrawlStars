@@ -52,7 +52,6 @@ void GameScene::addChatBox()
 	this->addChild(_chatBox);
 	_chatBox->setGlobalZOrder(kFightUI);
 	_chatBox->setVisible(false);
-	_chatBox->setDefaultHeroName(herodataVec[0].heroID);
 }
 
 void GameScene::updateChatBoxPosition()

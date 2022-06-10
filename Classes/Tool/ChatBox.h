@@ -9,6 +9,7 @@
 
 #include "cocos2d.h"
 #include "Const/Const.h"
+#include "Tool/Data.h"
 #include <vector>
 #include <string>
 
@@ -20,15 +21,24 @@ class ChatBox : public cocos2d::Sprite
 	CC_SYNTHESIZE(std::string, _message, Message);
 
 private:
-	std::vector<std::string> _messages;
 	std::vector<cocos2d::Label*> _labelMessages;
 	cocos2d::Label* _labelInputMessage;
 	std::string _defaultHeroName; 
 	std::size_t _messageSize;
 
-	int enterCount = 0;
+	static int enterCount;
+
+	//每次的UI Label
+	cocos2d::Label* _labelMessage;
 
 public:
+	std::vector<std::string> _messages;
+	std::vector<std::string>& getVectorOfString() { return _messages; }
+	void setVectorOfString(const std::vector<std::string>& messages) { _messages = messages; }
+
+	int getHeroNotRobotNum();
+
+	void addLabelMessages();
 	/**
 	* @fn switchKeycodeToChar
 	* @brief 每一个字符转换成char
@@ -48,11 +58,14 @@ public:
 
 	void setDefaultHeroName(std::string heroid);
 
-	//void pushMessage(std::string newMessage);
+	void updateChatBox(); 
+
+	void messagesOnScreen(float fdelta);
 
 	virtual bool init() override;
 
 	CREATE_FUNC(ChatBox); 
 
 	ChatBox();
+
 };
