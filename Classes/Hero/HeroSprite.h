@@ -41,15 +41,16 @@ public:
 	/// @name Attribute Manipulators
 	/// @{
 
-	Level getMoveSpeed()   const noexcept { return _moveSpeed; }
-	double getEnergy()     const noexcept { return _energy; }
-	int getShotRange()     const noexcept { return 75 * static_cast<int>(_shotRange); }
-	int getHitPoint()      const noexcept { return _hitPoint; }
-	int getSkillHitPoint() const noexcept { return _skillHitPoint; }
-	int getHP()            const noexcept { return _healthPoint; }
-	int getDiamond()       const noexcept { return _diamond; }
-	bool alive()           const noexcept { return _alive; }
-	bool skillStatus()     const noexcept { return _energy == _maxEnergy; }
+	std::string getHeroPicture() const noexcept { return _heroTexture; }
+	Level getMoveSpeed()         const noexcept { return _moveSpeed; }
+	double getEnergy()           const noexcept { return _energy; }
+	int getShotRange()           const noexcept { return 75 * static_cast<int>(_shotRange); }
+	int getHitPoint()            const noexcept { return _hitPoint; }
+	int getSkillHitPoint()       const noexcept { return _skillHitPoint; }
+	int getHP()                  const noexcept { return _healthPoint; }
+	int getDiamond()             const noexcept { return _diamond; }
+	bool alive()                 const noexcept { return _alive; }
+	bool skillStatus()           const noexcept { return _energy == _maxEnergy; }
 
 	void resetMoveSpeed(float fdelta = 1) noexcept { _moveSpeed = _originalMoveSpeed; }
 	void setMoveSpeed(Level speed)        noexcept { _moveSpeed = speed; }
