@@ -1,7 +1,4 @@
-
 /** @author  ±ÃÏ“› */
-
-#pragma once
 
 #include "Factory/BulletFactory.h"
 #include "exceptions/bad_classid.hpp"

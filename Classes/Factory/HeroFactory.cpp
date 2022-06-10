@@ -1,7 +1,5 @@
 /** @author  ±ÃÏ“› */
 
-#pragma once
-
 #include "Factory/HeroFactory.h"
 #include "exceptions/bad_classid.hpp"
 
@@ -62,4 +60,5 @@ Hero* HeroFactory::createWithClassID(std::string classID)
 void HeroFactory::registerClassCreator(std::string classID, HeroCreator creator)
 {
 	_heroFactoryMap.emplace(classID, creator);
+	registerClassID(classID);
 }

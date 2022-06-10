@@ -13,7 +13,18 @@ class HeroFactory :protected Factory
 {
 public:
 	static std::unique_ptr<HeroFactory>& getInstance();
+
+	/** 
+	* @fn createWithClassID
+	* @brief instantiation
+	*/
 	Hero* createWithClassID(std::string classID);
+
+	/**
+	* @fn getClassIDVec
+	* @brief get vector of class ID
+	*/
+	using Factory::getClassIDVec;
 	
 	void registerClassCreator(std::string classID, HeroCreator creator);
 
