@@ -1,41 +1,39 @@
-//2150266 Ê±ÌìÒÝ
+//2150266 æ—¶å¤©é€¸
 
 #pragma once
 
 #include "cocos2d.h"
 #include "Hero/HeroSprite.h"
-#include "Hero/BulletSprite.h"
+#include "Bullet/BulletSprite.h"
 
 /**
 * @class Beiya
 * @brief the class is derived from hero with detailed attributes
 * @details the attributes of Beiya
 *		_maxHealthPoint = 3360;
-*		_maxAmmo = 1;
 *		_hitPoint = 1120;
+*		_maxAmmo = 1;
 *		_moveSpeed = Level::MEDIUM;
 *		_shotRange = Level::HIGH;
 *		_loadSpeed = Level::EXTREME_HIGH;
 */
 class Beiya :public Hero
 {
+	friend class HeroRegister;
+
 public:
 	/**
-	* @fn createBeiya
-	* @brief the only way to instantiate class Beiya
-	* @warning the create function with filename is disabled
+	* @fn create
+	* @brief to register the constructor to the factory
 	*/
-	static Beiya* createBeiya();
-	static Beiya* create(const std::string&) = delete;
+	static Beiya* create();
 
 protected:
 	/** overrides */
-	virtual bool attack(cocos2d::Touch* touch, cocos2d::Event* event)            override;
-	virtual bool superChargedSkill(cocos2d::Touch* touch, cocos2d::Event* event) override;
+	virtual bool attackAnimation(cocos2d::Point touchLocation) override;
+	virtual bool skillAnimation(cocos2d::Point touchLocation)  override;
 
 private:
 	/** the initialization of Beiya */
 	Beiya();
-
-	static const std::string _beiyaPicture;  ///< The filename of the picture
 };
