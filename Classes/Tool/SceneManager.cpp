@@ -7,7 +7,7 @@ SceneManager* SceneManager::getInstance()
 	if (_scene_manager == NULL)
 	{
 		_scene_manager = new SceneManager();
-        //Èİ´í´¦Àí
+		//å®¹é”™å¤„ç†
 		if (_scene_manager)
 		{
 			_scene_manager->autorelease();
@@ -22,36 +22,47 @@ SceneManager* SceneManager::getInstance()
 	return _scene_manager;
 }
 
-void SceneManager::changeScene(EnumSceneType type)
+void SceneManager::changeScene(EnumSceneType type, int operate)
 {
-	//¶ÏÑÔ¼ì²éÊäÈë
-	assert(type < EnumSceneType::en_Max && type > EnumSceneType::en_Min);
+	//æ–­è¨€æ£€æŸ¥è¾“å…¥
+	assert(type <= EnumSceneType::en_Max && type >= EnumSceneType::en_Min);
 
-	Scene* scene = NULL;
-	switch (type)
-	{
-	case EnumSceneType::en_MainScene:
-		scene = MainScene::create();
-		break;
-	case EnumSceneType::en_GameScene:
-		scene = GameScene::create();
-		break;
-	case EnumSceneType::en_SettlementScene:
-		scene = SettlementScene::create();
-		break;
-	}
-
-	assert(scene != NULL);
-
-	if (scene == NULL)
-		return;
 	Director* director = Director::getInstance();
-	const Scene* cur_scene = director->getRunningScene();
-	if (cur_scene == NULL)
+	if (operate != 2)
 	{
-		director->runWithScene(scene);
-		_first = false;
+		Scene* scene = NULL;
+		switch (type)
+		{
+		case EnumSceneType::en_MainScene:
+			scene = MainScene::create();
+			break;
+		case EnumSceneType::en_GameScene:
+			scene = GameScene::create();
+			break;
+		case EnumSceneType::en_SettlementScene:
+			scene = SettlementScene::create();
+			break;
+		case EnumSceneType::en_PauseScene:
+			scene = PauseScene::create();
+			break;
+		}
+
+		assert(scene != NULL);
+
+		if (operate == 0)
+		{
+			const Scene* cur_scene = director->getRunningScene();
+			if (cur_scene == NULL)
+			{
+				director->runWithScene(scene);
+				_first = false;
+			}
+			else
+				director->replaceScene(TransitionCrossFade::create(0.5f, scene));
+		}
+		else if (operate == 1)
+			director->pushScene(TransitionCrossFade::create(0.5f, scene));
 	}
 	else
-		director->replaceScene(scene);
+		director->popScene();
 }

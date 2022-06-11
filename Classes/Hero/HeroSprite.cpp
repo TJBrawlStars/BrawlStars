@@ -1,4 +1,4 @@
-//2150266 Ê±ÌìÒÝ
+//2150266 æ—¶å¤©é€¸
 #include "HeroSprite.h"
 #include "Treasure/TreasureBoxSprite.h"
 #include "exceptions/unexpected_parent.hpp"
@@ -116,6 +116,7 @@ bool Hero::attack(Point target)
 	if (!this->alive())
 		return false;
 
+<<<<<<< HEAD
 	/** modify the ammunition quantity */
 	//judge the ammo number
 	if (!_ammo)
@@ -134,6 +135,16 @@ bool Hero::attack(Point target)
 	//start cool down
 	this->scheduleOnce([](float) {}, 0.5, "attack CD");
 
+=======
+	//modify the ammunition quantity
+	if (!_ammo)
+		return true;
+	if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
+		schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
+	--_ammo;
+	_ammoStrip[_ammo]->setVisible(false);
+
+>>>>>>> develop
 	//run the animation
 	return this->attackAnimation(target);
 }
@@ -186,8 +197,11 @@ void Hero::moveStep(Point target)
 	Node* parentScene = nullptr;
 	if (this->getParent()->getName() == "robot" || this->getParent()->getName() == "player")
 		parentScene = this->getParent()->getParent();
+<<<<<<< HEAD
 	else
 		throw unexpected_parent(this->getParent());
+=======
+>>>>>>> develop
 	dynamic_cast<Scene*>(parentScene)->getPhysicsWorld()->queryRect(
 		PhysicsQueryRectCallbackFunc([&contactBarrier](PhysicsWorld& world, PhysicsShape& shape, void* data)->bool
 			{
