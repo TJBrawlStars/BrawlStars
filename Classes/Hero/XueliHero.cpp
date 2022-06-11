@@ -23,7 +23,7 @@ Xueli* Xueli::create()
 Xueli::Xueli() :Hero(3360, 1, Level::MEDIUM)
 {
 	_ammo = _maxAmmo;
-	_hitPoint = 1725;
+	_hitPoint = 725;
 	_skillHitPoint = 3312;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::MEDIUM;
@@ -74,8 +74,6 @@ bool Xueli::attackAnimation(cocos2d::Point touchLocation)
 		bullet[i]->runAction(Sequence::create(shot, removeBullet, nullptr));
 
 	}
-	
-	
 
 	return true;
 }
@@ -105,9 +103,11 @@ bool  Xueli::skillAnimation(cocos2d::Point touchLocation)
 	attackVec.push_back(attackVec_thi);
 
 	Bullet* bullet[2];
-
-	int count = 1;
+	
 	std::string bulletNo[6] = { "1","2","3","4","5","6" };
+	int count = 1;
+	
+
 	//add projectile
 	for (auto i = 0; i < 2; ++i)
 	{
