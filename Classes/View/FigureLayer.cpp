@@ -1,7 +1,7 @@
 #include "FigureLayer.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include"Tool/Tools.h"
 #include "MainScene.h"
@@ -11,6 +11,8 @@ using namespace ui;
 
 
 std::vector<std::string> FigureLayer::heroVec;
+//存放英雄信息传给游戏
+extern std::vector<HeroData> herodataVec;
 
 bool FigureLayer::init()
 {
@@ -65,6 +67,7 @@ void FigureLayer::SetFigures()
 		//马上跟上初始化设定打勾的角色
 		if (name == _figure)
 			_select = Tools::SpriteCreate(figure->getPosition(), "ui/select.png", this);
+		figure->setName(heroVec.at(i - 1));
 		figure->addTouchEventListener([this](Ref* ref, Widget::TouchEventType type)
 			{
 				//这边本来直接在匿名函数里使用了&figure，但是匿名函数在运行的过程中figure已被释放，是要在ref里取出这个按钮
@@ -72,6 +75,10 @@ void FigureLayer::SetFigures()
 				{
 					auto button = dynamic_cast<Button*>(ref);
 					_figure = button->getNormalFile().file;
+					if (herodataVec.size() == 1)
+						herodataVec.at(0) = HeroData(button->getName() + " false", PlistData::getDataByType(PlistData::DataType::ID));
+					else
+						herodataVec.push_back(HeroData(button->getName() + " false", PlistData::getDataByType(PlistData::DataType::ID)));
 					auto distory = RemoveSelf::create();
 					_select->runAction(distory);
 					_select = Tools::SpriteCreate(button->getPosition(), "ui/select.png", this);

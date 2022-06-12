@@ -1,5 +1,5 @@
 #pragma once
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "cocos2d.h"
 #include "HelloWorldScene.h"
@@ -47,7 +47,7 @@ public:
     /**
     * @brief 设置成第一次运行场景
     */
-    void SetFirst(){ _first = true; }
+    void SetFirst() { _first = true; }
 
 private:
 

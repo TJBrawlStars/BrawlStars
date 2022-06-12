@@ -1,7 +1,7 @@
 #include "RoomLayer.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "Tool/SceneManager.h"
 #include"Tool/Tools.h"
@@ -167,13 +167,13 @@ void RoomLayer::SetButton()
 void RoomLayer::SetHero()
 {
 	std::string name;
-	for (auto temp : _humandata)
-	{
-		//这里之后用_humandata.get来获取角色英雄
-		name = "Beiya";
-		name += " false";
-		herodataVec.push_back(HeroData(name, PlistData::getDataByType(PlistData::DataType::ID)));
-	}
+	//for (auto temp : _humandata)
+	//{
+	//	//这里之后用_humandata.get来获取角色英雄
+	//	name = PlistData::getDataByType(;
+	//	name += " false";
+	//	herodataVec.push_back(HeroData(name, PlistData::getDataByType(PlistData::DataType::ID)));
+	//}
 	auto heroVec = HeroFactory::getInstance()->getClassIDVec();
 	srand(time(NULL));
 	for (int i = 0; i < _member.getRobot(); ++i)

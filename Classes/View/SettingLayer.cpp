@@ -1,7 +1,7 @@
 #include "SettingLayer.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "Tool/Setting.h"
 #include"Tool/Tools.h"
@@ -105,6 +105,8 @@ void SettingLayer::Set()
 			{
 				Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 				//这边还要删掉本地账号信息
+				PlistData::reset();
+				MainScene::Reset();
 				Setting::getInstance()->StopSound();
 				Setting::getInstance()->SetLogin(false);
 				SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_MainScene);
