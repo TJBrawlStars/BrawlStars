@@ -21,6 +21,16 @@ private:
     FriendLayer() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
         , _bg(NULL), _back(NULL), _text(NULL) {};
 
+    /**
+    * @brief 接收好友信息
+    */
+    bool RecvFriend();
+
+    /**
+    * @brief 生成好友列表
+    */
+    void addFriend();
+
 private:
 
     const cocos2d::Size kVisibleSize;
@@ -36,6 +46,9 @@ private:
 
     //文本框
     cocos2d::ui::TextField* _text;
+
+    //好友列表
+    std::vector<std::string> _friend;
 
 };
 
