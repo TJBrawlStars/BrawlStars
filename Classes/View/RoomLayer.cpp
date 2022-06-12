@@ -8,7 +8,7 @@ using namespace ui;
 #include"Tool/Setting.h"
 #include"Tool/Data.h"
 #include"FigureLayer.h"
-#include"Tool/Const.h"
+#include"Const/Const.h"
 #pragma execution_character_set("utf-8")  
 
 //存放英雄信息传给游戏
