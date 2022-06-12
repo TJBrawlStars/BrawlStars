@@ -1,8 +1,11 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "Client.h"
+#include"Tool/Data.h"
+using namespace std;
 
 SOCKET Client::_socket = INVALID_SOCKET;
 Client* Client::_client = NULL;
+static std::mutex _mutex;
 
 Client* Client::getInstance(const std::string& ip)
 {
@@ -33,8 +36,13 @@ Client* Client::getInstance(const std::string& ip)
 
 void Client::Close()
 {
-	if (_socket != INVALID_SOCKET)
+	if (_socket != INVALID_SOCKET && _client != NULL)
+	{
+		_socket = INVALID_SOCKET;
+		delete _client;
+		_client = NULL;
 		closesocket(_socket);
+	}
 }
 
 void Client::recvData()
@@ -47,19 +55,48 @@ void Client::recvData()
 			break;
 		//给锁定下作用域
 		{
-			CCLOG("recieve");
+			CCLOG("recieve true");
 			std::lock_guard<std::mutex>lock(_mutex);
-			_msg.push_back(recvBuf);
+			if (recvBuf[0] == '?' && recvBuf[1] == 'F' && recvBuf[2] == 'R')
+				Client::getInstance()->sendData("FRI" + PlistData::getDataByType(PlistData::DataType::Profile)
+					+ ":" + PlistData::getDataByType(PlistData::DataType::Name)
+					+ ":" + PlistData::getDataByType(PlistData::DataType::Cups)
+					+ ":" + PlistData::getDataByType(PlistData::DataType::ID));
+			else
+				_msg.push_back(recvBuf);
 		}
 		Sleep(20);
 	}
-	CCLOG("client down");
+	CCLOG("server down");
+	Close();
+	Socket::close_Socket();
 }
 
 void Client::sendData(const std::string& data)
 {
 	if (INVALID_SOCKET == send(_socket, data.c_str(), kMAX, 0))//最后一个是flag写0即可
 		err("send");
+}
+
+void Client::updateFriend(std::vector<std::string>& data)
+{
+	//智能锁
+	std::lock_guard<std::mutex>lock(_mutex);
+
+	std::vector<std::string>::iterator it = _msg.begin();
+	while (it != _msg.end())
+	{
+		auto poi = (*it).substr(0, 3);
+		if (poi == "FRI")
+		{
+			auto value = (*it).substr(3);
+			data.push_back(value);
+			it = _msg.erase(it);
+			if (it == _msg.end())
+				break;
+		}
+		++it;
+	}
 }
 
 void Client::Start()
@@ -73,12 +110,27 @@ void Client::update(std::vector<std::string>& data)
 	//智能锁
 	std::lock_guard<std::mutex>lock(_mutex);
 
-	for (auto value : _msg)
+
+	std::vector<std::string>::iterator it = _msg.begin();
+	while (it != _msg.end())
+	{
+		auto poi = (*it).substr(0, 3);
+		if (poi == "MSG")
+		{
+			data.push_back(*it);
+			it = _msg.erase(it);
+			if (it == _msg.end())
+				break;
+		}
+		++it;
+	}
+
+	/*for (auto value : _msg)
 	{
 		data.push_back(value);
 		CCLOG(value.c_str());
 	}
-	_msg.clear();
+	_msg.clear();*/
 }
 
 Client::Client(const std::string& ip)
@@ -107,18 +159,18 @@ bool Client::create(const std::string& ip)
 	addr.sin_addr.S_un.S_addr = inet_addr(ip.c_str());
 
 	int retry_times = 0;
-	while (INVALID_SOCKET == connect(client, static_cast<struct sockaddr*>(static_cast<void*>(&addr)), sizeof(addr)) && retry_times < 7)
+	while (INVALID_SOCKET == connect(client, static_cast<struct sockaddr*>(static_cast<void*>(&addr)), sizeof(addr)) && retry_times < 3)
 	{
 		++retry_times;
 		err("retry connect");
 	    
 		//等一会再重连
-		Sleep(500);
-	}
-	if (retry_times == 7)
-	{
-		err("connect fail");
-		return false;
+		Sleep(300);
+		if (retry_times == 3)
+		{
+			err("connect fail");
+			return false;
+		}
 	}
 
 	CCLOG("connect true");

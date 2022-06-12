@@ -5,7 +5,8 @@
 #pragma comment(lib,"ws2_32.lib")
 
 //宏定义一个err，显示问题
-#define err(errMsg) CCLOG(cocos2d::Value(__LINE__).asString().c_str());
+#define err(errMsg) CCLOG(cocos2d::Value(__LINE__).asString().c_str());\
+CCLOG(errMsg);
 
 //使用端口
 constexpr int kPORT = 7777;

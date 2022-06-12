@@ -18,11 +18,14 @@ public:
 	//开始接收内容
 	void Start();
 
-	//获取最新数据
+	//获取最新消息
 	virtual void update(std::vector<std::string>& data);
 
 	//发送内容
 	void sendData(const std::string&);
+
+	//获取最新好友
+	virtual void updateFriend(std::vector<std::string>& data);
 
 private:
 
@@ -42,8 +45,6 @@ private:
 	static SOCKET _socket;
 
 	static Client* _client;
-
-	std::mutex _mutex;
 
 };
 
