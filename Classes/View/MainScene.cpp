@@ -1,7 +1,7 @@
 #include "MainScene.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "LoadingScene.h"
 #include "RoomLayer.h"
@@ -16,6 +16,7 @@ using namespace ui;
 #include "Tool/Data.h"
 #include "Net/Client.h"
 #include "Const/Const.h"
+#include"Factory/HeroFactory.h"
 
 #pragma execution_character_set("utf-8")  
 
@@ -66,6 +67,19 @@ void MainScene::Load()
 				Tools::SwitchScene(_info, Tools::SwitchSceneType::Down);
 			}
 		});
+
+	auto heroVec = HeroFactory::getInstance()->getClassIDVec();
+	auto figurename = PlistData::getDataByType(PlistData::DataType::Figure);
+	for (auto name : heroVec)
+	{
+		if (HeroFactory::getInstance()->createWithClassID(name)->getHeroPicture() == figurename)
+		{
+			if (herodataVec.size() >= 1)
+				herodataVec.at(0) = HeroData(name + " false", PlistData::getDataByType(PlistData::DataType::ID));
+			else
+				herodataVec.push_back(HeroData(name + " false", PlistData::getDataByType(PlistData::DataType::ID)));
+		}
+	}
 }
 
 bool MainScene::init()
