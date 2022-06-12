@@ -37,6 +37,11 @@ public:
     static  MainScene* GetMainScene() { return _that; }
 
     /**
+    * @brief ÷ÿ÷√
+    */
+    static void Reset() { _that = NULL; }
+
+    /**
     * @brief –ﬁ∏ƒÕ∑œÒ
     */
     void SetInfo(const std::string& filename);
@@ -59,8 +64,6 @@ private:
         , _bg(NULL), _loading(NULL), _menu_button(NULL), _info_button(NULL), _play_button(NULL)
         , _figure(NULL), _room(NULL), _menu(NULL), _back(NULL), _changeFigure(NULL), _info(NULL)
         , _friends(NULL) {};
-
-    ~MainScene() { _that = NULL; }
 
     void updateChatBoxPosition();
 
