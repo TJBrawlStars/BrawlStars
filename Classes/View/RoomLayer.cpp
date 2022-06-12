@@ -8,7 +8,10 @@ using namespace ui;
 #include"Tool/Setting.h"
 #include"Tool/Data.h"
 #include"FigureLayer.h"
+#include"Factory/HeroFactory.h"
 #include"Const/Const.h"
+#include<time.h>
+#include <stdlib.h> 
 #pragma execution_character_set("utf-8")  
 
 //存放英雄信息传给游戏
@@ -114,6 +117,13 @@ void RoomLayer::MemberCreate()
 	PlusMemberCreate();
 }
 
+std::string RoomLayer::RandomHero(const std::vector<std::string>& heroID)
+{
+	int num = heroID.size();
+	int a = rand() % num;
+	return heroID.at(a);
+}
+
 void RoomLayer::PlusMemberCreate()
 {
 	for (int i = 1; i <= 9; ++i)
@@ -164,10 +174,12 @@ void RoomLayer::SetHero()
 		name += " false";
 		herodataVec.push_back(HeroData(name, PlistData::getDataByType(PlistData::DataType::ID)));
 	}
+	auto heroVec = HeroFactory::getInstance()->getClassIDVec();
+	srand(time(NULL));
 	for (int i = 0; i < _member.getRobot(); ++i)
 	{
 		//之后这边给机器人随机一个hero吧
-		name = "Beiya";
+		name = RandomHero(heroVec);
 		name += " true";
 		herodataVec.push_back(HeroData(name));
 	}
@@ -212,15 +224,16 @@ void RoomLayer::menuCloseCallback(Ref* pSender)
 					if (type == Widget::TouchEventType::ENDED)
 					{
 						Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
-						_member.setHuman(true);
-						_current->setName("human");
-						_current->setSelectedIndex(2);
+						/*_member.setHuman(true);
+						_current->setName("human");*/
+						_current->setSelectedIndex(0);
 						SetButton();
 					}
 				});
 		}
 		else
 		{
+			item->setSelectedIndex(0);
 			Setting::getInstance()->GoSoundEffect("audio/click_effect.mp3");
 			if (item->getName() == "robot")
 				_member.setRobot(false);

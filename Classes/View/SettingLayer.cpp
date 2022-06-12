@@ -190,6 +190,7 @@ void SettingLayer::TextFieldEvent(Ref* pSender, cocos2d::ui::TextField::EventTyp
 		}
 		else
 		{
+			Client::getInstance()->Close();
 			Socket::close_Socket();
 			_client_menu0->setSelectedIndex(0);
 		}

@@ -3,6 +3,7 @@
 #include "cocos2d.h"
 #include"ui/CocosGUI.h"
 
+class HeroFactory;
 class MainScene;
 
 /**
@@ -25,7 +26,9 @@ private:
 
     //这里不能给std::string赋空指针，草坑死我了,NULL用习惯了，应该是使用了空指针系统不晓得这个string有多长了
     FigureLayer() :kVisibleSize(cocos2d::Director::getInstance()->getVisibleSize())
-        , kNum(2), _bg(NULL), _back(NULL), _figure(""), _select(NULL) {};
+        ,  _bg(NULL), _back(NULL), _figure(""), _select(NULL) 
+    {
+    };
 
     /**
     * @brief 显示现有角色
@@ -34,10 +37,13 @@ private:
 
 private:
 
+    //现有英雄名字
+    static std::vector<std::string> heroVec;
+
     const cocos2d::Size kVisibleSize;
 
     //现有角色个数,在初始化的地方改数值，相当于#define
-    const int kNum;
+    int kNum;
 
     //背景
     cocos2d::Sprite* _bg;

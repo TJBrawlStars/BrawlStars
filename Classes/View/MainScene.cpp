@@ -212,6 +212,7 @@ void MainScene::SetFigure(const std::string& filename)
 	{
 		this->scheduleOnce([this, filename](float dlt)
 			{
+				_figure->removeFromParent();
 				_figure = Tools::ButtonCreateN(kVisibleSize / 2, filename, this);
 				_figure->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 					{
