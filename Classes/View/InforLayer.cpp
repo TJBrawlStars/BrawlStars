@@ -1,7 +1,7 @@
 #include "InforLayer.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "Tool/Setting.h"
 #include"Tool/Tools.h"

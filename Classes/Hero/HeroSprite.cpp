@@ -1,6 +1,7 @@
 //2150266 时天逸
 #include "HeroSprite.h"
 #include "Treasure/TreasureBoxSprite.h"
+#include "exceptions/unexpected_parent.hpp"
 #include <cmath>
 
 USING_NS_CC;
@@ -21,9 +22,13 @@ namespace {
 	}
 }
 
-Hero::Hero(const int originalHP, const int maxAmmo)
-	:_originalHP(originalHP), _maxHealthPoint(originalHP), _healthPoint(originalHP)
-	, _maxAmmo(maxAmmo)
+Hero::Hero(const int originalHP, const int maxAmmo,const Level originalMoveSpeed)
+	:_originalHP(originalHP),
+	_maxHealthPoint(originalHP),
+	_healthPoint(originalHP),
+	_originalMoveSpeed(originalMoveSpeed),
+	_moveSpeed(originalMoveSpeed),
+	_maxAmmo(maxAmmo)
 {
 }
 
@@ -111,6 +116,26 @@ bool Hero::attack(Point target)
 	if (!this->alive())
 		return false;
 
+<<<<<<< HEAD
+	/** modify the ammunition quantity */
+	//judge the ammo number
+	if (!_ammo)
+		return true;
+
+	//check the cool down of attack
+	if (this->isScheduled("attack CD"))
+		return true;
+
+	//modify attributes
+	if (!isScheduled(SEL_SCHEDULE(&Hero::load)))
+		schedule(SEL_SCHEDULE(&Hero::load), 2.0 - static_cast<float>(_loadSpeed) * 0.25);
+	--_ammo;
+	_ammoStrip[_ammo]->setVisible(false);
+
+	//start cool down
+	this->scheduleOnce([](float) {}, 0.5, "attack CD");
+
+=======
 	//modify the ammunition quantity
 	if (!_ammo)
 		return true;
@@ -119,6 +144,7 @@ bool Hero::attack(Point target)
 	--_ammo;
 	_ammoStrip[_ammo]->setVisible(false);
 
+>>>>>>> develop
 	//run the animation
 	return this->attackAnimation(target);
 }
@@ -171,6 +197,11 @@ void Hero::moveStep(Point target)
 	Node* parentScene = nullptr;
 	if (this->getParent()->getName() == "robot" || this->getParent()->getName() == "player")
 		parentScene = this->getParent()->getParent();
+<<<<<<< HEAD
+	else
+		throw unexpected_parent(this->getParent());
+=======
+>>>>>>> develop
 	dynamic_cast<Scene*>(parentScene)->getPhysicsWorld()->queryRect(
 		PhysicsQueryRectCallbackFunc([&contactBarrier](PhysicsWorld& world, PhysicsShape& shape, void* data)->bool
 			{

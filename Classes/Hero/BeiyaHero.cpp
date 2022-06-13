@@ -20,12 +20,11 @@ Beiya* Beiya::create()
 	return new(std::nothrow) Beiya();
 }
 
-Beiya::Beiya() :Hero(3360, 1)
+Beiya::Beiya() :Hero(3360, 1, Level::MEDIUM)
 {
 	_ammo = _maxAmmo;
 	_hitPoint = 1120;
 	_skillHitPoint = 762;
-	_moveSpeed = Level::MEDIUM;
 	_shotRange = Level::HIGH;
 	_loadSpeed = Level::EXTREME_HIGH;
 

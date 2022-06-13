@@ -4,6 +4,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include <random>
 
 #define CLASS_DECLARATION_ACCESS public
 
@@ -23,6 +24,9 @@ CLASS_DECLARATION_ACCESS:
 	public:
 		static Box* createBox();
 
+		/** overrides */
+		virtual const cocos2d::Vec2& getPosition() const override;
+
 		/**
 		* @fn deductHP
 		* @brief deduct hp and update the blood strip. generate diamond if the blood strip is empty
@@ -32,6 +36,13 @@ CLASS_DECLARATION_ACCESS:
 		int deductHP(const int deductPoint);
 
 		int getHP() const noexcept { return _healthPoint; }
+
+		/**
+		* @fn setExist
+		* @brief set the status of box
+		* @param exist: modify the attributes of the node without removing or adding node
+		*/
+		void setExist(bool exist);
 
 	private:
 		/** the initializers */
@@ -55,10 +66,32 @@ CLASS_DECLARATION_ACCESS:
 	public:
 		static Diamond* createDiamond();
 
+		/** overrides */
+		virtual const cocos2d::Vec2& getPosition() const override;
+
+		/**
+		* @fn dropDiamond
+		* @brief drop a diamond close to the point
+		* @details the position of the diamond is automatically set
+		* @warning dont modify the position of the diamond
+		*/
+		static Diamond* dropDiamond(cocos2d::Point dropPoint);
+
+		/**
+		* @fn setExist
+		* @brief set the status of diamond
+		* @param exist: modify the attributes of the node without removing or adding node
+		*/
+		void setExist(bool exist);
+
 	private:
+		/** initializers */
 		Diamond() {}
 		bool initWithFile(const std::string& filename);
 		void initializeDiamondPhysics();
+
+		static std::default_random_engine _diamondRand;
+		static bool _initRand;
 	};
 
 public:

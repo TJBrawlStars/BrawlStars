@@ -2,7 +2,7 @@
 USING_NS_CC;
 using namespace ui;
 //#define NDEBUG
-#include<cassert>
+//#include<cassert>
 #include "Tool/SceneManager.h"
 #include"Tool/Tools.h"
 #include"Tool/Data.h"
@@ -17,10 +17,12 @@ bool SettlementScene::init()
 	if (!Scene::init())
 		return false;
 
+	herodataVec.clear();
+
 	//背景
 	_bg = Tools::SetBg("ui/settlementBg.png", this);
 
-    //继续按钮
+	//继续按钮
 	_continue = Tools::ButtonCreate("继 续", Vec2(kVisibleSize.width / 2, 70), this);
 	_continue->addClickEventListener([](Ref*)
 		{
@@ -40,13 +42,13 @@ void SettlementScene::Win()
 {
 	//读游戏控制器的操作，这边就先直接win叭
 	unsigned int ranking = single.rank(PlistData::getDataByType(PlistData::DataType::ID));
-	assert(ranking <= 10 && ranking >= 1);
+	//assert(ranking <= 10 && ranking >= 1);
 	unsigned int cups = single.find(PlistData::getDataByType(PlistData::DataType::ID))->second->second._trophy;
 
 	//获得奖杯数目
 	auto cupslabel = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f), "获得奖杯", "微软雅黑", 35, this);
 	cupslabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	_cups= Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f), "", "微软雅黑", 35, this);
+	_cups = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2, kVisibleSize.height * 0.9f), "", "微软雅黑", 35, this);
 	_cups->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 
 	//获得金币数量(根据模式不同改变，但只有一个模式就定100叭)
@@ -56,7 +58,7 @@ void SettlementScene::Win()
 	_money->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
 	PlistData::WriteDataByType(PlistData::DataType::Money, Value(Value(PlistData::getDataByType(PlistData::DataType::Money)).asInt() + 100).asString());
 
-	auto label = Tools::LabelCreateTTF(Vec2(kVisibleSize.width / 2 - 450, kVisibleSize.height - 100), "第 " + Value(ranking).asString() + " 名", "fonts/arial.ttf", 75, this);
+	auto label = Tools::LabelCreateSystem(Vec2(kVisibleSize.width / 2 - 450, kVisibleSize.height - 100), "第 " + Value(ranking).asString() + " 名", "微软雅黑", 75, this);
 
 	_cups->setString("   " + Value(cups).asString());
 	PlistData::WriteDataByType(PlistData::DataType::Cups, Value(Value(PlistData::getDataByType(PlistData::DataType::Cups)).asInt() + cups).asString());

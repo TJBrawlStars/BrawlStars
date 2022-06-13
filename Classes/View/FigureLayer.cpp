@@ -1,12 +1,18 @@
 #include "FigureLayer.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include"Tool/Tools.h"
 #include "MainScene.h"
 #include "Tool/Data.h"
+#include"Factory/HeroFactory.h"
 #include"RoomLayer.h"
+
+
+std::vector<std::string> FigureLayer::heroVec;
+//存放英雄信息传给游戏
+extern std::vector<HeroData> herodataVec;
 
 bool FigureLayer::init()
 {
@@ -17,6 +23,11 @@ bool FigureLayer::init()
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = CC_CALLBACK_2(FigureLayer::onTouchBegan, this);
 	Tools::LayerSwallow(listener, this);
+
+	//读取现有heroname信息
+	if (heroVec.size() == 0)
+		heroVec = HeroFactory::getInstance()->getClassIDVec();
+	kNum = heroVec.size();
 
 	//背景
 	_bg = Tools::SetBg(this);
@@ -45,15 +56,18 @@ bool FigureLayer::init()
 void FigureLayer::SetFigures()
 {
 	std::string name;
+	auto heroVec= HeroFactory::getInstance()->getClassIDVec();
 	for (int i = 1; i <= kNum; ++i)
 	{
 		//超过三个换行
-		name = "ui/figure" + Value(i).asString() + ".jpg";
-		auto figure = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2 - (2 - i) * 250, kVisibleSize.height / 2 + 150 - (i - 1) / 3 * 300)
+		name = HeroFactory::getInstance()->createWithClassID(heroVec.at(i - 1))->getHeroPicture();
+		Button* figure;
+		figure = Tools::ButtonCreateN(Vec2(kVisibleSize.width / 2 - (2 - ((i-1)%3+1) ) * 250, kVisibleSize.height / 2 + 150 - (i  - 1) / 3 * 300)
 			, name, this);
 		//马上跟上初始化设定打勾的角色
-		if (Value(i).asString().at(0) == _figure.at(9))
+		if (name == _figure)
 			_select = Tools::SpriteCreate(figure->getPosition(), "ui/select.png", this);
+		figure->setName(heroVec.at(i - 1));
 		figure->addTouchEventListener([this](Ref* ref, Widget::TouchEventType type)
 			{
 				//这边本来直接在匿名函数里使用了&figure，但是匿名函数在运行的过程中figure已被释放，是要在ref里取出这个按钮
@@ -61,6 +75,10 @@ void FigureLayer::SetFigures()
 				{
 					auto button = dynamic_cast<Button*>(ref);
 					_figure = button->getNormalFile().file;
+					if (herodataVec.size() == 1)
+						herodataVec.at(0) = HeroData(button->getName() + " false", PlistData::getDataByType(PlistData::DataType::ID));
+					else
+						herodataVec.push_back(HeroData(button->getName() + " false", PlistData::getDataByType(PlistData::DataType::ID)));
 					auto distory = RemoveSelf::create();
 					_select->runAction(distory);
 					_select = Tools::SpriteCreate(button->getPosition(), "ui/select.png", this);

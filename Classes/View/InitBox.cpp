@@ -1,10 +1,12 @@
+//2152590 О©╫О©╫О©╫О©╫
+
 #include"GameScene.h"
 #include"Treasure/TreasureBoxSprite.h"
-#include<vector>
+
 
 void GameScene::addBox()
 {
-	//╠╕оДкФ╩ЗЁЖожтз╣ьм╪иоё╛╡╩╟Эю╗уо╟╜нО╣дн╩жц
+	//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫з╣О©╫м╪О©╫оёО©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫о╟О©╫О©╫О©╫О©╫н╩О©╫О©╫
 	for (int i = 0; i < 10; ++i)
 	{
 		auto _box = TreasureBox::createTreasureBox();

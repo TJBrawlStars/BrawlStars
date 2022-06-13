@@ -63,6 +63,14 @@ void Box::initializeBloodStrip(const int maxHealthPoint)
 	this->addChild(_bloodStrip);
 }
 
+const Vec2& Box::getPosition() const
+{
+	if (this->getParent()->getName() == "treasure")
+		return this->getParent()->getPosition();
+	else
+		return Node::getPosition();
+}
+
 int Box::deductHP(const int deductPoint)
 {
 	if (deductPoint < 0)
@@ -72,11 +80,23 @@ int Box::deductHP(const int deductPoint)
 	_bloodStrip->setPercent(static_cast<double>(_healthPoint) / _maxHealthPoint * 100);
 
 	if (!_healthPoint) {
-		this->setVisible(false);
-		this->getPhysicsBody()->setCategoryBitmask(0x00);
-		dynamic_cast<TreasureBox*>(this->getParent())->getDiamond()->getPhysicsBody()->setCategoryBitmask(0x08);
-		dynamic_cast<TreasureBox*>(this->getParent())->getDiamond()->setVisible(true);
+		this->setExist(false);
+		dynamic_cast<TreasureBox*>(this->getParent())->getDiamond()->setExist(true);
 	}
 
 	return _healthPoint;
+}
+
+void Box::setExist(bool exist)
+{
+	if (exist) {
+		this->setVisible(true);
+		this->getPhysicsBody()->setCategoryBitmask(0x02);
+		this->setName("box");
+	}
+	else {
+		this->setVisible(false);
+		this->getPhysicsBody()->setCategoryBitmask(0x00);
+		this->setName("null");
+	}
 }
