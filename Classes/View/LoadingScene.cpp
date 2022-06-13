@@ -1,7 +1,7 @@
 #include "LoadingScene.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "Tool/SceneManager.h"
 #include "Tool/Setting.h"
