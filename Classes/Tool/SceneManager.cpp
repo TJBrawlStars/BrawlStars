@@ -7,7 +7,7 @@ SceneManager* SceneManager::getInstance()
 	if (_scene_manager == NULL)
 	{
 		_scene_manager = new SceneManager();
-		//Èİ´í´¦Àí
+		//å®¹é”™å¤„ç†
 		if (_scene_manager)
 		{
 			_scene_manager->autorelease();
@@ -24,7 +24,7 @@ SceneManager* SceneManager::getInstance()
 
 void SceneManager::changeScene(EnumSceneType type, int operate)
 {
-	//¶ÏÑÔ¼ì²éÊäÈë
+	//æ–­è¨€æ£€æŸ¥è¾“å…¥
 	assert(type <= EnumSceneType::en_Max && type >= EnumSceneType::en_Min);
 
 	Director* director = Director::getInstance();

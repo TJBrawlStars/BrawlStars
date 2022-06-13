@@ -63,9 +63,19 @@ list(APPEND GAME_SOURCE
      Classes/View/MainScene.cpp
      Classes/View/RoomLayer.cpp
      Classes/View/SettlementScene.cpp
+     Classes/View/FigureLayer.cpp
+     Classes/View/FriendLayer.cpp
+     Classes/View/InforLayer.cpp
+     Classes/View/MenuLayer.cpp
+     Classes/View/PauseScene.cpp
      Classes/Tool/SceneManager.cpp
+     Classes/Tool/Member.cpp
+     Classes/Tool/Setting.cpp
+     Classes/Tool/Tools.cpp
+     Classes/Tool/Data.cpp
      Classes/Hero/HeroSprite.cpp
      Classes/Hero/BeiyaHero.cpp
+     Classes/Hero/BulletSprite.cpp
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
@@ -75,9 +85,19 @@ list(APPEND GAME_HEADER
      Classes/View/MainScene.h
      Classes/View/RoomLayer.h
      Classes/View/SettlementScene.h
+     Classes/View/FigureLayer.h
+     Classes/View/FriendLayer.h
+     Classes/View/InforLayer.h
+     Classes/View/MenuLayer.h
+     Classes/View/PauseScene.h
      Classes/Tool/SceneManager.h
+     Classes/Tool/Member.h
+     Classes/Tool/Setting.h
+     Classes/Tool/Tools.h
+     Classes/Tool/Data.h
      Classes/Hero/HeroSprite.h
      Classes/Hero/BeiyaHero.h
+     Classes/Hero/BulletSprite.h
      )
 
 if(ANDROID)

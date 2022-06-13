@@ -52,7 +52,6 @@ void GameScene::updateLeaderBoard()
                     ++count;
             }
         }
-        //_heroVec.clear();
         SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_SettlementScene);
     }
 }
