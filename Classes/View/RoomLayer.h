@@ -42,6 +42,11 @@ private:
 	void MemberCreate();
 
 	/**
+    * @brief 设给机器人随机英雄
+    */
+	std::string RandomHero(const std::vector<std::string>&);
+
+	/**
 	* @brief 9个+框
 	*/
 	void PlusMemberCreate();

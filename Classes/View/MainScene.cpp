@@ -1,7 +1,7 @@
 #include "MainScene.h"
 USING_NS_CC;
 using namespace ui;
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "LoadingScene.h"
 #include "RoomLayer.h"
@@ -14,6 +14,10 @@ using namespace ui;
 #include "MenuLayer.h"
 #include "FriendLayer.h"
 #include "Tool/Data.h"
+#include "Net/Client.h"
+#include "Const/Const.h"
+#include"Factory/HeroFactory.h"
+
 #pragma execution_character_set("utf-8")  
 
 MainScene* MainScene::_that = NULL;
@@ -63,6 +67,19 @@ void MainScene::Load()
 				Tools::SwitchScene(_info, Tools::SwitchSceneType::Down);
 			}
 		});
+
+	auto heroVec = HeroFactory::getInstance()->getClassIDVec();
+	auto figurename = PlistData::getDataByType(PlistData::DataType::Figure);
+	for (auto name : heroVec)
+	{
+		if (HeroFactory::getInstance()->createWithClassID(name)->getHeroPicture() == figurename)
+		{
+			if (herodataVec.size() >= 1)
+				herodataVec.at(0) = HeroData(name + " false", PlistData::getDataByType(PlistData::DataType::ID));
+			else
+				herodataVec.push_back(HeroData(name + " false", PlistData::getDataByType(PlistData::DataType::ID)));
+		}
+	}
 }
 
 bool MainScene::init()
@@ -71,6 +88,23 @@ bool MainScene::init()
 		return false;
 
 	_that = this;
+	/*******************************聊天框************************************/
+
+	//创建键盘监听器
+	_gmlistenerKeyBoard = EventListenerKeyboard::create();
+	//绑定监听事件
+	_gmlistenerKeyBoard->onKeyPressed = CC_CALLBACK_2(MainScene::onPressKey, this);
+	_gmlistenerKeyBoard->onKeyReleased = CC_CALLBACK_2(MainScene::onReleaseKey, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(_gmlistenerKeyBoard, this);
+
+	//聊天框
+	_chatBox = ChatBox::create();
+	_chatBox->setAnchorPoint(Vec2::ANCHOR_BOTTOM_RIGHT);
+	this->addChild(_chatBox);
+	_chatBox->setGlobalZOrder(kFightUI);
+	_chatBox->setVisible(false);
+	/*******************************聊天框************************************/
+
 	//初始化Tools
 	Tools::set();
 
@@ -151,12 +185,39 @@ bool MainScene::init()
 		{
 			if (type == Widget::TouchEventType::ENDED)
 			{
+				_countButton++;
+
+				if (_countButton % 2 == 1)
+				{
+					_chatBox->setVisible(true);
+				}
+				else
+				{
+					_chatBox->setVisible(false);
+				}
 				//聊天系统，这边做一个聊天的侧边栏叭
 			}
 		});
 
+	this->scheduleUpdate();
+
 	CCLOG("main finish");
 	return true;
+}
+
+void MainScene::updateChatBoxPosition()
+{
+	{
+		auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
+
+		//聊天框
+		_chatBox->setPosition(190,80);
+	}
+}
+
+void MainScene::update(float dt)
+{
+	updateChatBoxPosition();
 }
 
 void MainScene::SetFigure(const std::string& filename)
@@ -165,6 +226,7 @@ void MainScene::SetFigure(const std::string& filename)
 	{
 		this->scheduleOnce([this, filename](float dlt)
 			{
+				_figure->removeFromParent();
 				_figure = Tools::ButtonCreateN(kVisibleSize / 2, filename, this);
 				_figure->addTouchEventListener([this](Ref*, Widget::TouchEventType type)
 					{
@@ -184,3 +246,31 @@ std::string MainScene::GetFigure() const
 {
 	return _figure->getNormalFile().file;
 }
+
+bool MainScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	if (_countButton % 2 == 1)
+	{
+		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER)
+		{
+			_chatBox->enterToUpdateMessage();
+		}
+		else if (keyCode == EventKeyboard::KeyCode::KEY_BACKSPACE)
+		{
+			_chatBox->backspaceTodateMessage();
+		}
+		else
+		{
+			_chatBox->updateMessage(ChatBox::switchKeycodeToChar(keyCode));
+		}
+	}
+
+	return true;
+}
+
+bool MainScene::onReleaseKey(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	return false;
+}
+
+int MainScene::_countButton = 0;

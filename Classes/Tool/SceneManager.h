@@ -1,5 +1,5 @@
 #pragma once
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "cocos2d.h"
 #include "HelloWorldScene.h"
