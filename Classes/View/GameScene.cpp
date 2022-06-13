@@ -8,27 +8,6 @@ bool GameScene::init()
 	if (!Scene::init() || !Scene::initWithPhysics())
 		return false;
 
-	//物理检测红框
-	//this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
-
-
-	//这是王佳垚写的，我先停掉了，停在我这个地图界面
-
-	/*auto label = Label::createWithSystemFont("游戏界面", "方正姚体", 50);
-	assert(label);
-	label->setPosition(kVisibleSize.x / 2, kVisibleSize.y / 2 - 100);
-	this->addChild(label);
-
-	auto _continue = Button::create("CloseNormal.png");
-	assert(_continue);
-	_continue->setPosition(kVisibleSize / 2);
-	this->addChild(_continue);
-	_continue->addClickEventListener([](Ref*)
-		{
-			SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_SettlementScene);
-		});*/
-
-
 	//初始化地图
 	addMap(cocos2d::random(1,3)); 
 	//初始化障碍层
@@ -42,7 +21,7 @@ bool GameScene::init()
 	//添加毒圈
 	addPoisonCircle();
 	//添加计时器
-	addTimer();
+	//addTimer();
 	//添加聊天室
 	addChatBox();
 	//添加物理引擎碰撞检测
@@ -66,12 +45,16 @@ void GameScene::update(float dt)
 	setViewPointByPlayer(_player->getPosition());
 
 	//更新 计时器 聊天室
-	updateMyTimerPosition();
+	//updateMyTimerPosition();
 	updateChatBoxPosition();
+	updateLeaderBoard();
+	//grassPlayerOpacity();
 
-	auto pos = _player->getPosition();
-	//log("ssx:%f", pos.x);
-	//log("ssy:%f", pos.y);
+	//if (!_player->alive())
+	//{
+	//	SceneManager::getInstance()->changeScene(SceneManager::EnumSceneType::en_SettlementScene);
+	//}
+
 	if (poisonCircleDown->getPosition().y > poisonCircleMax / 2)
 	{
 		poisonCircleDown->setPosition(poisonCircleDown->getPosition().x, poisonCircleDown->getPosition().y - poisonCircleMarch);

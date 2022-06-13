@@ -1,5 +1,5 @@
 #pragma once
-//#define NDEBUG
+#define NDEBUG
 #include<cassert>
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
@@ -7,7 +7,7 @@
 #include "Tool/MapInfo.h"
 #include "Hero/HeroSprite.h"
 #include "Hero/BeiyaHero.h"
-#include "Tool/Timer.h"
+//#include "Tool/Timer.h"
 #include "Participant/PlayerParticipant.h"
 #include "Participant/ParticipantNode.h"
 #include "Tool/ChatBox.h"
@@ -130,12 +130,15 @@ public:
 
     void updateMyTimerPosition();
     void updateChatBoxPosition();
-
+    void updateLeaderBoard();
 
     
 
-    //鼠标点击事件
+    //鼠标点击事件(仅用于)
     virtual bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+
+
+
     //按键事件
     virtual bool onPressKey(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     virtual bool onReleaseKey(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
@@ -150,9 +153,11 @@ private:
     //监听器
     cocos2d::EventListenerTouchOneByOne* _gmlistenerTouch;
     cocos2d::EventListenerKeyboard* _gmlistenerKeyBoard;
-
     //聊天框是否开启
     bool _isChatboxOpen;
+
+
+
 
     //地图信息（initMap()函数初始化了里面的变量）
     MapInfo _mapinfo;
@@ -169,7 +174,7 @@ private:
     //聊天框按钮
     cocos2d::Sprite* _chatboxSwitch;
     //计时器系统
-    MyTimer* _timer;
+    //MyTimer* _timer;
     //聊天框
     ChatBox* _chatBox;
     //物理引擎初始化判断
