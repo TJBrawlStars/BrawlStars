@@ -13,24 +13,24 @@ extern std::vector<HeroData> herodataVec;
 /**
 * @brief 初始化计时器
 */
-void GameScene::addTimer()
-{
-	_timer = MyTimer::create();
-	this->addChild(_timer, kTimerPriority);
-
-}
-
-void GameScene::updateMyTimerPosition()
-{
-	auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
-
-	cocos2d::Label* tmptimerInfo = _timer->getMyTimerInfo();
-	cocos2d::Sprite* tmptimerInfoBG = _timer->getMyTimerInfoBG();
-
-	tmptimerInfoBG->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(-visibleSize.width / 2, visibleSize.height / 2));
-	tmptimerInfo->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(55 - visibleSize.width / 2, visibleSize.height / 2));
-	tmptimerInfo->setString((_timer->getHour() + ":" + _timer->getMinute() + ":" + _timer->getSecond()));
-}
+//void GameScene::addTimer()
+//{
+//	_timer = MyTimer::create();
+//	this->addChild(_timer, kTimerPriority);
+//
+//}
+//
+//void GameScene::updateMyTimerPosition()
+//{
+//	auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
+//
+//	cocos2d::Label* tmptimerInfo = _timer->getMyTimerInfo();
+//	cocos2d::Sprite* tmptimerInfoBG = _timer->getMyTimerInfoBG();
+//
+//	tmptimerInfoBG->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(-visibleSize.width / 2, visibleSize.height / 2));
+//	tmptimerInfo->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(55 - visibleSize.width / 2, visibleSize.height / 2));
+//	tmptimerInfo->setString((_timer->getHour() + ":" + _timer->getMinute() + ":" + _timer->getSecond()));
+//}
 
 
 /********************************** 聊天室 *****************************************/
@@ -52,7 +52,6 @@ void GameScene::addChatBox()
 	this->addChild(_chatBox);
 	_chatBox->setGlobalZOrder(kFightUI);
 	_chatBox->setVisible(false);
-	_chatBox->setDefaultHeroName(herodataVec[0].heroID);
 }
 
 void GameScene::updateChatBoxPosition()
@@ -74,14 +73,6 @@ bool GameScene::onTouchBegan(Touch* touch, Event* event)
 {
 	Rect worldchatboxSwitch = Rect(_chatboxSwitch->getPosition().x-46, _chatboxSwitch->getPosition().y, 46, 41);
 	auto touchlocation = _player->convertToNodeSpace(touch->getLocation());
-
-	//log("rect.x=%f", worldchatboxSwitch.getMinX());
-	//log("rect.x=%f", worldchatboxSwitch.getMaxX());
-	//log("rect.y=%f", worldchatboxSwitch.getMinY());
-	//log("rect.y=%f", worldchatboxSwitch.getMaxY());
-	//log("touchlocation.x=%f", touchlocation.x);
-	//log("touchlocation.y=%f", touchlocation.y);
-
 
 	//点中框了
 	if (worldchatboxSwitch.containsPoint(touchlocation))
@@ -106,7 +97,11 @@ bool GameScene::onPressKey(EventKeyboard::KeyCode keyCode, Event* event)
 	{
 		if (keyCode == EventKeyboard::KeyCode::KEY_ENTER)
 		{
-			log("ss");
+			_chatBox->enterToUpdateMessage(); 
+		} 
+		else if (keyCode == EventKeyboard::KeyCode::KEY_BACKSPACE)
+		{
+			_chatBox->backspaceTodateMessage();
 		}
 		else
 		{

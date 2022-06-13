@@ -197,6 +197,7 @@ bool GameScene::isGrassExist(cocos2d::Point position)
     return false;
 }
 
+
 Vector<Sprite*> GameScene::getGrass()
 {
     return _grass;
