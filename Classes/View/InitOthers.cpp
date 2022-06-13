@@ -13,24 +13,24 @@ extern std::vector<HeroData> herodataVec;
 /**
 * @brief 初始化计时器
 */
-void GameScene::addTimer()
-{
-	_timer = MyTimer::create();
-	this->addChild(_timer, kTimerPriority);
-
-}
-
-void GameScene::updateMyTimerPosition()
-{
-	auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
-
-	cocos2d::Label* tmptimerInfo = _timer->getMyTimerInfo();
-	cocos2d::Sprite* tmptimerInfoBG = _timer->getMyTimerInfoBG();
-
-	tmptimerInfoBG->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(-visibleSize.width / 2, visibleSize.height / 2));
-	tmptimerInfo->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(55 - visibleSize.width / 2, visibleSize.height / 2));
-	tmptimerInfo->setString((_timer->getHour() + ":" + _timer->getMinute() + ":" + _timer->getSecond()));
-}
+//void GameScene::addTimer()
+//{
+//	_timer = MyTimer::create();
+//	this->addChild(_timer, kTimerPriority);
+//
+//}
+//
+//void GameScene::updateMyTimerPosition()
+//{
+//	auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
+//
+//	cocos2d::Label* tmptimerInfo = _timer->getMyTimerInfo();
+//	cocos2d::Sprite* tmptimerInfoBG = _timer->getMyTimerInfoBG();
+//
+//	tmptimerInfoBG->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(-visibleSize.width / 2, visibleSize.height / 2));
+//	tmptimerInfo->setPosition(this->destPos(this->getHero()->getPosition()) + cocos2d::Vec2(55 - visibleSize.width / 2, visibleSize.height / 2));
+//	tmptimerInfo->setString((_timer->getHour() + ":" + _timer->getMinute() + ":" + _timer->getSecond()));
+//}
 
 
 /********************************** 聊天室 *****************************************/

@@ -38,15 +38,23 @@ void GameScene::addHeroPlayer()
 		Participant* player;
 		if (isRobot == "true")
 		{
-			player = Robot::createWithHeroID(heroname);
+			player = Robot::createWithHeroID(heroname); 
+			herodataVec[i].heroID = "robot" + std::to_string(i); 
 		}
 		else if (isRobot == "false")
 		{
 			player = Player::createWithHeroID(heroname);
 		}
 
+		std::string id = herodataVec[i].heroID;
+		CCLOG(id.c_str());
+
 		_heroVec.push_back(player);
-		player->setPosition(_tenPosition[tenRandVector[i]]);
+		if (i == 0)
+			player->setPosition(400, 200);
+		else
+		    player->setPosition(_tenPosition[i]); 
+
 		this->addChild(player, kHeroPriority, i + 10);
 
 		//льепжВ╫г
