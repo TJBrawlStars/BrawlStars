@@ -3,6 +3,7 @@ USING_NS_CC;
 using namespace ui;
 //#define NDEBUG
 #include<cassert>
+#include"Factory/HeroFactory.h"
 #pragma execution_character_set("utf-8") 
 
 bool PlistData::_exit = false;
@@ -82,11 +83,12 @@ void PlistData::WriteDataByType(DataType type, const std::string& data)
 
 ValueMap& PlistData::initData(const std::string& id)
 {
+	auto name = HeroFactory::getInstance()->createWithClassID("Beiya")->getHeroPicture();
 	_map.insert(std::make_pair("ID", id));
 	_map.insert(std::make_pair("Name", "¿ÕÏÒĞ¡½ãµÄÃ¨Ã¨"));
 	_map.insert(std::make_pair("Profile", "ui/info1.png"));
 	_map.insert(std::make_pair("Cups", "0"));
 	_map.insert(std::make_pair("Money", "0"));
-	_map.insert(std::make_pair("Figure", "ui/figure1.jpg"));
+	_map.insert(std::make_pair("Figure", name));
 	return _map;
 }
